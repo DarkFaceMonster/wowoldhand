@@ -1,0 +1,75 @@
+﻿<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\..\FrameXML\UI.xsd">
+	<script file="ShamanApi.lua"/>
+    <Script file="Shaman.lua"/>	
+<!-- COLORs FRAME -->
+<Button name="ShamanColorRectangle" frameStrata="LOW" movable="false">
+		<Size>
+			<AbsDimension x="21" y="21"/>
+		</Size>
+		<Color a="1" r="1" g="1" b="1" />
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT">
+  			<Offset>
+  				<AbsDimension x="-3" y="3"/>
+  			</Offset>
+			</Anchor>
+		</Anchors>		
+  	<NormalTexture name="$parentNormalTexture" file="Interface\ChatFrame\ChatFrameColorSwatch">
+  	  <Color a="1" r="1" g="1" b="1" />
+  	</NormalTexture>
+  	<Scripts>
+  		<OnLoad>	
+  		  self:RegisterForDrag("RightButton");
+  			Shaman_RegisterEvents(self);
+  		</OnLoad>
+  		<OnUpdate>
+  			Shaman_Frame_OnUpdate();
+  		</OnUpdate>		
+  		<OnEvent>
+  			if (event == "COMBAT_LOG_EVENT_UNFILTERED") then
+  				Shaman_CombatLogEvent(event, ...);
+  			else
+  				Shaman_OnEvent(event, arg1, arg2, arg3);		
+  			end
+  		</OnEvent>			
+  	</Scripts>  
+</Button>
+
+<Button name="Shaman_MSG_Frame" frameStrata="LOW" movable="true">
+	<Size>
+		<AbsDimension x="120" y="21"/>
+	</Size>
+	<Anchors>
+		<Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT">
+			<Offset>
+				<AbsDimension x="22" y="0"/>
+			</Offset>
+		</Anchor>
+	</Anchors>
+	<Layers>
+		<Layer level="OVERLAY">
+			<FontString name="Shaman_MSG_Text" inherits="GameFontNormalSmall" justifyH="LEFT" text="" virtual="true">
+				<Size>
+					<AbsDimension x="116" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset x="0" y="0"/>
+					</Anchor>
+				</Anchors>
+				<FontHeight>
+					<AbsValue val="13"/>
+				</FontHeight>
+			    <Color r="1" g="1" b="1"/>			
+			</FontString>
+		</Layer>		
+	</Layers>	
+	<Scripts>
+		<OnUpdate>
+			--Shaman_Msg_OnUpdate();
+		</OnUpdate>		
+	</Scripts>  
+</Button>
+	<GameTooltip name="ShamanTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
+</Ui>

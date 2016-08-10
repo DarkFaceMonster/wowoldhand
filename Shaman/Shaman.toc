@@ -1,0 +1,7 @@
+﻿## Interface: 30200
+## Author: oldhand
+## Title: 智能施法插件(萨满祭司版)
+## Notes: 智能施法插件(萨满祭司版)
+## SavedVariables: Shaman_SaveData
+## Version: 3.2.2.2552
+Shaman.xml

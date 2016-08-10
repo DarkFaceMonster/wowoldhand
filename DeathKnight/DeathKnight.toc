@@ -1,0 +1,8 @@
+﻿## Interface: 30300
+## Author: oldhand
+## Title: 智能施法插件(死亡骑士版)
+## Notes: 智能施法插件(死亡骑士版)
+## SavedVariables: DeathKnight_SaveData, Oldhand_ImmuneSpell, DeathKnight_ActionTable
+## Version: 3.3.5.1552
+
+DeathKnight.xml

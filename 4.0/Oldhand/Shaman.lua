@@ -242,7 +242,7 @@ function Shaman_BreakCasting(myspell)
 	return 0;
 end
 
-function Shaman_TestPlayerDebuff(unit)
+function Oldhand_TestPlayerDebuff(unit)
   --local healthPercent, maxHealth = Shaman_GetPlayerHealthPercent(unit);
 	--if healthPercent < 40 then return 0; end;
 	local i = 1;
@@ -883,7 +883,7 @@ function Shaman_BreakCast(LossHealth)
 end
 
 function Shaman_playerSafe()
-	local debufftype = Shaman_TestPlayerDebuff("player");
+	local debufftype = Oldhand_TestPlayerDebuff("player");
 --	if debufftype==3 or debufftype==2 then
 --		if Oldhand_CastSpell("驱毒术","Spell_Nature_NullifyPoison") then return true; end;
 --	end

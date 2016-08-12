@@ -534,53 +534,6 @@ function Oldhand_CastSpell_IgnoreRange(text, texture)
 	return false;
 end
 
--- 不考虑距离
-function Oldhand_CastSpellIgnoreRange(text, texture)
-	for i = 61, 72 do
-		if ( HasAction(i) ) then
-			local temptexture = GetActionTexture(i);
-			if temptexture == texture then
-				if Oldhand_CanUseAction(i) then
-					Oldhand_SetText(text, i - 48);
-					return true;
-				end
-			end
-		end
-	end
-	for i = 1, 12 do
-		if ( HasAction(i) ) then
-			local temptexture = GetActionTexture(i);
-			if temptexture == texture then
-				if Oldhand_CanUseAction(i) then
-					Oldhand_SetText(text, i);
-					return true;
-				end
-			end
-		end
-	end
-	return false;
-end
-
-function Oldhand_CastSpellByIdIgnoreRange(text, i)
-  -- Oldhand_AddMessage("CastSpellByIdIgnoreRange.."..text..": "..i);
-  if i > 0 then
-		if ( HasAction(i) ) then
-		  --Oldhand_AddMessage("CastSpellByIdIgnoreRange..HasAction");
-			if Oldhand_CanUseAction(i) then
-			  --Oldhand_AddMessage("CastSpellByIdIgnoreRange..CanUseAction");
-				local index = i;
-				if (i >= 61 and i<=72) then
-					index = i - 48;
-				end
-				Oldhand_SetText(text, index);
-				return true;
-			end
-		end
-	end
-
-	return false;
-end
-
 function Oldhand_CastSpellById_IgnoreRange(text, i)
 	if i > 0 then
 		if HasAction(i) then

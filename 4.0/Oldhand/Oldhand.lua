@@ -5,12 +5,16 @@ Oldhand_PlayerTalentInfoDatas = {};
 
 local dynamicMicroID = 72;
 local playerClass;
+local englishClass;
 local Oldhand_DPS = 2; -- 默认天赋2，比如萨满1元素，2增强，3治疗
 local Oldhand_Old_UnitPopup_OnClick;
 local Oldhand_AutoFollowName="";
 local TestHelpTarget = "";
 local target_count = 0;		-- 目标个数
 local target_table = {};
+local is_valid_class = false; -- 是否有效职业
+
+local oldhand_dps_module = {};
 
 local   Oldhand_DISEASE = '疾病';
 local 	Oldhand_MAGIC   = '魔法';
@@ -90,9 +94,9 @@ local Oldhand_SKIP_BY_CLASS_LIST = {
 		};
 	};
 
-local spell_table = {};
---spell_table["临近风暴之怒"] = 72;
---spell_table["大副的怀表"] = 71;
+oldhand_spell_table = {};
+--oldhand_spell_table["临近风暴之怒"] = 72;
+--oldhand_spell_table["大副的怀表"] = 71;
 
 -- 获取玩家当前天赋
 function Oldhand_AutoSelectMode()
@@ -112,7 +116,7 @@ function Oldhand_BreakCasting(myspell)
 	    --DeathKnight_AddMessage(string.format("目标 正在施放 %s 。。。无法打断", spell));
 	    return 0;
 	  else
-	    DeathKnight_AddMessage(string.format("目标 正在施放 %s 。。。", spell));
+--	    DeathKnight_AddMessage(string.format("目标 正在施放 %s 。。。", spell));
 	  end;
 	  currTargetCasting = spell;
 	end;
@@ -198,14 +202,28 @@ function Oldhand_TestPlayerDebuff(unit)
 end
 
 function Oldhand_RegisterEvents(self)
-	local englishClass;
 	playerClass, englishClass = UnitClass("player");
-	if playerClass=="战士" and Warrior_DpsOut1==nil and Warrior_DpsOut2==nil and Warrior_DpsOut3==nil then return; end;
-	if not (playerClass=="萨满祭司") then
-			HideUIPanel(Oldhand_MSG_Frame);
-			HideUIPanel(OldhandColorRectangle);
-			return;
+	
+	if playerClass=="死亡骑士" and (DeathKnight_DpsOut1 ~= nil and DeathKnight_DpsOut2 ~= nil and DeathKnight_DpsOut3 ~= nil) then
+	  is_valid_class = true;
+	  oldhand_dps_module[englishClass] =  DeathKnight_DpsOut;
 	end;
+  if playerClass=="战士" and (Warrior_DpsOut1 ~= nil and Warrior_DpsOut2 ~= nil and Warrior_DpsOut3 ~= nil) then
+    is_valid_class = true;
+    oldhand_dps_module[englishClass] = Warrior_DpsOut;
+  end;
+  if playerClass=="萨满祭司" and (Shaman_DpsOut1 ~= nil and Shaman_DpsOut2 ~= nil and Shaman_DpsOut3 ~= nil) then 
+    is_valid_class = true;
+    oldhand_dps_module[englishClass] = Shaman_DpsOut;
+  end;
+  
+	if not is_valid_class then return; end;
+	
+	--if not (playerClass=="萨满祭司") then
+	--		HideUIPanel(Oldhand_MSG_Frame);
+	--		HideUIPanel(OldhandColorRectangle);
+	--		return;
+	--end;
 	self:RegisterEvent("PLAYER_ENTERING_WORLD");
 	self:RegisterEvent("UI_ERROR_MESSAGE");
 	self:RegisterEvent("PLAYER_TARGET_CHANGED");
@@ -242,9 +260,11 @@ function Oldhand_UnitPopup_OnClick()
 	end
 end
 function Oldhand_OnEvent(event)
-  if playerClass=="死亡骑士" and (DeathKnight_DpsOut1 == nil and DeathKnight_DpsOut2 == nil and DeathKnight_DpsOut3 == nil) then return; end;
-  if playerClass=="战士" and (Warrior_DpsOut1 == nil and Warrior_DpsOut2 == nil and Warrior_DpsOut3 == nil) then Oldhand_AddMessage("没有战士职业插件"); return; end;
-	if not (playerClass=="萨满祭司") then return; end;
+  if not is_valid_class then
+    Oldhand_AddMessage("没有 "..playerClass.." 职业插件");
+    return;
+  end;
+
 	if (event=="PLAYER_ENTERING_WORLD") then
 		Oldhand_Data = {};
 		Oldhand_Data[UnitName("player")] = {
@@ -264,12 +284,12 @@ function Oldhand_OnEvent(event)
 			return;
 		end;
 		if UnitIsPlayer("target") then
-		        local MaxTalents = 0;
+		  local MaxTalents = 0;
 			for t=1, GetNumTalentTabs(true) do
-			    local __,__,Talents = GetTalentTabInfo(t,true);
-			    if Talents > MaxTalents then
-				   MaxTalents = Talents
-			    end
+		    local __,__,Talents = GetTalentTabInfo(t,true);
+		    if Talents > MaxTalents then
+			    MaxTalents = Talents
+		    end
 			end
 
 			for s=1, GetNumTalentTabs(true) do
@@ -298,7 +318,6 @@ function Oldhand_OnEvent(event)
 		end
 		return;
 	end;
-
 
 	if (event=="PLAYER_TARGET_CHANGED") then
 		if not UnitExists("playertarget") then
@@ -335,6 +354,7 @@ function Oldhand_GetPlayerTalent(playername)
 	end
 	return false;
 end
+
 function Oldhand_CreateMacro()
 	if GetMacroIndexByName("打断施法") == 0 then
 		CreateMacro("打断施法", 67, "/stopcasting", 1, 1);
@@ -361,66 +381,33 @@ function Oldhand_CreateMacro()
 	PlaceAction(49);
 	ClearCursor();
 	if Oldhand_DPS == 2 then
-		if GetMacroIndexByName("增强模式") == 0 then
-			CreateMacro("增强模式", 62, "/script Oldhand_Input(1);", 0, 0);
+		if GetMacroIndexByName("天赋1模式") == 0 then
+			CreateMacro("天赋1模式", 62, "/script Oldhand_Input(1);", 0, 0);
 		end;
-		PickupMacro("增强模式");
+		PickupMacro("天赋2模式");
 	elseif Oldhand_DPS == 1 then
-		if GetMacroIndexByName("元素模式") == 0 then
-			CreateMacro("元素模式", 62, "/script Oldhand_Input(1);", 0, 0);
+		if GetMacroIndexByName("天赋2模式") == 0 then
+			CreateMacro("天赋2模式", 62, "/script Oldhand_Input(1);", 0, 0);
 		end;
-		PickupMacro("元素模式");
+		PickupMacro("天赋2元素模式");
 	elseif Oldhand_DPS == 3 then
-		if GetMacroIndexByName("治疗模式") == 0 then
-			CreateMacro("治疗模式", 62, "/script Oldhand_Input(1);", 0, 0);
+		if GetMacroIndexByName("天赋3模式") == 0 then
+			CreateMacro("天赋3模式", 62, "/script Oldhand_Input(1);", 0, 0);
 		end;
-		PickupMacro("治疗模式");
+		PickupMacro("天赋3模式");
 	end
 	PlaceAction(50);
 	ClearCursor();
 
   Oldhand_PutAction("自动攻击", 1);
-  Oldhand_PutAction("治疗之涌", 7);
-  Oldhand_PutAction("先祖之魂", 11);
-
-  Oldhand_PutAction("嗜血", 62);
-  Oldhand_PutAction("星界转移", 63);
-  Oldhand_PutAction("风剪", 64);
-  Oldhand_PutAction("陷地图腾", 65);
-  Oldhand_PutAction("净化术", 69);
-  Oldhand_PutAction("净化灵魂", 70);
-
-  if Oldhand_DPS == 1 then
-    Oldhand_PutAction("闪电箭", 2);
-    Oldhand_PutAction("烈焰震击", 3);
-    Oldhand_PutAction("熔岩爆裂", 4);
-    Oldhand_PutAction("大地震击", 5);
-    Oldhand_PutAction("冰霜震击", 6);
-    Oldhand_PutAction("闪电链", 8);
-    Oldhand_PutAction("雷霆风暴", 9);
-    Oldhand_PutAction("元素冲击", 10);
-
-    Oldhand_PutAction("图腾掌握", 12);
-
-
-    Oldhand_PutAction("震地图腾", 66);
-    Oldhand_PutAction("土元素", 67);
-    Oldhand_PutAction("火元素", 68);
-  elseif Oldhand_DPS == 2 then
-    Oldhand_PutAction("火舌", 2);
-    Oldhand_PutAction("石拳", 3);
-    Oldhand_PutAction("冰封", 4);
-    Oldhand_PutAction("熔岩猛击", 5);
-    Oldhand_PutAction("风暴打击", 6);
-    Oldhand_PutAction("闪电箭", 8);
-    Oldhand_PutAction("毁灭闪电", 9);
-
-    Oldhand_PutAction("野性狼魂", 66);
-    Oldhand_PutAction("降雨", 67);
-    Oldhand_PutAction("幽魂步", 68);
-  elseif Oldhand_DPS == 3 then
-
-  end;
+  
+  if playerClass == "萨满祭司" then
+    Shaman_CreateMacro();
+  elseif playerClass == "死亡骑士" then
+    DeathKnight_CreateMacro();
+  elseif playerClass == "战士" then
+    Warrior_CreateMacro();
+  end
 
 	if Oldhand_TestTrinket("部落勋章") then
 		Oldhand_PutAction("部落勋章", 71);
@@ -483,10 +470,10 @@ function Oldhand_PutAction(text, index)
 	if Oldhand_PickupSpellByBook(text) then
 		PlaceAction(index);
 		ClearCursor();
-		spell_table[text] = index;
+		oldhand_spell_table[text] = index;
 		return true;
 	end;
-	spell_table[text] = 0;
+	oldhand_spell_table[text] = 0;
 	return false;
 end;
 
@@ -587,14 +574,17 @@ end;
 function Oldhand_Input(i)
 	Oldhand_DPS = Oldhand_DPS + 1;
 	if (Oldhand_DPS > 3) then Oldhand_DPS = 1; end;
-
-	if Oldhand_DPS == 1 then
-		Oldhand_AddMessage("进入元素模式(PVP适用)...");
-	elseif Oldhand_DPS == 2 then
-		Oldhand_AddMessage("进入增强模式(PVP适用)...");
-	else
-		Oldhand_AddMessage("进入治疗模式...");
-	end
+	
+  Oldhand_AddMessage(playerClass.."进入天赋"..Oldhand_DPS.."模式(PVP适用)...");
+  return;
+  
+	--if Oldhand_DPS == 1 then
+	--	Oldhand_AddMessage("进入元素模式(PVP适用)...");
+	--elseif Oldhand_DPS == 2 then
+	--	Oldhand_AddMessage("进入增强模式(PVP适用)...");
+	--else
+	--	Oldhand_AddMessage("进入治疗模式...");
+	--end
 end;
 
 function Oldhand_Msg_OnUpdate()
@@ -624,7 +614,7 @@ function Oldhand_Msg_OnUpdate()
 end;
 
 function Oldhand_Frame_OnUpdate()
-	if playerClass~="萨满祭司" then return; end;
+	if not is_valid_class then return; end;
 
 	--if(ChatFrameEditBox:IsVisible()) then
 	local activeWindow = ChatEdit_GetActiveWindow();
@@ -689,21 +679,34 @@ function Oldhand_Frame_OnUpdate()
 	end;
 
 	if UnitAffectingCombat("player") or IsCurrentAction(Oldhand_Auto_Attack()) then
-	  --Oldhand_AddMessage("Oldhand_DPS = "..Oldhand_DPS);
-
-		if Oldhand_DPS == 1 then
-			Oldhand_DpsOut1();
-		elseif Oldhand_DPS == 2 then
-			Oldhand_DpsOut2();
-		else
-			Oldhand_DpsOut3();
-		end
+	  if playerClass == "萨满祭司" then
+	    Shaman_DpsOut(Oldhand_DPS);
+	  elseif playerClass == "死亡骑士" then
+	    DeathKnight_DpsOut(Oldhand_DPS);
+	  elseif playerClass == "战士" then
+	    Warrior_DpsOut(Oldhand_DPS);
+	  end;
+	  --oldhand_dps_module[englishClass](Oldhand_DPS);
+	  
+		--if Oldhand_DPS == 1 then
+		--	Oldhand_DpsOut1();
+		--elseif Oldhand_DPS == 2 then
+		--	Oldhand_DpsOut2();
+		--else
+		--	Oldhand_DpsOut3();
+		--end
 		return;
-	else
-		isPlague = 0;
+
+
 	end
 	--Oldhand_SetText("无动作",0);
 end;
+
+function Oldhand_SelectPartyTarget(unitid)
+	if UnitIsUnit("target", "party"..unitid) then return false; end;
+	Oldhand_SetText("选取"..unitid.."个队友",unitid+29);
+	return true;	
+end
 
 function Oldhand_ClearTargetTable()
 	if (target_count > 0) then
@@ -996,6 +999,11 @@ function Oldhand_UnitAffectingCombat()
 	return false;
 end;
 
+function Oldhand_GetUnitPowerPercent(unit)
+	local power, powermax  = UnitPower(unit), UnitPowerMax(unit);
+	local powerPercent = floor(power*100/powermax+0.5);
+	return powerPercent;
+end
 
 function Oldhand_CombatLogEvent(event,...)
 	if not (playerClass=="萨满祭司") then return; end;
@@ -1157,15 +1165,15 @@ function Oldhand_Use_INV_Jewelry_TrinketPVP_02()
 	if UnitIsPlayer("playertarget") then
 		if Oldhand_NoControl_Debuff() then
 			if Oldhand_TestTrinket("部落徽记") or Oldhand_TestTrinket("部落勋章")  then
-				if Oldhand_CastSpell("部落徽记","INV_Jewelry_TrinketPVP_02") then
+				if Oldhand_CastSpell("部落徽记", "INV_Jewelry_TrinketPVP_02") then
 					--StartTimer("INV_Jewelry_TrinketPVP")
 					return true;
 				end
 			end
 			if Oldhand_TestTrinket("联盟徽记") or Oldhand_TestTrinket("联盟勋章")  then
-				if Oldhand_CastSpell("联盟徽记","INV_Jewelry_TrinketPVP_01") then
+				if Oldhand_CastSpell("联盟徽记", "INV_Jewelry_TrinketPVP_01") then
 					--StartTimer("INV_Jewelry_TrinketPVP")
-					return true;
+					return true; 
 				end
 			end
 		end

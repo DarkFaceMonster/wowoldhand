@@ -16,11 +16,6 @@ local TestHelpTarget = "";
 local target_count = 0;		-- 目标个数
 local target_table = {};	
 
-local   Shaman_DISEASE = '疾病';
-local 	Shaman_MAGIC   = '魔法';
-local 	Shaman_POISON  = '中毒';
-local 	Shaman_CURSE   = '诅咒';
-
 -- 2 Ability_Shaman_Lavalash		熔岩猛击
 -- 3 Ability_Shaman_Stormstrike 	风暴打击
 -- 4 Spell_Nature_EarthShock		大地震击
@@ -107,211 +102,10 @@ shaman_action_table["伊萨诺斯甲虫"] = 236164;
 -- 100 spell_shaman_unleashweapon_wind 风怒武器
 --  Spell_Fire_FlameTounge		火舌武器
 
-local  Shaman_IGNORELIST = {
-		["放逐术"]	= true,
-		["相位变换"]	= true,
-		["冰冻"] = true,
-		["火球术"] = true,
-		["寒冰箭"] = true,
-		["深寒之冬"] = true,
-		["加尔脉冲"] = true,
-		["月火术"] = true,
-		["熔岩镣铐"] = true,
-		["雷霆一击"] = true,
-		["灼烧土地"] = true,
-		["强化灼烧"] = true,
-		["圣光审判"] = true,
-		["智慧审判"] = true,
-		["公正审判"] = true,
-		["辩护"] = true,
-		["正义复仇"] = true,
-	};
-	
-local Shaman_SKIP_LIST = {
-		["无梦睡眠"] = true,
-		["强效昏睡"] = true,
-		["心灵视界"] = true,
-	};
-local 	Shaman_CLASS_DRUID   = '德鲁伊';
-local 	Shaman_CLASS_HUNTER  = '猎人';
-local 	Shaman_CLASS_MAGE    = '法师';
-local 	Shaman_CLASS_PALADIN = '圣骑士';
-local 	Shaman_CLASS_PRIEST  = '牧师';
-local 	Shaman_CLASS_ROGUE   = '盗贼';
-local 	Shaman_CLASS_SHAMAN  = '萨满祭司';
-local 	Shaman_CLASS_WARLOCK = '术士';
-local 	Shaman_CLASS_Shaman_ = '战士';
-
-local Shaman_SKIP_BY_CLASS_LIST = {
-		[Shaman_CLASS_Shaman_] = {		
-			["上古狂乱"]   = true,
-			["点燃法力"]   = true,
-			["污浊之魂"]   = true,
-		};
-		[Shaman_CLASS_ROGUE] = {			
-			["沉默"]       = true;
-			["上古狂乱"]   = true,
-			["点燃法力"]   = true,
-			["污浊之魂"]   = true,
-			["煽动烈焰"]   = true,	
-			["熔岩镣铐"]   = true,
-		};
-		[Shaman_CLASS_HUNTER] = {			
-			["煽动烈焰"]   = true,	
-		};
-		[Shaman_CLASS_MAGE] = {			
-			["煽动烈焰"]   = true,	
-		};
-		[Shaman_CLASS_DRUID]= {
-			["煽动烈焰"]   = true,	
-		};
-		[Shaman_CLASS_PALADIN]= {
-			["煽动烈焰"]   = true,	
-		};
-		[Shaman_CLASS_PRIEST]= {
-			["煽动烈焰"]   = true,	
-		};
-		[Shaman_CLASS_SHAMAN]= {
-			["煽动烈焰"]   = true,	
-		};
-		[Shaman_CLASS_WARLOCK]= {
-			["煽动烈焰"]   = true,	
-		};
-	};
-
 local spell_table = {};
 spell_table["临近风暴之怒"] = 72;
 spell_table["大副的怀表"] = 71;
 
-function Shaman_AutoSelectMode()
-	if UnitAffectingCombat("player")~=1 then
-	  local currentSpec = GetSpecialization();
-	  Shaman_DPS = currentSpec;
-	end
-end
-
-function Shaman_BreakCasting(myspell)
-	local target_name = UnitName("target");
-	local spell, _, displayName, _, startTime, endTime, _, _, notInterruptible = UnitCastingInfo("target");
-	if (spell == null) then currTargetCasting = null; return 0; end;
-	if (spell ~= null and spell ~= currTargetCasting) then
-	  if (notInterruptible) then
-	    --Shaman_AddMessage(string.format("目标 正在施放 %s 。。。无法打断", spell));
-	    return 0;
-	  else
-	    Shaman_AddMessage(string.format("目标 正在施放 %s 。。。", spell));
-	  end;
-	  currTargetCasting = spell;
-	end;
-	if endTime and startTime then
-		target_spellname = spell;
-		
-		local isPlayer = false;
-		if not (UnitIsPlayer("target") and UnitCanAttack("player","target")) then 
-			isPlayer = true;
-		end;
-
-		if not isPlayer then
-			local g_FindNpcName = false;
-			for k, v in pairs(Shaman_SaveData) do
-				if v["npcname"] == target_name and  v["spellname"] == myspell and v["targetspellname"] == target_spellname then
-			    	g_FindNpcName = true;
-			  	end
-			end
-			if g_FindNpcName then
-				--Shaman_AddMessage(string.format("%s 正在施放 %s，无法打断。",target_name,spell));
-				return 0;
-			end;
-		end
-	
-		local remainTime = endTime - GetTime() * 1000;
-		--Shaman_AddMessage(string.format("%s 正在施放 %s。。。，剩余时间：%f",target_name,spell,remainTime));
-		if (remainTime <= 800.0) then
-			if (spell) then
-				--Shaman_AddMessage(string.format("打断：%s 的 %s，还剩 %d 毫秒。",target_name,spell,remainTime));
-				return 1; 
-			elseif displayName then
-				--Shaman_AddMessage(string.format("打断：%s 的 %s，还剩 %d 毫秒。",target_name,displayName,remainTime));
-				return 1; 
-			end;
-		end
-	else
-		target_spellname = "";
-	end
-
-	return 0;
-end
-
-function Oldhand_TestPlayerDebuff(unit)
-  --local healthPercent, maxHealth = Shaman_GetPlayerHealthPercent(unit);
-	--if healthPercent < 40 then return 0; end;
-	local i = 1;
-	while UnitDebuff(unit, i ) do
-		ShamanTooltip:SetOwner(Shaman_MSG_Frame, "ANCHOR_BOTTOMRIGHT", 0, 0);
-		ShamanTooltip:SetUnitDebuff(unit, i);		
-		local	debuff_name = ShamanTooltipTextLeft1:GetText();
-		local   debuff_type = ShamanTooltipTextRight1:GetText();				
-		ShamanTooltip:Hide();
-		if (debuff_name) and (debuff_type) then
-			if (Shaman_IGNORELIST[debuff_name]) then
-				break;
-			end
-			if (UnitAffectingCombat("player")) then
-				if (Shaman_SKIP_LIST[debuff_name]) then
-					break;
-				end
-				if (Shaman_SKIP_BY_CLASS_LIST[UClass]) then
-					if (Shaman_SKIP_BY_CLASS_LIST[UClass][debuff_name]) then
-						break;
-					end
-				end
-			end						
-			if (debuff_type) then
-				if (debuff_type == Shaman_MAGIC) then							
-					return 1;
-				elseif (debuff_type == Shaman_DISEASE) then							
-					return 2;
-				elseif (debuff_type == Shaman_POISON) then							
-					return 3;
-				elseif (debuff_type == Shaman_CURSE) then							
-					return 4;					
-				end
-			end	
-		end;
-		i = i + 1;
-	end	
-	return 0;
-end
-
-function Shaman_RegisterEvents(self)
-	local englishClass;
-	playerClass, englishClass = UnitClass("player");
-	if not (playerClass=="萨满祭司") then
-			HideUIPanel(Shaman_MSG_Frame);
-			HideUIPanel(ShamanColorRectangle);
-			return;
-	end;
-	self:RegisterEvent("PLAYER_ENTERING_WORLD");		
-	self:RegisterEvent("UI_ERROR_MESSAGE");
-	self:RegisterEvent("PLAYER_TARGET_CHANGED");
-	self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED");
-	--self:RegisterEvent("INSPECT_TALENT_READY");
-	
-	UnitPopupButtons["ShamanPOPUP"] = { text = "智能施法跟随对象", dist = 0 };	
-		
-	if (UnitPopupMenus["SELF"]) then
-		--table.insert( UnitPopupMenus["SELF"], "ShamanPOPUP");		
-	end	
-	if (UnitPopupMenus["PLAYER"]) then
-		--table.insert( UnitPopupMenus["PLAYER"], "ShamanPOPUP");		
-	end
-	if (UnitPopupMenus["PARTY"]) then
-		--table.insert( UnitPopupMenus["PARTY"], "ShamanPOPUP");		
-	end
-	
-	--Shaman_Old_UnitPopup_OnClick = UnitPopup_OnClick;
-	--UnitPopup_OnClick = Shaman_UnitPopup_OnClick;
-end;
 function Shaman_UnitPopup_OnClick()
 	local index = this.value;
 	local dropdownFrame = getglobal(UIDROPDOWNMENU_INIT_MENU);
@@ -326,98 +120,7 @@ function Shaman_UnitPopup_OnClick()
 		Shaman_Old_UnitPopup_OnClick();
 	end
 end
-function Shaman_OnEvent(event)	
-	if not (playerClass=="萨满祭司") then return; end;
-	if (event=="PLAYER_ENTERING_WORLD") then
-		Shaman_Data = {};
-		Shaman_Data[UnitName("player")] = 
-					{			
-					Rogue={},
-					};
-		if( Shaman_SaveData == nil ) then
-		    Shaman_SaveData = {};
-		end
-		DEFAULT_CHAT_FRAME:AddMessage("智能施法插件 2.0 (萨满祭司版)   www.oldhand.net 版权所有");			
-		getglobal("ShamanColorRectangle".."NormalTexture"):SetVertexColor(0, 0, 0);
-		Shaman_AutoSelectMode();	
-		Shaman_CreateMacro();
-	end;	
-	if (event=="INSPECT_TALENT_READY") then
-		if not UnitExists("playertarget") then	
-			return; 
-		end;
-		if UnitIsPlayer("target") then	
-		        local MaxTalents = 0;
-			for t=1, GetNumTalentTabs(true) do
-			    local __,__,Talents = GetTalentTabInfo(t,true);
-			    if Talents > MaxTalents then
-				   MaxTalents = Talents
-			    end
-			end
-			
-			for s=1, GetNumTalentTabs(true) do	
-			    local __,__,Talents = GetTalentTabInfo(s,true);
-			    if 0==1 and  Talents == MaxTalents then
-				   if UnitAffectingCombat("player") ~= 1 then
-					 Oldhand_AddMessage_A("**你的目标是"..GetTalentTabInfo(s,true).."天赋的"..UnitClass("target").."**");
-				   end
-				   if UnitIsUnit("player","target") and UnitAffectingCombat("player") ~= 1 then
-					Shaman_CreateMacro();
-				   end;
-				   if not UnitCanAttack("player","target")  then
-						if UnitClass("target") == "德鲁伊" and GetTalentTabInfo(s,true) == "野性战斗" then
-							Shaman_AddPlayerTalent(UnitName("target"));
-						end;
-						if UnitClass("target") == "圣骑士" and GetTalentTabInfo(s,true) == "防护" then
-							Shaman_AddPlayerTalent(UnitName("target"));
-						end;
-						if UnitClass("target") == "战士" and GetTalentTabInfo(s,true) == "防护" then
-							Shaman_AddPlayerTalent(UnitName("target"));
-						end;	
-				   end;
-				   return ;
-			    end
-			end
-		end
-		return;
-	end;
 
-	
-	if (event=="PLAYER_TARGET_CHANGED") then
-		if not UnitExists("playertarget") then	
-			return; 
-		end;
-		if UnitAffectingCombat("player") ~= 1 and UnitIsUnit("target", "player") then
-			Shaman_AutoSelectMode();	
-			Shaman_CreateMacro();
-		end;
-		if UnitIsPlayer("target") and not UnitIsUnit("player","target") then	
-			NotifyInspect("playertarget");
-		end;	
-	end;	
-
-end;
-
-function Shaman_AddPlayerTalent(playername)
-	for k, v in pairs(Shaman_PlayerTalentInfoDatas) do							
-		if(playername == v["Name"]) then
-			return;
-		end		
-	end
-
-	table.insert(Shaman_PlayerTalentInfoDatas,
-		{
-		["Name"] = playername,
-		});
-end
-function Shaman_GetPlayerTalent(playername)
-	for k, v in pairs(Shaman_PlayerTalentInfoDatas) do							
-		if(playername == v["Name"]) then
-			return true;
-		end		
-	end
-	return false;
-end
 function Shaman_CreateMacro()	
 	if GetMacroIndexByName("打断施法") == 0 then
 		CreateMacro("打断施法", 67, "/stopcasting", 1, 1);
@@ -433,106 +136,77 @@ function Shaman_CreateMacro()
 	--PlaceAction(1);
 	--ClearCursor();
 
-	if GetMacroIndexByName("狂暴") == 0 then
-		CreateMacro("狂暴", 66, "/cast 狂暴", 1, 0);
-	end;
 
-	if GetMacroIndexByName("更换模式") == 0 then
-		CreateMacro("更换模式", 61, "/script Shaman_Input(1);", 1, 1);
-	end;	
-	PickupMacro("更换模式");
-	PlaceAction(49);
-	ClearCursor();	
-	if Shaman_DPS == 2 then
-		if GetMacroIndexByName("增强模式") == 0 then
-			CreateMacro("增强模式", 62, "/script Shaman_Input(1);", 0, 0);
-		end;
-		PickupMacro("增强模式");
-	elseif Shaman_DPS == 1 then
-		if GetMacroIndexByName("元素模式") == 0 then
-			CreateMacro("元素模式", 62, "/script Shaman_Input(1);", 0, 0);
-		end;
-		PickupMacro("元素模式");
-	elseif Shaman_DPS == 3 then
-		if GetMacroIndexByName("治疗模式") == 0 then
-			CreateMacro("治疗模式", 62, "/script Shaman_Input(1);", 0, 0);
-		end;
-		PickupMacro("治疗模式");
-	end
-	PlaceAction(50);
-	ClearCursor();
-
-  Shaman_PutAction("自动攻击", 1);
-  Shaman_PutAction("治疗之涌", 7);
-  Shaman_PutAction("先祖之魂", 11);
+  Oldhand_PutAction("治疗之涌", 7);
+  Oldhand_PutAction("先祖之魂", 11);
   
-  Shaman_PutAction("嗜血", 62);
-  Shaman_PutAction("星界转移", 63);
-  Shaman_PutAction("风剪", 64);
-  Shaman_PutAction("陷地图腾", 65);
-  Shaman_PutAction("净化术", 69);
-  Shaman_PutAction("净化灵魂", 70);
+  Oldhand_PutAction("嗜血", 62);
+  Oldhand_PutAction("星界转移", 63);
+  Oldhand_PutAction("风剪", 64);
+  Oldhand_PutAction("陷地图腾", 65);
+  Oldhand_PutAction("净化术", 69);
+  Oldhand_PutAction("净化灵魂", 70);
   
   if Shaman_DPS == 1 then
-    Shaman_PutAction("闪电箭", 2);
-    Shaman_PutAction("烈焰震击", 3);
-    Shaman_PutAction("熔岩爆裂", 4);
-    Shaman_PutAction("大地震击", 5);
-    Shaman_PutAction("冰霜震击", 6);
-    Shaman_PutAction("闪电链", 8);
-    Shaman_PutAction("雷霆风暴", 9);
-    Shaman_PutAction("元素冲击", 10);
+    Oldhand_PutAction("闪电箭", 2);
+    Oldhand_PutAction("烈焰震击", 3);
+    Oldhand_PutAction("熔岩爆裂", 4);
+    Oldhand_PutAction("大地震击", 5);
+    Oldhand_PutAction("冰霜震击", 6);
+    Oldhand_PutAction("闪电链", 8);
+    Oldhand_PutAction("雷霆风暴", 9);
+    Oldhand_PutAction("元素冲击", 10);
     
-    Shaman_PutAction("图腾掌握", 12);
+    Oldhand_PutAction("图腾掌握", 12);
     
     
-    Shaman_PutAction("震地图腾", 66);
-    Shaman_PutAction("土元素", 67);
-    Shaman_PutAction("火元素", 68);
+    Oldhand_PutAction("震地图腾", 66);
+    Oldhand_PutAction("土元素", 67);
+    Oldhand_PutAction("火元素", 68);
   elseif Shaman_DPS == 2 then
-    Shaman_PutAction("火舌", 2);
-    Shaman_PutAction("石拳", 3);
-    Shaman_PutAction("冰封", 4);
-    Shaman_PutAction("熔岩猛击", 5);
-    Shaman_PutAction("风暴打击", 6);
-    Shaman_PutAction("闪电箭", 8);
-    Shaman_PutAction("毁灭闪电", 9);
+    Oldhand_PutAction("火舌", 2);
+    Oldhand_PutAction("石拳", 3);
+    Oldhand_PutAction("冰封", 4);
+    Oldhand_PutAction("熔岩猛击", 5);
+    Oldhand_PutAction("风暴打击", 6);
+    Oldhand_PutAction("闪电箭", 8);
+    Oldhand_PutAction("毁灭闪电", 9);
     
-    Shaman_PutAction("野性狼魂", 66);
-    Shaman_PutAction("降雨", 67);
-    Shaman_PutAction("幽魂步", 68);  
+    Oldhand_PutAction("野性狼魂", 66);
+    Oldhand_PutAction("降雨", 67);
+    Oldhand_PutAction("幽魂步", 68);  
   elseif Shaman_DPS == 3 then
   
   end;
 
 	if Oldhand_TestTrinket("部落勋章") then
-		Shaman_PutAction("部落勋章", 71);
+		Oldhand_PutAction("部落勋章", 71);
 	elseif Oldhand_TestTrinket("大副的怀表") then
-		Shaman_PutAction("大副的怀表", 72);
+		Oldhand_PutAction("大副的怀表", 72);
 	elseif Oldhand_TestTrinket("菲斯克的怀表") then
-		Shaman_PutAction("菲斯克的怀表", 72);
+		Oldhand_PutAction("菲斯克的怀表", 72);
 	elseif Oldhand_TestTrinket("恐惧小盒") then
-		Shaman_PutAction("恐惧小盒", 71);
+		Oldhand_PutAction("恐惧小盒", 71);
 	elseif Oldhand_TestTrinket("恐惧小盒") then
-		Shaman_PutAction("战歌的热情", 71);
+		Oldhand_PutAction("战歌的热情", 71);
 	elseif Oldhand_TestTrinket("苔原护符") then
-		Shaman_PutAction("苔原护符", 71);
+		Oldhand_PutAction("苔原护符", 71);
 	elseif Oldhand_TestTrinket("食人魔殴斗者的徽章") then
-		Shaman_PutAction("食人魔殴斗者的徽章", 71);
+		Oldhand_PutAction("食人魔殴斗者的徽章", 71);
 	end
 	if Oldhand_TestTrinket("胜利旌旗") then
-		Shaman_PutAction("胜利旌旗", 72);
+		Oldhand_PutAction("胜利旌旗", 72);
 	elseif Oldhand_TestTrinket("临近风暴之怒") then
-		Shaman_PutAction("临近风暴之怒", 71);
+		Oldhand_PutAction("临近风暴之怒", 71);
 	elseif Oldhand_TestTrinket("英雄勋章") then
-		Shaman_PutAction("英雄勋章", 72);
+		Oldhand_PutAction("英雄勋章", 72);
 	elseif Oldhand_TestTrinket("伊萨诺斯甲虫") then
-		Shaman_PutAction("伊萨诺斯甲虫", 72);
+		Oldhand_PutAction("伊萨诺斯甲虫", 72);
 	elseif Oldhand_TestTrinket("刃拳的宽容") then
-		Shaman_PutAction("刃拳的宽容", 72);
+		Oldhand_PutAction("刃拳的宽容", 72);
 	end
 	
-	Shaman_PutAction("狂暴", 51);
+	Oldhand_PutAction("狂暴", 51);
 
 	SetBinding("F1", "MULTIACTIONBAR1BUTTON1");
 	SetBinding("F2", "MULTIACTIONBAR1BUTTON2");
@@ -560,40 +234,8 @@ function Shaman_CreateMacro()
 	SaveBindings(1);
 end;
 
-function Shaman_PutAction(text, index)
-	if not text then return false;end;
-	Oldhand_AddMessage(text..index);
-	if Oldhand_PickupSpellByBook(text) then
-		PlaceAction(index);
-		ClearCursor();
-		spell_table[text] = index;
-		return true;
-	end;
-	spell_table[text] = 0;
-	return false;
-end;
-
 function Shaman_NoTarget_RunCommand()
 	return Shaman_RunCommand();
-end;
-
-function Oldhand_Test_IsFriend(unitname)
-	if (UnitInRaid("player")) then
-		for id=1, GetNumRaidMembers()  do
-			if UnitName("raid"..id) == unitname then
-				if UnitCanAttack("player","raid"..id) then return false; end;
-				return true;
-			end;			
-		end
-	else
-		for id=1, GetNumGroupMembers()  do
-			if UnitName("party"..id) == unitname then
-				if UnitCanAttack("player","party"..id) then return false; end;
-				return true;
-			end;
-		end
-	end
-	return false;
 end;
 
 function Shaman_AutoDrink()	
@@ -614,6 +256,7 @@ function Shaman_RunCommand()
 	end	
 	return false;
 end;
+
 function Shaman_Auto_Trinket()
 	if not Oldhand_PlayerBU("水手的迅捷") then
 		if Oldhand_TestTrinket("大副的怀表") and (IsActionInRange(Oldhand_GetActionID("Ability_Shaman_Lavalash")) ~= 0)  then
@@ -669,6 +312,7 @@ function Shaman_Auto_Trinket()
 	--end  	
 	return false;
 end
+
 function Shaman_dps_playerSafe()
 	--if not Shaman_PlayerDeBU("断筋") or not Shaman_PlayerDeBU("减速药膏") or not Shaman_PlayerDeBU("寒冰箭") or not Shaman_PlayerDeBU("冰冻") or not Shaman_PlayerDeBU("冰霜陷阱光环")
 	--	or not Shaman_PlayerDeBU("强化断筋") or not Shaman_PlayerDeBU("减速术") or not Shaman_PlayerDeBU("摔绊") or not Shaman_PlayerDeBU("震荡射击")
@@ -715,7 +359,7 @@ function Shaman_DpsOut1()
 
 	if Shaman_playerSafe() then return true; end;
 	
-  if Shaman_BreakCasting("风剪")==1 and Oldhand_CastSpell("风剪", shaman_action_table["风剪"]) then return true; end;
+  if Oldhand_BreakCasting("风剪")==1 and Oldhand_CastSpell("风剪", shaman_action_table["风剪"]) then return true; end;
 
 	if UnitIsPlayer("target") and UnitCanAttack("player","target") then
 		if Oldhand_TargetDeBU("冰霜震击") then
@@ -746,8 +390,8 @@ function Shaman_DpsOut1()
 	  if Oldhand_CastSpell("熔岩爆裂", shaman_action_table["熔岩爆裂"]) then return true; end;
 	end;
 	
-	local healthPercent1, maxHealth1 = Shaman_GetPlayerHealthPercent("player");
-	local healthPercent2, maxHealth2 = Shaman_GetPlayerHealthPercent("target");
+	local healthPercent1, maxHealth1 = Oldhand_GetPlayerHealthPercent("player");
+	local healthPercent2, maxHealth2 = Oldhand_GetPlayerHealthPercent("target");
 	
 	if maxHealth2 > maxHealth1 then
 	  if Oldhand_CastSpell_IgnoreRange("火元素", shaman_action_table["火元素"]) then return true; end;
@@ -794,7 +438,7 @@ function Shaman_DpsOut2()
 		return true; 
 	end;
 	
-	if Shaman_BreakCasting("风剪")==1 and Oldhand_CastSpell("风剪", shaman_action_table["风剪"]) then return true; end;
+	if Oldhand_BreakCasting("风剪")==1 and Oldhand_CastSpell("风剪", shaman_action_table["风剪"]) then return true; end;
 	
 	-- 增强	Buff
 	if Shaman_RunCommand() then return true; end;
@@ -858,7 +502,7 @@ function Shaman_DpsOut3()
 	end;
 	if Shaman_playerSafe() then return true; end;
 	
-	if Shaman_BreakCasting("风剪")==1 and Oldhand_CastSpell("风剪", shaman_action_table["风剪"]) then return true; end;
+	if Oldhand_BreakCasting("风剪")==1 and Oldhand_CastSpell("风剪", shaman_action_table["风剪"]) then return true; end;
 	
 	-- 增强	Buff
 	if Shaman_RunCommand() then return true; end;
@@ -895,7 +539,7 @@ function Shaman_DpsOut3()
 	end
 	if UnitCanAttack("player", "target") and UnitName("player")~=tt_name and tt_name~=null then
 		
-		if Oldhand_CastSpell("闪电箭","Spell_Nature_Lightning") then return true; end;
+		if Oldhand_CastSpell("闪电箭", "Spell_Nature_Lightning") then return true; end;
 	end
 	
 	local tt_name = UnitName("targettarget");
@@ -904,41 +548,6 @@ function Shaman_DpsOut3()
 	return;		
 
 end;
-
-function Shaman_BreakCast(LossHealth)
-	if UnitExists("playertarget") then
-		if not UnitCanAttack("player","target") then
-			if UnitIsDeadOrGhost("target") then
-				--if Oldhand_CastSpell("打断施法","Ability_GolemThunderClap") then return true; end;
-				Oldhand_SetText("打断施法",27);	
-				return true;
-			end			
-			if (IsActionInRange(Oldhand_GetActionID("Spell_Holy_HolyBolt")) ~= 1) then
-				--if Oldhand_CastSpell("打断施法","Ability_GolemThunderClap") then return true; end;
-				Oldhand_SetText("打断施法",27);	
-				return true;
-			end	
-			if Shaman_GetPlayerLossHealth("target") < LossHealth then
-				--if Oldhand_CastSpell("打断施法","Ability_GolemThunderClap") then return true; end;
-				Oldhand_SetText("打断施法",27);	
-				return true;
-			end
-		else
-			if Shaman_GetPlayerLossHealth("player") < LossHealth then
-				--if Oldhand_CastSpell("打断施法","Ability_GolemThunderClap") then return true; end;
-				Oldhand_SetText("打断施法",27);	
-				return true;
-			end
-		end
-	else
-		if Shaman_GetPlayerLossHealth("player") < LossHealth then
-				--if Oldhand_CastSpell("打断施法","Ability_GolemThunderClap") then return true; end;
-				Oldhand_SetText("打断施法",27);	
-				return true;
-		end
-	end
-	return false;
-end
 
 function Shaman_playerSafe()
 	local debufftype = Oldhand_TestPlayerDebuff("player");
@@ -952,7 +561,7 @@ function Shaman_playerSafe()
 		if Oldhand_CastSpell("净化灵魂", shaman_action_table["净化灵魂"]) then return true; end;
 	end
 	
-	local HealthPercent, maxHealth = Shaman_GetPlayerHealthPercent("player");
+	local HealthPercent, maxHealth = Oldhand_GetPlayerHealthPercent("player");
 	--Oldhand_AddMessage("player health percent: "..HealthPercent);
 	if HealthPercent < 60 then
 		if Oldhand_CastSpell_IgnoreRange("星界转移", shaman_action_table["星界转移"]) then return true; end;
@@ -991,26 +600,7 @@ function Shaman_playerSafe()
 	return false;
 end;
 
-function Shaman_SelectPartyTarget(unitid)
-	if UnitIsUnit("target", "party"..unitid) then return false; end;
-	Oldhand_SetText("选取"..unitid.."个队友",unitid+29);
-	return true;	
-end
-function Shaman_GetPlayerManaPercent(unit)
-	if UnitIsDeadOrGhost("player") then return 100; end
-	local mana, manamax = UnitMana("player"), UnitManaMax("player");
-	local ManaPercent = floor(mana*100/manamax+0.5);
-	return ManaPercent;	
-end
-function Shaman_GetPlayerLossHealth(unit)	
-	local health, healthmax  = UnitHealth(unit), UnitHealthMax(unit);
-	return healthmax - health;	
-end
-function Shaman_GetPlayerHealthPercent(unit)	
-	local health, healthmax  = UnitHealth(unit), UnitHealthMax(unit);
-	local healthPercent = floor(health*100/healthmax+0.5);	
-	return healthPercent, healthmax;	
-end
+
 function Shaman_Do_Reincarnation_CanUseAction(i) 
 	local _, duration, _ = GetActionCooldown(i);
 	local isUsable, notEnoughMana = IsUsableAction(i);					
@@ -1025,231 +615,6 @@ function Shaman_Do_Reincarnation_CanUseAction(i)
 	end		
 	return false; 
 end
-
-function Shaman_NoControl_Debuff()
-	if not Shaman_PlayerDeBU("心灵尖啸") 
-	   or not Shaman_PlayerDeBU("精神控制") 
-	   or not Shaman_PlayerDeBU("恐惧")
-	   or not Shaman_PlayerDeBU("恐惧嚎叫") 	 
-	   or not Shaman_PlayerDeBU("女妖媚惑") 
-	   or not Shaman_PlayerDeBU("破胆怒吼") 
-	   or not Shaman_PlayerDeBU("休眠") 		 
-	   or not Shaman_PlayerDeBU("逃跑")
-	   or not Shaman_PlayerDeBU("凿击")
-	   or not Shaman_PlayerDeBU("媚惑")  
-	   or not Shaman_PlayerDeBU("变形术") 
-	   or not Shaman_PlayerDeBU("休眠")  
-	   or not Shaman_PlayerDeBU("致盲")  		
-	   or not Shaman_PlayerDeBU("闷棍") 				
-	   or not Shaman_PlayerDeBU("冰冻陷阱") 
-	   or not Shaman_PlayerDeBU("肾击") 
-	   or not Shaman_PlayerDeBU("忏悔") 
-	   or not Shaman_PlayerDeBU("霜寒刺骨")
-	   or not Shaman_PlayerDeBU("制裁之锤")	
-	   or not Shaman_PlayerDeBU("强化断筋")
-	   or not Shaman_PlayerDeBU("冲击")
-	   or not Shaman_PlayerDeBU("冰霜新星") 
-	   or not Shaman_PlayerDeBU("纠缠根须")
-	   or not Shaman_PlayerDeBU("偷袭")
-	then
-		return true;
-	end
-	return false;	
-end	
-
-
-function Shaman_IsSpellInRange(spellname,unit)
-	if UnitExists(unit) then
-		if UnitIsVisible(unit) then
-			if IsSpellInRange(spellname,unit) == 1 then
-				return true;
-			end
-		end
-	end
-	return false;
-end
-function Shaman_UnitAffectingCombat()
-	if UnitAffectingCombat("player") == 1 then
-		return true;
-	end
-	if (UnitInRaid("player")) then
-		for id=1, GetNumRaidMembers()  do
-			local unit = "raid"..id ;
-			if UnitExists(unit) then	
-				if UnitAffectingCombat(unit) == 1 and  UnitIsVisible(unit) then
-					return true;
-				end
-			end
-		end
-	else
-		for id=1, GetNumGroupMembers()  do
-			local unit = "party"..id ;
-			if UnitExists(unit) then	
-				if UnitAffectingCombat(unit) == 1 and  UnitIsVisible(unit) then
-					return true;
-				end
-			end
-		end
-	end;
-	return false;
-end;
-
-
-function Shaman_CombatLogEvent(event,...)
-	if not (playerClass=="萨满祭司") then return; end;
-	local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = ...
-	local amount, school, resisted, blocked, absorbed, critical, glancing, crushing, missType, enviromentalType,interruptedSpellId, interruptedSpellName, interruptedSpellSchool;
-
-	if eventType == "SPELL_CAST_SUCCESS" then
-		spellId, spellName, spellSchool = select(9, ...);
-		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_HOSTILE_PLAYERS) then
-				if spellName == "消失" and sourceName then
-					Shaman_Warning_AddMessage("**敌对玩家>>"..sourceName.."<<使用了消失,反隐反隐!**");					
-					table.insert(Shaman_Data[UnitName("player")]["Rogue"],{["Command"] = "奉献"});				
-					StartTimer("Ability_Shaman_WarCry");					
-					return;
-				end;
-				if spellName == "隐形术" and sourceName then
-					Shaman_Warning_AddMessage("**敌对玩家>>"..sourceName.."<<使用了隐形术,反隐反隐!**");					
-					table.insert(Shaman_Data[UnitName("player")]["Rogue"],{["Command"] = "奉献"});				
-					StartTimer("Ability_Shaman_WarCry");					
-					return;
-				end;
-				if spellName == "闪避" and sourceName then
-					Shaman_Warning_AddMessage("**警告:敌对玩家>>"..sourceName.."<<获得闪避效果,效果持续8秒!**");
-					return;	
-				end;
-				if spellName == "圣盾术" and sourceName then					
-					Shaman_Warning_AddMessage("**警告:敌对玩家>>"..sourceName.."<<获得".. spellName .."效果!!**");					
-					return;	
-				end;
-				if spellName == "保护之手" and sourceName then
-					if destName then
-						Shaman_Warning_AddMessage("**警告:敌对玩家>>"..sourceName.."<<给>>"..destName.."<<施放了保护之手!!**");
-					else
-						Shaman_Warning_AddMessage("**警告:敌对玩家>>"..sourceName.."<<施放了保护之手!!**");
-					end;
-					return;	
-				end;
-		end
-		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_FRIENDLY_UNITS) and spellName then			
-			if (spellName == "嘲讽" or spellName == "正义防御" ) and sourceName and destName then
-				--Shaman_Warning_AddMessage("**>>"..sourceName.."<<对"..destName.."成功施放了"..spellName.."!**");
-			end;			
-		end;	
-		
-		return;
-	end;	
-	
-	if eventType == "SPELL_MISSED" then
-		spellId, spellName, spellSchool, missType = select(9, ...);	
-		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) and spellName then			
-			if missType == "RESIST" then
-				Oldhand_AddMessage("**>>"..destName.."<<抵抗了"..sourceName.."的"..spellName.."!**");
-			elseif missType == "IMMUNE" then
-				Oldhand_AddMessage("**>>"..destName.."<<免疫了"..sourceName.."的"..spellName.."!**");
-				if spellName == "冰冷触摸" then mianyi1 = 1;end;
-				if spellName == "心灵冰冻" then mianyi2 = 1;end;
-				if sourceName == UnitName("player") then
-				      local g_FindNpcName = false;
-				      for k, v in pairs(Shaman_SaveData) do		       
-					      if v["npcname"] == destName and  v["spellname"] == spellName then  
-						 g_FindNpcName = true;
-					      end
-				      end
-				      if not g_FindNpcName then
-					      table.insert(Shaman_SaveData,{["npcname"] = destName,["spellname"] = spellName,});
-				      end;
-				end;
-				return;
-			end			
-			return;		
-		end;
-		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_FRIENDLY_UNITS) and spellName then			
-			if (spellName == "嘲讽" or spellName == "正义防御" ) and sourceName and destName then
-				if missType == "RESIST" then
-					Shaman_Warning_AddMessage("**>>"..destName.."<<抵抗了"..sourceName.."的"..spellName.."!**");
-				elseif missType == "IMMUNE" then
-					Shaman_Warning_AddMessage("**>>"..destName.."<<免疫了"..sourceName.."的"..spellName.."!**");					
-					return;
-				end			
-				return;
-			end;
-			if spellName == "震荡猛击"  and sourceName and destName then
-				if missType == "RESIST" then
-					Shaman_Warning_AddMessage("**>>"..destName.."<<抵抗了"..sourceName.."的"..spellName.."!**");
-				elseif missType == "IMMUNE" then
-					Shaman_Warning_AddMessage("**>>"..destName.."<<免疫了"..sourceName.."的"..spellName.."!**");					
-					return;
-				end			
-				return;
-			end;
-		end;
-		return;
-	end;
-	if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) then		
-		if (eventType == "SPELL_DAMAGE") then
-			spellId, spellName, spellSchool, amount, school, resisted, blocked, absorbed, critical, glancing, crushing = select(9, ...)
-			if spellName and amount > 500 then
-				if critical then
-					Oldhand_AddMessage("你的|cffffff00"..spellName.."|r|cff00ff00对|r|cffffff00"..destName.."|r|cff00ff00造成|r|cffffff00"..amount.."|r|cff00ff00伤害(|r|cffffff00爆击|r|cff00ff00)...|r");				       
-				else
-					Oldhand_AddMessage("你的|cffffff00"..spellName.."|r|cff00ff00对|r|cffffff00"..destName.."|r|cff00ff00造成|r|cffffff00"..amount.."|r|cff00ff00伤害...|r");				       
-				end
-			end
-		end
-	end
-	if eventType == "SPELL_HEAL" then
-		spellId, spellName, spellSchool, amount, critical = select(9, ...);
-		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) and amount > 300 and destName and sourceName then
-			if critical then
-				Oldhand_AddMessage("|cff00ff00你的|cffffff00"..spellName.."|r|cff00ff00给|r|cffffff00"..destName.."|r|cff00ff00恢复|r|cffffff00"..amount.."|r|cff00ff00点生命(|r|cffffff00爆击|r|cff00ff00)...|r");				       
-			else
-				Oldhand_AddMessage("|cff00ff00你的|cffffff00"..spellName.."|r|cff00ff00给|r|cffffff00"..destName.."|r|cff00ff00恢复|r|cffffff00"..amount.."|r|cff00ff00点生命...|r");				       
-			end	
-			return;
-		end;
-		if CombatLog_Object_IsA(destFlags, COMBATLOG_FILTER_MINE) and amount > 300 and destName and sourceName then
-			if critical then
-				Oldhand_AddMessage("|cffffff00"..sourceName.."|r|cff00ff00的|cffffff00"..spellName.."|r|cff00ff00给我|cff00ff00恢复|r|cffffff00"..amount.."|r|cff00ff00点生命(|r|cffffff00爆击|r|cff00ff00)...|r");				       
-			else
-				Oldhand_AddMessage("|cffffff00"..sourceName.."|r|cff00ff00的|cffffff00"..spellName.."|r|cff00ff00给我|r|cff00ff00恢复|r|cffffff00"..amount.."|r|cff00ff00点生命...|r");				       
-			end			
-		end;
-		
-		return;
-	end;
-	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		if eventType == "SPELL_DAMAGE" then
-			Shaman_CountTarget(sourceGUID, sourceName, destGUID, destName);
-		elseif eventType == "UNIT_DIED" or eventType=="UNIT_DESTROYED" then
-			Shaman_DecreaseTarget(sourceGUID, sourceName, destGUID, destName);
-		end
-	end
-end
-
-function Shaman_DecreaseTarget(sourceGUID, sourceName, destGUID, destName)
-	if target_count > 0 then
-		if not Shaman_Test_IsFriend(srcName) then
-			if target_table[srcGuid]~=null then 
-				target_count = target_count-1;
-				target_table[srcGuid] = null;
-				Oldhand_AddMessage("战斗中目标数："..target_count.." "..destName.." 已被杀死或摧毁");
-			end;
-		end
-	end
-end
-
-function Shaman_Test()	
-	for i = 1, 120 do
-		if ( HasAction(i) ) then
-			local texture = GetActionTexture(i);
-			local text = GetActionText(i);
-			DEFAULT_CHAT_FRAME:AddMessage(i.." |cffffff00" .. texture .. "|r");
-		end;		
-	end;
-	
-end;
 
 function Shaman_Use_INV_Jewelry_TrinketPVP_02()
 	if UnitIsPlayer("playertarget") then 

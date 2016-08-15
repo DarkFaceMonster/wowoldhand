@@ -100,6 +100,24 @@ oldhand_spell_table = {};
 
 -- 获取玩家当前天赋
 function Oldhand_AutoSelectMode()
+  Oldhand_DPS = 0;
+  playerClass, englishClass = UnitClass("player");
+	
+	if playerClass=="死亡骑士" and (DeathKnight_DpsOut1 ~= nil and DeathKnight_DpsOut2 ~= nil and DeathKnight_DpsOut3 ~= nil) then
+	  is_valid_class = true;
+	  oldhand_dps_module[englishClass] =  DeathKnight_DpsOut;
+	end;
+  if playerClass=="战士" and (Warrior_DpsOut1 ~= nil and Warrior_DpsOut2 ~= nil and Warrior_DpsOut3 ~= nil) then
+    is_valid_class = true;
+    oldhand_dps_module[englishClass] = Warrior_DpsOut;
+  end;
+  if playerClass=="萨满祭司" and (Shaman_DpsOut1 ~= nil and Shaman_DpsOut2 ~= nil and Shaman_DpsOut3 ~= nil) then 
+    is_valid_class = true;
+    oldhand_dps_module[englishClass] = Shaman_DpsOut;
+  end;
+  
+	if not is_valid_class then return; end;
+	
 	if UnitAffectingCombat("player")~=1 then
 	  local currentSpec = GetSpecialization();
 	  Oldhand_DPS = currentSpec;
@@ -215,6 +233,10 @@ function Oldhand_RegisterEvents(self)
   if playerClass=="萨满祭司" and (Shaman_DpsOut1 ~= nil and Shaman_DpsOut2 ~= nil and Shaman_DpsOut3 ~= nil) then 
     is_valid_class = true;
     oldhand_dps_module[englishClass] = Shaman_DpsOut;
+  end;
+  if playerClass=="术士" and (Warlock_DpsOut1 ~= nil and Warlock_DpsOut2 ~= nil and Warlock_DpsOut3 ~= nil) then 
+    is_valid_class = true;
+    oldhand_dps_module[englishClass] = Warlock_DpsOut;
   end;
   
 	if not is_valid_class then return; end;
@@ -407,6 +429,8 @@ function Oldhand_CreateMacro()
     DeathKnight_CreateMacro();
   elseif playerClass == "战士" then
     Warrior_CreateMacro();
+  elseif playerClass == "术士" then
+    Warlock_CreateMacro();
   end
 
 	if Oldhand_TestTrinket("部落勋章") then
@@ -588,7 +612,7 @@ function Oldhand_Input(i)
 end;
 
 function Oldhand_Msg_OnUpdate()
-	if playerClass~="萨满祭司" then return; end;
+	
 	if UnitOnTaxi("player") == 1 then return; end;
 	if UnitIsDeadOrGhost("player") then
 		return;
@@ -665,7 +689,7 @@ function Oldhand_Frame_OnUpdate()
 	--if Oldhand_dps_playerSafe() then return; end;
 	--if Oldhand_HelpTarget() then return; end;
 
-	if not UnitExists("playertarget") then
+	if not UnitExists("playertarget") and not UnitExists("target") then
 		Oldhand_SetText("没有目标", 0);
 		return;
 	end;
@@ -685,6 +709,8 @@ function Oldhand_Frame_OnUpdate()
 	    DeathKnight_DpsOut(Oldhand_DPS);
 	  elseif playerClass == "战士" then
 	    Warrior_DpsOut(Oldhand_DPS);
+	  elseif playerClass == "术士" then
+	    Warlock_DpsOut(Oldhand_DPS);
 	  end;
 	  --oldhand_dps_module[englishClass](Oldhand_DPS);
 	  
@@ -998,12 +1024,6 @@ function Oldhand_UnitAffectingCombat()
 	end;
 	return false;
 end;
-
-function Oldhand_GetUnitPowerPercent(unit)
-	local power, powermax  = UnitPower(unit), UnitPowerMax(unit);
-	local powerPercent = floor(power*100/powermax+0.5);
-	return powerPercent;
-end
 
 function Oldhand_CombatLogEvent(event,...)
 	if not (playerClass=="萨满祭司") then return; end;

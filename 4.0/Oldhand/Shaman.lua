@@ -379,7 +379,7 @@ function Shaman_DpsOut1()
 	  if Oldhand_CastSpell("大地震击", shaman_action_table["大地震击"]) then return true; end;
 	end;
 
-	local debuff1, remainTime1 = Shaman_CheckDebuffByPlayer("烈焰震击");
+	local debuff1, remainTime1 = Oldhand_CheckDebuffByPlayer("烈焰震击");
 
 	if (not debuff1 or remainTime1 < 5) then
 	  if Oldhand_CastSpell("烈焰震击", shaman_action_table["烈焰震击"]) then return true; end;

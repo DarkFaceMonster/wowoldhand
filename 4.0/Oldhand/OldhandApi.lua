@@ -221,7 +221,11 @@ function Oldhand_CanUseAction(i)
 end
 
 function Oldhand_TestPlayerIsHorse()
-	local i = 1;	
+  local name, remainTime = Oldhand_PlayerBU("召唤司机");
+  if name ~= null then
+    return true;
+  end;
+	local i = 1;
 	while UnitBuff("player", i ) do
 		OldhandTooltip:SetOwner(Oldhand_MSG_Frame, "ANCHOR_BOTTOMRIGHT", 0, 0);
 		OldhandTooltip:SetUnitBuff("player", i);		
@@ -232,7 +236,7 @@ function Oldhand_TestPlayerIsHorse()
 			if string.find(vText2, "能量值回复速度提高100") then
 				return false;
 			end
-			if string.find(vText2, "飞行速度提高") or string.find(vText2, "速度提高60") or string.find(vText2, "速度提高100") then						
+			if string.find(vText2, "飞行速度提高") or string.find(vText2, "移动速度提高60") or string.find(vText2, "移动速度提高100") then						
 				return true;
 			end								
 		end		
@@ -548,6 +552,59 @@ function Oldhand_CastSpellById_IgnoreRange(text, i)
 		end
 	end
 	return false;
+end
+
+-- 不考虑距离
+function Oldhand_CastSpellIgnoreRange(text, texture)
+	for i = 61, 72 do
+		if ( HasAction(i) ) then
+			local temptexture = GetActionTexture(i);
+			if temptexture == texture then
+				if Oldhand_CanUseAction(i) then
+					Oldhand_SetText(text, i - 48);
+					return true;
+				end
+			end
+		end
+	end
+	for i = 1, 12 do
+		if ( HasAction(i) ) then
+			local temptexture = GetActionTexture(i);
+			if temptexture == texture then
+				if Oldhand_CanUseAction(i) then
+					Oldhand_SetText(text, i);
+					return true;
+				end
+			end
+		end
+	end
+	return false;
+end
+
+function Oldhand_CastSpellByIdIgnoreRange(text, i)
+  -- Oldhand_AddMessage("CastSpellByIdIgnoreRange.."..text..": "..i);
+  if i > 0 then
+		if ( HasAction(i) ) then
+		  --Oldhand_AddMessage("CastSpellByIdIgnoreRange..HasAction");
+			if Oldhand_CanUseAction(i) then
+			  --Oldhand_AddMessage("CastSpellByIdIgnoreRange..CanUseAction");
+				local index = i;
+				if (i >= 61 and i<=72) then
+					index = i - 48;
+				end
+				Oldhand_SetText(text, index);
+				return true;
+			end
+		end
+	end
+
+	return false;
+end
+
+function Oldhand_GetUnitPowerPercent(unit)
+	local power, powermax  = UnitPower(unit), UnitPowerMax(unit);
+	local powerPercent = floor(power*100/powermax+0.5);
+	return powerPercent;
 end
 
 function Oldhand_CastSpellbyID(text,texture,i)

@@ -2,6 +2,7 @@
 	<Script file="OldhandApi.lua"/>
 	<Script file="DeathKnight.lua"/>
 	<Script file="Shaman.lua"/>
+	<Script file="Warlock.lua"/>
   <Script file="Oldhand.lua"/>	
 <!-- COLORs FRAME -->
 <Button name="OldhandColorRectangle" frameStrata="LOW" movable="false">

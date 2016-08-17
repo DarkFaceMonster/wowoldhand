@@ -26,7 +26,7 @@ local warlock_action_table = {};
 warlock_action_table["吸取生命"] = 136169;
 warlock_action_table["制造灵魂石"] = 538745;
 warlock_action_table["奥术洪流"] = 136222;
-warlock_action_table["召唤恶魔"] = 136218; -- 小鬼 136218 ；蓝胖子 136221 ；
+warlock_action_table["召唤小鬼"] = 136218; -- 小鬼 136218 ；蓝胖子 136221 ；
 
 -- 痛苦
 warlock_action_table["痛楚"] = 136139;
@@ -36,6 +36,7 @@ warlock_action_table["腐蚀术"] = 136118;
 -- 恶魔
 warlock_action_table["暗影箭"] = 136197;
 warlock_action_table["古尔丹之手"] = 535592;
+warlock_action_table["召唤恐惧猎犬"] = 1378282;
 
 -- 毁灭
 warlock_action_table["献祭"] = 135817;
@@ -334,123 +335,21 @@ function Warlock_DpsOut2()
 	end;
 	-- 近战范围		
 	--local isNearAction = IsActionInRange(Oldhand_GetActionID(237517));
-	
-	if Oldhand_CastSpell("古尔丹之手", warlock_action_table["古尔丹之手"]) then return true; end;
-	if Oldhand_CastSpell("暗影箭", warlock_action_table["暗影箭"]) then return true; end;
-	
-	if Oldhand_GetUnitPowerPercent("player") >= 75 then
-		if Oldhand_CastSpell("冰霜打击", warlock_action_table["冰霜打击"]) then return true; end;
-	end
-	
-	--local id1, id2 = Oldhand_GetActionID("Spell_Warlock_MindFreeze"), Oldhand_GetActionID("Spell_Shadow_SoulLeech_3");
 	if Warlock_playerSafe() then return true; end;
-	
-	if Oldhand_BreakCasting("奥术洪流")==1 and Oldhand_CastSpell("奥术洪流", warlock_action_table["奥术洪流"]) then return true; end;
-	--if Oldhand_CastSpellIgnoreRange("冰霜之柱",warlock_action_table["冰霜之柱"]) then return true; end;
-	
-	-- 增强饰品
+-- if HealthPercent < 60 then
+--		if Oldhand_CastSpell_IgnoreRange("吸取生命", shaman_action_table["吸取生命"]) then return true; end;
+-- end;
+		-- 增强饰品
 	if Warlock_Auto_Trinket() then return true; end;
   
 	-- 增强	Buff
 	if Warlock_RunCommand() then return true; end;
-	local debuff1,remainTime1 = Oldhand_CheckDebuffByPlayer("冰霜疫病");
-	local debuff2,remainTime2 = Oldhand_CheckDebuffByPlayer("血之疫病");
-	if not debuff1 then
-	  debuff1,remainTime1 = Oldhand_CheckDebuffByPlayer("锋锐之霜");
-	end;
-	if not debuff2 then
-	  debuff2,remainTime2 = Oldhand_CheckDebuffByPlayer("死疽");
-	end;
-
-	local strenth = 0;
-	local buff1 = Oldhand_PlayerBU("不洁之力");
-	local buff2 = Oldhand_PlayerBU("暴怒");
-	local buff3 = Oldhand_PlayerBU("伟大");
-	local buff4 = Oldhand_PlayerBU("杰出");
-	local buff5 = Oldhand_PlayerBU("憎恶之力");
-	local buff6 = Oldhand_PlayerBU("不洁之能");
-	local buff7 = Oldhand_PlayerBU("血性狂怒");
-	local buff8 = Oldhand_PlayerBU("战斗!");
-	local buff9 = Oldhand_PlayerBU("台风");
-	local buff10 = Oldhand_PlayerBU("末日之眼");
-	local buff11 = Oldhand_PlayerBU("杀戮机器");
-	if buff1 then strenth = strenth + 200; end;		-- 不洁之力
-	if buff2 then strenth = strenth + 500; end;
-	if buff3 then strenth = strenth + 350; end;
-	if buff4 then strenth = strenth + 450; end;
-	if buff5 then strenth = strenth + 200; end;
-	if buff6 then strenth = strenth + 180; end;
-	if buff7 then strenth = strenth + 160; end;
-	if buff8 then strenth = strenth + 830; end;
-	if buff9 then strenth = strenth + 765; end;
-	if buff10 then strenth = strenth + 1512; end;
-
-	if (debuff2 and debuff1) then 
-	  --Oldhand_AddMessage("两个疾病")
-		step = 1;
-		if plagueMode==1 and target_count > 2 and ((GetTime() - plagueTime > 16) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
-			if plageRune==0 then
-				if Api_CheckRune(1) then
-					if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then
-						Oldhand_AddMessage("使用鲜血符文传染，序号：1");
-						plageRune = 1;
-						return true;
-					end
-				elseif Api_CheckRune(2) then
-					if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then
-						Oldhand_AddMessage("使用鲜血符文传染，序号：2");
-						plageRune = 2;
-						return true;
-					end
-				else
-					plageRune = Api_CheckDeathRune();
-					if plageRune>0 then
-						Oldhand_AddMessage("使用死亡符文传染，序号："..plageRune);
-						Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud");
-						return true;
-					end
-				end
-			elseif not Api_CheckRune(plageRune) then
-				local temp = GetTime() - plagueTime;
-				Oldhand_AddMessage("已使用符文 " ..plageRune.. " 施放传染...距离上次传染时间："..temp.." 秒");
-				plagueTime = GetTime();
-				
-				plageRune = 0;
-			else
-				return Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud");
-			end
-		end;
-	end;
-
-	if Oldhand_PlayerBU("白霜") or Oldhand_PlayerBU("冰冻之雾") then
-	  Oldhand_AddMessage("白霜...................")
-		if Oldhand_CastSpell("凛风冲击", warlock_action_table["凛风冲击"]) then return true; end;
-	end
-	if Oldhand_PlayerBU("杀戮机器") then
-		if Oldhand_CastSpell("湮灭", warlock_action_table["湮灭"]) then return true; end;
-		if Oldhand_CastSpell("冰霜之镰", warlock_action_table["冰霜之镰"]) then return true; end;
-		--if Oldhand_CastSpell("冰霜打击","Spell_Warlock_EmpowerRuneBlade2") then return true; end;
-	end
-	if (Oldhand_GetUnitPowerPercent("player") >= 50) then
-		--if Oldhand_CastSpell("湮灭","Spell_Warlock_ClassIcon") then return true; end;
-		if Oldhand_CastSpell("冰霜打击", warlock_action_table["冰霜打击"]) then return true; end;
-	end
-
-  if isNearAction then
-    if Oldhand_CastSpell("冰川突进", warlock_action_table["冰川突进"]) then return true; end;
-    if Oldhand_CastSpell("冰霜之镰", warlock_action_table["冰霜之镰"]) then return true; end;
-  end;
-
-  if Oldhand_CastSpell("凛风冲击", warlock_action_table["凛风冲击"]) then return true; end; -- Spell_ Warlock_ IceTouch
-	if not Api_CheckRunes() then
-		if Oldhand_CastSpell("符文武器增效","INV_Sword_62") then return true; end;
-	end
 	
-	--if Oldhand_CastSpell("冰霜打击","Spell_Warlock_EmpowerRuneBlade2") then return true; end;
-	
-	if Oldhand_CastSpell("湮灭", warlock_action_table["湮灭"]) then return true; end;
+	if Oldhand_BreakCasting("奥术洪流")==1 and Oldhand_CastSpell("奥术洪流", warlock_action_table["奥术洪流"]) then return true; end;
 
-	if Oldhand_CastSpell("冰霜之镰", warlock_action_table["冰霜之镰"]) then return true; end;
+	if Oldhand_CastSpellIgnoreRange("召唤恐惧猎犬", warlock_action_table["召唤恐惧猎犬"]) then return true; end;
+		--if Oldhand_CastSpell("古尔丹之手", warlock_action_table["古尔丹之手"]) then return true; end;
+	if Oldhand_CastSpell("暗影箭", warlock_action_table["暗影箭"]) then return true; end;
 	
 	Oldhand_SetText("无动作",0);
 	return;		
@@ -627,107 +526,34 @@ function Warlock_DpsOut1()
 		Oldhand_SetText("目标无法攻击",0);
 		return ;
 	end;
+	if UnitIsPlayer("target") and UnitCanAttack("player", "target") then
+	end;
 	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Oldhand_Test_Target_Debuff()) then
 		mianyi1 = 0; 
 		--Oldhand_SetText("开始攻击",26);	
 		Oldhand_SetText("自动攻击",1);
 		return true;
 	end;
-
-	local tt_name = UnitName("targettarget");
-	if UnitCanAttack("player", "target") and UnitName("player")~=tt_name and tt_name~=null and UnitHealthMax("targettarget")<120000 then
-		if Oldhand_CastSpell("黑暗命令","Spell_Nature_DeathKnightRage") then return true; end;
-	end
-	
-	
-	if (IsActionInRange(Oldhand_GetActionID("Spell_Warlock_MindFreeze")) ~= 0 or IsActionInRange(Oldhand_GetActionID("Spell_Shadow_SoulLeech_3")) ~= 0) then
-		if Oldhand_BreakCasting("心灵冰冻")==1 and Oldhand_CastSpell("心灵冰冻", warlock_action_table["心灵冰冻"]) then return true; end;
-		if Oldhand_BreakCasting("绞袭")==1 and Oldhand_CastSpell("绞袭","Spell_Shadow_SoulLeech_3") then return true; end;
-	end;
-	
-	if Warlock_playerSafe() then return true; end;
-	
-	if UnitIsPlayer("target") and UnitCanAttack("player", "target") then
-		if Oldhand_TargetDeBU("寒冰锁链") then
-			if Oldhand_CastSpell("寒冰锁链","Spell_Frost_ChainsOfIce") then return true; end;
-		end;
-	end;
-
-	-- 增强	Buff
+  	-- 增强	Buff
 	if Warlock_RunCommand() then return true; end;
 
 	-- 增强饰品
 	if Warlock_Auto_Trinket() then return true; end;
-
-	local debuff1,remainTime1 = Oldhand_CheckDebuffByPlayer("冰霜疫病");
-	local debuff2,remainTime2 = Oldhand_CheckDebuffByPlayer("血之疫病");
-	if not debuff1 and not debuff2 then
-		if Oldhand_CastSpell("爆发","spell_deathvortex") then return true; end;
-	end;
-  if (IsCurrentAction(Oldhand_GetActionID("spell_Warlock_defile"))) then 
-		Oldhand_SetText("亵渎",0);
-		return true; 
-	end;
-  if (IsCurrentAction(Oldhand_GetActionID("Spell_Shadow_DeathAndDecay"))) then 
-		Oldhand_SetText("枯萎凋零",0);
-		return true; 
-	end;
-
-	--if (debuff1) and (debuff2) then
-	--	step = 1;
-	--	if plagueMode==1 and target_count > 2 and ((GetTime() - plagueTime > 16) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
-	--		if plageRune==0 then
-	--			if Api_CheckRune(1) then
-	--				if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then
-	--					Oldhand_AddMessage("使用鲜血符文传染，序号：1");
-	--					plageRune = 1;
-	--					return true;
-	--				end
-	--			elseif Api_CheckRune(2) then
-	--				if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then
-	--					Oldhand_AddMessage("使用鲜血符文传染，序号：2");
-	--					plageRune = 2;
-	--					return true;
-	--				end
-	--			else
-	--				plageRune = Api_CheckDeathRune();
-	--				if plageRune>0 then
-	--					Oldhand_AddMessage("使用死亡符文传染，序号："..plageRune);
-	--					Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud");
-	--					return true;
-	--				end
-	--			end
-	--		elseif not Api_CheckRune(plageRune) then
-	--			local temp = GetTime() - plagueTime;
-	--			Oldhand_AddMessage("已使用符文 " ..plageRune.. " 施放传染...距离上次传染时间："..temp.." 秒");
-	--			plagueTime = GetTime();
-	--			
-	--			plageRune = 0;
-	--		else
-	--			return Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud");
-	--		end
-	--	end;
-	--end;
-	if debuff1 and debuff2 then
-	  if Oldhand_CastSpell("血液沸腾","Spell_Warlock_BloodBoil") then return true; end;
-	elseif not debuff1 then
-		plageRune = 0;
-		if Oldhand_CastSpell("冰冷触摸","Spell_Frost_ArcticWinds") then return true; end;
-	elseif not debuff2 then
-		plageRune = 0;
-		if Oldhand_CastSpell("暗影打击","Spell_Warlock_EmpowerRuneBlade") then return true; end;
-	end;
-
-
-	if Oldhand_CastSpell("灵界打击","Spell_Warlock_Butcher2") then return true; end;
-
-	if (UnitPower("player") > 80) then
-		if Oldhand_CastSpell("凋零缠绕","Spell_Shadow_DeathCoil") then return true; end;
-	end 
-	if not Api_CheckRunes() then
-		if Oldhand_CastSpell("符文武器增效","INV_Sword_62") then return true; end;
-	end
 	
+	local tt_name = UnitName("targettarget");
+	local debuff1,remainTime1 = Oldhand_CheckDebuffByPlayer("腐蚀术");
+	local debuff2,remainTime2 = Oldhand_CheckDebuffByPlayer("痛楚");
+
+	if (IsActionInRange(Oldhand_GetActionID("Spell_Warlock_MindFreeze")) ~= 0 or IsActionInRange(Oldhand_GetActionID("Spell_Shadow_SoulLeech_3")) ~= 0) then
+	  if Oldhand_BreakCasting("奥术洪流")==1 and Oldhand_CastSpell("奥术洪流", warlock_action_table["奥术洪流"]) then return true; end;
+	end;
+	
+	if Warlock_playerSafe() then return true; end;
+	if Oldhand_CastSpell("痛苦无常", warlock_action_table["痛苦无常"]) then return true; end;
+  if not debuff1 then
+		if Oldhand_CastSpell("腐蚀术", warlock_action_table["腐蚀术"]) then return true; end;
+	end;
+	if Oldhand_CastSpell("痛楚", warlock_action_table["痛楚"]) then return true; end;
 	
 	Oldhand_SetText("无动作",0);
 	return;		

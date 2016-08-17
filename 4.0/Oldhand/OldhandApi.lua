@@ -378,6 +378,11 @@ function Oldhand_GetUnitAssistantHandType(unit)
 	return "";
 end
 function Oldhand_AddMessage(str)
+  local rune_count = 0;
+	for i=1, 5 do
+		local _, _, runeReady = GetRuneCooldown(i);
+		if runeReady then rune_count = rune_count + 1; end;
+	end
 	if Messagestr ~= str then
 		Messagestr = str;
 		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00战斗信息:|r |cff00ff00" .. str .. "|r");	
@@ -687,3 +692,15 @@ function EndTimer(id)
 	end
 end
 
+-- 获取可用符文或灵魂碎片
+function Api_CheckRunes()
+  Oldhand_AddMessage("rune_count: ");
+  local rune_count = 0;
+  Oldhand_AddMessage("rune_count: "..rune_count);
+	for i=1, 5 do
+		local _, _, runeReady = GetRuneCooldown(i);
+		if runeReady then rune_count = rune_count + 1; end;
+	end
+	Oldhand_AddMessage("rune_count: "..rune_count);
+	return rune_count;
+end

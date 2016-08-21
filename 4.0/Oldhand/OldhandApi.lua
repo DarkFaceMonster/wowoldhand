@@ -193,6 +193,7 @@ function Oldhand_GetSpellCooldown(spellname)
 	local start, duration, enable = GetActionCooldown(i);
 	return duration;
 end
+
 function CanUseAction(i) 
 	local _, duration, _ = GetActionCooldown(i);
 	local isUsable, notEnoughMana = IsUsableAction(i);					
@@ -208,6 +209,7 @@ function CanUseAction(i)
 	end	
 	return false; 
 end
+
 function Oldhand_CanUseAction(i)
   local start, duration, enable = GetActionCooldown(i);
 	if duration == 0 and start==0 and enable==1 then
@@ -532,6 +534,7 @@ function Oldhand_CastSpell_IgnoreRange(text, texture)
 	for i = 1, 12 do
 		if ( HasAction(i) ) then
 			local temptexture = GetActionTexture(i);
+			
 			if temptexture == texture then
 				if Oldhand_CanUseAction(i) then
 					Oldhand_SetText(text, i);

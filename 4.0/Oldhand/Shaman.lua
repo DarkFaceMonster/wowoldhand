@@ -79,6 +79,7 @@ shaman_action_table["图腾掌握"] = 511726;
 shaman_action_table["震地图腾"] = 451165;
 shaman_action_table["土元素"] = 136024;
 shaman_action_table["火元素"] = 135790;
+shaman_action_table["升腾"] = 135791;
 
 
 -- 增强
@@ -159,7 +160,7 @@ function Shaman_CreateMacro()
     
     Oldhand_PutAction("图腾掌握", 12);
     
-    
+    Oldhand_PutAction("升腾", 65);
     Oldhand_PutAction("震地图腾", 66);
     Oldhand_PutAction("土元素", 67);
     Oldhand_PutAction("火元素", 68);
@@ -385,6 +386,8 @@ function Shaman_DpsOut1()
 	  if Oldhand_CastSpell("烈焰震击", shaman_action_table["烈焰震击"]) then return true; end;
 	end
 	
+	if Oldhand_CastSpell_IgnoreRange("升腾", shaman_action_table["升腾"]) then return true; end;
+	
 	local buff1, remainTime1, count1 = Oldhand_PlayerBU("熔岩奔腾");
 	if buff1 then
 	  if Oldhand_CastSpell("熔岩爆裂", shaman_action_table["熔岩爆裂"]) then return true; end;
@@ -393,14 +396,22 @@ function Shaman_DpsOut1()
 	local healthPercent1, maxHealth1 = Oldhand_GetPlayerHealthPercent("player");
 	local healthPercent2, maxHealth2 = Oldhand_GetPlayerHealthPercent("target");
 	
-	if maxHealth2 > maxHealth1 then
+	if maxHealth2 > maxHealth1 or partyNum >= 1 then
 	  if Oldhand_CastSpell_IgnoreRange("火元素", shaman_action_table["火元素"]) then return true; end;
 	end;
-  
-	if Oldhand_CastSpell_IgnoreRange("元素冲击", shaman_action_table["元素冲击"]) then return true; end;
+
+	local haveTotem, totemName, startTime, duration = GetTotemInfo(1);
+	if ""==totemName and startTime == 0 and maxHealth2 > maxHealth1 * 3 then
+	  --local id = Oldhand_GetActionID(shaman_action_table["图腾掌握"]);
+	  --Oldhand_AddMessage("id: "..id);
+	  --if id >= 61 then id = id - 48; end;
+	  --Oldhand_SetText("图腾掌握", id);
+	  if Oldhand_CastSpell_IgnoreRange("图腾掌握", shaman_action_table["图腾掌握"]) then return true; end;
+	end;
+	  
+	if Oldhand_CastSpell("元素冲击", shaman_action_table["元素冲击"]) then return true; end;
 	
 	if Oldhand_CastSpell("熔岩爆裂", shaman_action_table["熔岩爆裂"]) then return true; end;
-	
 	
 	--Oldhand_AddMessage("tuandui : "..partyNum);
 	if partyNum >= 1 then
@@ -409,6 +420,8 @@ function Shaman_DpsOut1()
 	  if Oldhand_CastSpell("闪电箭", shaman_action_table["闪电箭"]) then return true; end;
 	end;
 	
+
+	 
 	Oldhand_SetText("无动作",0);
 	return;		
 

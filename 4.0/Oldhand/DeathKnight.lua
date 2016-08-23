@@ -14,8 +14,6 @@ local isAnimateDeading = 0; -- 是否正在使用活力分流
 local step = 0;	-- 循环步骤
 local target_spellname = "";	-- 目标正在施法的法术名称
 local needBloodTap = 0;  -- 需要活力分流
-local target_count = 0;		-- 目标个数
-local target_table = {};	
 
 local dynamicMicroID = 72;
 local playerClass;
@@ -571,7 +569,7 @@ function DeathKnight_DpsOut2()
 	if (debuff2 and debuff1) then 
 	  --Oldhand_AddMessage("两个疾病")
 		step = 1;
-		if plagueMode==1 and target_count > 2 and ((GetTime() - plagueTime > 16) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
+		if plagueMode==1 and Oldhand_TargetCount() > 2 and ((GetTime() - plagueTime > 16) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
 			if plageRune==0 then
 				if Api_CheckRune(1) then
 					if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then
@@ -661,12 +659,6 @@ function DeathKnight_DpsOut3()
 
   if DeathKnight_playerSafe() then return true; end;
   
-	if IsPetActive() then
-	  if Oldhand_CastSpellIgnoreRange("黑暗突变", deathknight_action_table["黑暗突变"]) then return true; end;
-	else
-	  if Oldhand_CastSpellIgnoreRange("亡者复生", deathknight_action_table["亡者复生"]) then return true; end;
-	end;
-			
 	-- 是否在近战范围（使用灵界打击）
 	local isNearAction = IsActionInRange(Oldhand_GetActionID(237517)) == true; 
 	
@@ -687,17 +679,15 @@ function DeathKnight_DpsOut3()
 		Oldhand_SetText("枯萎凋零",0);
 		return true; 
 	end;
-	
-  local power = UnitPower("player");
-	if (power >= 80) then
-		if Oldhand_CastSpell("黑暗仲裁者", deathknight_action_table["黑暗仲裁者"]) then return true; end;
-	end
 
-	if (power >= 70) then
-		if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
-	end
-
+	if IsPetActive() then
+	  if Oldhand_CastSpellIgnoreRange("黑暗突变", deathknight_action_table["黑暗突变"]) then return true; end;
+	else
+	  if Oldhand_CastSpellIgnoreRange("亡者复生", deathknight_action_table["亡者复生"]) then return true; end;
+	end;
+			
 	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
+	local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("target");
 	local debuff7, remainTime7 = Oldhand_CheckDebuffByPlayer("灵魂收割");
 	if not debuff7 then
   	if target_health_percent < 50 or target_health < 260000 then
@@ -705,8 +695,9 @@ function DeathKnight_DpsOut3()
   	end;
   end;
   
-  if target_health > 300000 then
+  if target_health > 500000 then
     if Oldhand_CastSpellIgnoreRange ("召唤石像鬼", deathknight_action_table["召唤石像鬼"]) then return true; end;
+    if Oldhand_CastSpell("黑暗仲裁者", deathknight_action_table["黑暗仲裁者"]) then return true; end;
   end;
 
 	-- 增强	Buff
@@ -741,7 +732,7 @@ function DeathKnight_DpsOut3()
 
 	if (debuff2 and debuff1) then 
 		step = 1;
-		if plagueMode==1 and target_count > 2 and ((GetTime() - plagueTime > 17) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
+		if plagueMode==1 and Oldhand_TargetCount() > 2 and ((GetTime() - plagueTime > 17) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
 			if plageRune==0 then
 				if Api_CheckRune(1) then
 					if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then
@@ -766,14 +757,16 @@ function DeathKnight_DpsOut3()
 		end;
 		if strenth >= 800 then
 			if Oldhand_CastSpellIgnoreRange("召唤石像鬼", spell_table["召唤石像鬼"]) then return true; end;
+			if Oldhand_CastSpell("黑暗仲裁者", deathknight_action_table["黑暗仲裁者"]) then return true; end;
 		end
 	end;
 
+  
   local partyNum = GetNumGroupMembers();
-	-- 没有恶性瘟疫则释放爆发
+	-- 没有恶性瘟疫则施放爆发
 	if (not debuff4) then
 	  if Oldhand_CastSpell("爆发", deathknight_action_table["爆发"]) then return true; end;
-	elseif (remainTime4 < 5 or target_health < 100000) and partyNum >= 1 then
+	elseif Oldhand_TargetCount() >= 3 then
 	  if Oldhand_CastSpell("传染", deathknight_action_table["传染"]) then return true; end;
 	end
 	-- 溃烂之伤达到5层
@@ -781,6 +774,12 @@ function DeathKnight_DpsOut3()
     if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
   end;
   
+  local power = UnitPower("player");
+	if (power >= 70 or (power >= 30 and player_health * 3 < target_health)) then
+		if Oldhand_CastSpell("黑暗仲裁者", deathknight_action_table["黑暗仲裁者"]) then return true; end;
+		if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
+	end
+
 	if Oldhand_CastSpell("脓疮打击", deathknight_action_table["脓疮打击"]) then return true; end;
 	if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
 
@@ -858,7 +857,7 @@ function DeathKnight_DpsOut1()
 
 	--if (debuff1) and (debuff2) then
 	--	step = 1;
-	--	if plagueMode==1 and target_count > 2 and ((GetTime() - plagueTime > 16) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
+	--	if plagueMode==1 and Oldhand_TargetCount() > 2 and ((GetTime() - plagueTime > 16) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
 	--		if plageRune==0 then
 	--			if Api_CheckRune(1) then
 	--				if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then

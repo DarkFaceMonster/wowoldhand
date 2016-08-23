@@ -760,6 +760,10 @@ function Oldhand_CountTarget(srcGuid, srcName, destGuid, destName)
 	end
 end
 
+function Oldhand_TargetCount()
+  return target_count;
+end;
+
 function Oldhand_RunCommand()
 	if UnitAffectingCombat("player") then
 		local id1 = Oldhand_GetActionID("Racial_Troll_Berserk");

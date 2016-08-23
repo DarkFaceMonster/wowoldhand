@@ -13,8 +13,6 @@ local Shaman_RaidFlag = 0;
 local Shaman_Old_UnitPopup_OnClick;
 local Shaman_AutoFollowName="";
 local TestHelpTarget = "";
-local target_count = 0;		-- 目标个数
-local target_table = {};	
 
 -- 2 Ability_Shaman_Lavalash		熔岩猛击
 -- 3 Ability_Shaman_Stormstrike 	风暴打击
@@ -462,7 +460,7 @@ function Shaman_DpsOut2()
   local partyNum = GetNumGroupMembers();
 	local power = UnitPower("player");
 	
-	if target_count >= 3 and power >= 20 then
+	if Oldhand_TargetCount() >= 3 and power >= 20 then
 	  if Oldhand_CastSpell("毁灭闪电", shaman_action_table["毁灭闪电"]) then return true; end;
 	end;
 

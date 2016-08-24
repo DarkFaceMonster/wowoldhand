@@ -667,10 +667,17 @@ function Oldhand_Frame_OnUpdate()
 		return;
 	end;
 
-	local spellname = UnitCastingInfo("player")
+	local spellname,_,displayName = UnitCastingInfo("player")
 	if spellname then
 	  -- Oldhand_AddMessage("UnitCastingInfo: "..spellname);
-		Oldhand_SetText("施放"..spellname,0);
+		Oldhand_SetText("施放"..spellname, 0);
+		return;
+	end
+	
+	spellname = UnitChannelInfo("player");
+	if spellname then
+	  Oldhand_AddMessage("UnitChannelInfo: "..spellname);
+		Oldhand_SetText("引导"..spellname, 0);
 		return;
 	end
 

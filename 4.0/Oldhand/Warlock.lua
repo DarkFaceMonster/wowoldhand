@@ -36,6 +36,7 @@ warlock_action_table["腐蚀术"] = 136118;
 -- 恶魔
 warlock_action_table["暗影箭"] = 136197;
 warlock_action_table["古尔丹之手"] = 535592;
+warlock_action_table["恶魔增效"] = 1378283;
 warlock_action_table["召唤恐惧猎犬"] = 1378282;
 
 -- 毁灭
@@ -336,9 +337,7 @@ function Warlock_DpsOut2()
 	-- 近战范围		
 	--local isNearAction = IsActionInRange(Oldhand_GetActionID(237517));
 	if Warlock_playerSafe() then return true; end;
--- if HealthPercent < 60 then
---		if Oldhand_CastSpell_IgnoreRange("吸取生命", shaman_action_table["吸取生命"]) then return true; end;
--- end;
+	
 		-- 增强饰品
 	if Warlock_Auto_Trinket() then return true; end;
   
@@ -347,6 +346,11 @@ function Warlock_DpsOut2()
 	
 	if Oldhand_BreakCasting("奥术洪流")==1 and Oldhand_CastSpell("奥术洪流", warlock_action_table["奥术洪流"]) then return true; end;
 
+  local pet_buff1 = Oldhand_UnitBU("pet", "恶魔增效");
+  if not pet_buff1 then
+    if Oldhand_CastSpell_IgnoreRange("恶魔增效", warlock_action_table["恶魔增效"]) then return true; end;
+  end;
+  
 	if Oldhand_CastSpellIgnoreRange("召唤恐惧猎犬", warlock_action_table["召唤恐惧猎犬"]) then return true; end;
 		--if Oldhand_CastSpell("古尔丹之手", warlock_action_table["古尔丹之手"]) then return true; end;
 	if Oldhand_CastSpell("暗影箭", warlock_action_table["暗影箭"]) then return true; end;
@@ -549,6 +553,11 @@ function Warlock_DpsOut1()
 	end;
 	
 	if Warlock_playerSafe() then return true; end;
+	
+	if not debuff2 then
+		if Oldhand_CastSpell("痛楚", warlock_action_table["痛楚"]) then return true; end;
+  end;
+	
 	if Oldhand_CastSpell("痛苦无常", warlock_action_table["痛苦无常"]) then return true; end;
   if not debuff1 then
 		if Oldhand_CastSpell("腐蚀术", warlock_action_table["腐蚀术"]) then return true; end;
@@ -570,8 +579,14 @@ end
 
 function Warlock_playerSafe()
 	local HealthPercent = Oldhand_GetPlayerHealthPercent("player");
-	if (HealthPercent < 50) then Oldhand_AddMessage('血量过低 '..HealthPercent); end;
-	
+	if (Warlock_DPS == 1 and HealthPercent < 60) then
+	  Oldhand_AddMessage('血量过低 '..HealthPercent);
+	  if Oldhand_CastSpell("吸取生命", warlock_action_table["吸取生命"]) then return true; end;
+	end;
+	if (Warlock_DPS == 2 and HealthPercent < 50) then
+	  Oldhand_AddMessage('血量过低 '..HealthPercent);
+	  if Oldhand_CastSpell("吸取生命", warlock_action_table["吸取生命"]) then return true; end;
+	end;
 	if (Warlock_DPS == 0 or Warlock_DPS == 1) then
 		if HealthPercent < 50 then
 			if Oldhand_CastSpell("吸血鬼之血", "Spell_Shadow_LifeDrain") then return true; end;

@@ -159,8 +159,25 @@ function Oldhand_PlayerDeBU(s)
 	--return B
 	
 end
-function Oldhand_UnitBU(unit,s) local P,B,i=unit,true,1  while UnitBuff(P,i)   do if string.find(UnitBuff(P,i),s)   then B=false end i=i+1 end return B end
+--function Oldhand_UnitBU(unit,s) local P,B,i=unit,true,1  while UnitBuff(P,i)   do if string.find(UnitBuff(P,i),s)   then B=false end i=i+1 end return B end
 function Oldhand_UnitDeBU(unit,s) local P,B,i=unit,true,1  while UnitDebuff(P,i) do if string.find(UnitDebuff(P,i),s) then B=false end i=i+1 end return B end
+
+function Oldhand_UnitBU(unit, s)
+  local i = 1;
+	local name, _, _, count, _, _, expirationTime = UnitBuff(unit, i);
+
+	while name ~= null do
+		if name==s then
+			local temp = expirationTime - GetTime();
+			return name, temp, count
+		end;
+		i = i+1;
+		name, _, _, count, _, _, expirationTime = UnitBuff(unit, i);
+	end
+
+	return null,null,0;
+end;
+
 function Oldhand_PlayerBU(s)
 	local i = 1;
 	local name, _, _, count, _, _, expirationTime = UnitBuff("player", i);

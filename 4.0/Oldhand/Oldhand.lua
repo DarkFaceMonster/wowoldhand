@@ -281,6 +281,7 @@ function Oldhand_UnitPopup_OnClick()
 		Oldhand_Old_UnitPopup_OnClick();
 	end
 end
+
 function Oldhand_OnEvent(event)
   if not is_valid_class then
     Oldhand_AddMessage("没有 "..playerClass.." 职业插件");
@@ -750,18 +751,18 @@ function Oldhand_ClearTargetTable()
 end
 
 function Oldhand_CountTarget(srcGuid, srcName, destGuid, destName)
-	if UnitAffectingCombat("player") and 0~=destName then
-		if not Oldhand_Test_IsFriend(destName) then
+	if UnitAffectingCombat("player") then
+		if destName and destGuid and not Oldhand_Test_IsFriend(destName) then
 			if not target_table[destGuid] then
 				target_count = target_count+1;
 				target_table[destGuid] = destName;
 				Oldhand_AddMessage("战斗中目标数："..target_count.." 目标名字："..destName);
 			end;
-		elseif not Oldhand_Test_IsFriend(srcName) then
+		elseif srcName and srcGuid and not Oldhand_Test_IsFriend(srcName) then
 			if target_table[srcGuid]==null then
 				target_count = target_count+1;
 				target_table[srcGuid] = srcName;
-				Oldhand_AddMessage("战斗中目标数："..target_count.." 目标名字："..destName);
+				Oldhand_AddMessage("战斗中目标数："..target_count.." 目标名字："..srcName);
 			end;
 		end
 	end
@@ -1037,10 +1038,17 @@ function Oldhand_UnitAffectingCombat()
 end;
 
 function Oldhand_CombatLogEvent(event,...)
-	if not (playerClass=="萨满祭司") then return; end;
-	local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = ...
+	if not is_valid_class then return; end;
+	
+	--local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = ...
+	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = ...
 	local amount, school, resisted, blocked, absorbed, critical, glancing, crushing, missType, enviromentalType,interruptedSpellId, interruptedSpellName, interruptedSpellSchool;
-
+  
+  --if sourceName == nil then sourceName = "nil"; end;
+  --if destName == nil then destName = "nil"; end;
+  --Oldhand_AddMessage("timestamp: "..timestamp.." eventType: "..eventType.." sourceGUID: "..sourceGUID.." sourceName: "..sourceName);
+  --Oldhand_AddMessage("sourceFlags: "..sourceFlags.." destGUID: "..destGUID.." destName: "..destName.." destFlags: "..destFlags);
+  
 	if eventType == "SPELL_CAST_SUCCESS" then
 		spellId, spellName, spellSchool = select(9, ...);
 		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_HOSTILE_PLAYERS) then
@@ -1161,9 +1169,10 @@ function Oldhand_CombatLogEvent(event,...)
 		return;
 	end;
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		if eventType == "SPELL_DAMAGE" then
+	  if (sourceGUID and sourceName) or (destGUID and destName) then
 			Oldhand_CountTarget(sourceGUID, sourceName, destGUID, destName);
-		elseif eventType == "UNIT_DIED" or eventType=="UNIT_DESTROYED" then
+		end;
+		if eventType == "UNIT_DIED" or eventType=="UNIT_DESTROYED" then
 			Oldhand_DecreaseTarget(sourceGUID, sourceName, destGUID, destName);
 		end
 	end

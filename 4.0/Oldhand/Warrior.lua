@@ -398,6 +398,13 @@ function Warrior_DpsOut2()
 
 	-- 狂怒饰品
 	if Warrior_Auto_Trinket() then return true; end;
+	
+	-- 近战范围		
+	local isNearAction = IsActionInRange(Oldhand_GetActionID(warrior_action_table["狂暴挥砍"]));
+	
+	if not isNearAction then
+	  if Oldhand_CastSpell("冲锋", warrior_action_table["冲锋"]) then return true; end;
+	end;
 
   local partyNum = GetNumGroupMembers();
   if Oldhand_PlayerBU("血肉顺劈") then
@@ -406,11 +413,11 @@ function Warrior_DpsOut2()
 	end
     
 	if Oldhand_PlayerBU("激怒") then
-	  Oldhand_AddMessage("发脾气.................................")
+	  --Oldhand_AddMessage("发脾气.................................")
 		if Oldhand_CastSpell("怒击", warrior_action_table["怒击"]) then return true; end;
 	end
-	if Oldhand_TargetCount() >= 3 and not Oldhand_PlayerBU("血肉顺劈") then
-	  if Oldhand_CastSpell("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
+	if (isNearAction and Oldhand_TargetCount() >= 3 and not Oldhand_PlayerBU("血肉顺劈")) or Oldhand_PlayerBU("摧枯拉朽") then
+	  if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
 	end;	  
   if power >= 85 then
     if Oldhand_CastSpell("暴怒", warrior_action_table["暴怒"]) then return true; end;

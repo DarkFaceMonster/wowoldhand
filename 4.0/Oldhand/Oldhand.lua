@@ -506,18 +506,30 @@ function Oldhand_NoTarget_RunCommand()
 	return Oldhand_RunCommand();
 end;
 
-function Oldhand_Test_IsFriend(unitname)
+function Oldhand_Test_IsFriend(unitname, unitguid)
+  if unitguid then
+    for id=1, 100 do
+      if UnitGUID("nameplate"..id) == unitguid then
+        return UnitIsFriend("player", "nameplate"..id);
+				
+			end;
+    end
+    
+		return true;
+	end
 	if (UnitInRaid("player")) then
+	  Oldhand_AddMessage("GetNumRaidMembers: "..GetNumRaidMembers());
 		for id=1, GetNumRaidMembers()  do
 			if UnitName("raid"..id) == unitname then
-				if UnitCanAttack("player","raid"..id) then return false; end;
+				if UnitCanAttack("player", "raid"..id) then return false; end;
 				return true;
 			end;
 		end
 	else
+	  Oldhand_AddMessage("GetNumGroupMembers: "..GetNumGroupMembers());
 		for id=1, GetNumGroupMembers()  do
 			if UnitName("party"..id) == unitname then
-				if UnitCanAttack("player","party"..id) then return false; end;
+				if UnitCanAttack("player", "party"..id) then return false; end;
 				return true;
 			end;
 		end
@@ -752,13 +764,13 @@ end
 
 function Oldhand_CountTarget(srcGuid, srcName, destGuid, destName)
 	if UnitAffectingCombat("player") then
-		if destName and destGuid and not Oldhand_Test_IsFriend(destName) then
+		if destName and destGuid and not Oldhand_Test_IsFriend(destName, destGuid) then
 			if not target_table[destGuid] then
 				target_count = target_count+1;
 				target_table[destGuid] = destName;
 				Oldhand_AddMessage("战斗中目标数："..target_count.." 目标名字："..destName);
 			end;
-		elseif srcName and srcGuid and not Oldhand_Test_IsFriend(srcName) then
+		elseif srcName and srcGuid and not Oldhand_Test_IsFriend(srcName, srcGuid) then
 			if target_table[srcGuid]==null then
 				target_count = target_count+1;
 				target_table[srcGuid] = srcName;
@@ -948,6 +960,7 @@ function Oldhand_GetPlayerLossHealth(unit)
 end
 
 function Oldhand_GetPlayerHealthPercent(unit)
+  if not unit then unit = "player"; end;
 	local health, healthmax  = UnitHealth(unit), UnitHealthMax(unit);
 	local healthPercent = floor(health*100/healthmax+0.5);
 	return healthPercent, healthmax;
@@ -1037,20 +1050,25 @@ function Oldhand_UnitAffectingCombat()
 	return false;
 end;
 
-function Oldhand_CombatLogEvent(event,...)
+function Oldhand_CombatLogEvent(event, ...)
 	if not is_valid_class then return; end;
+	
+	local player_health, player_max_health = Oldhand_GetPlayerHealthPercent();
+	local valve_health = player_max_health / 10;
 	
 	--local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = ...
 	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = ...
-	local amount, school, resisted, blocked, absorbed, critical, glancing, crushing, missType, enviromentalType,interruptedSpellId, interruptedSpellName, interruptedSpellSchool;
+	local amount, school, resisted, blocked, absorbed, critical, glancing, crushing, missType, enviromentalType, interruptedSpellId, interruptedSpellName, interruptedSpellSchool;
+  local spellId, spellName, spellSchool;
   
-  --if sourceName == nil then sourceName = "nil"; end;
-  --if destName == nil then destName = "nil"; end;
-  --Oldhand_AddMessage("timestamp: "..timestamp.." eventType: "..eventType.." sourceGUID: "..sourceGUID.." sourceName: "..sourceName);
-  --Oldhand_AddMessage("sourceFlags: "..sourceFlags.." destGUID: "..destGUID.." destName: "..destName.." destFlags: "..destFlags);
+  -- 1st Parameter (12th)	2nd Parameter (13th)	3rd Parameter (14th)
+  -- spellId	spellName	spellSchool
+  
+  -- 1st Param (15th)	2nd Param (16th)	3rd Param (17th)	4th Param (18th)	5th Param (19th)	6th Param (20th)	7th Param (21st)	8th Param (22nd)	9th Param (23rd)	10th Param (24th)
+  -- amount	overkill	school	resisted	blocked	absorbed	critical	glancing	crushing	isOffHand
   
 	if eventType == "SPELL_CAST_SUCCESS" then
-		spellId, spellName, spellSchool = select(9, ...);
+		spellId, spellName, spellSchool = select(12, ...);
 		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_HOSTILE_PLAYERS) then
 				if spellName == "消失" and sourceName then
 					Oldhand_Warning_AddMessage("**敌对玩家>>"..sourceName.."<<使用了消失,反隐反隐!**");
@@ -1091,7 +1109,7 @@ function Oldhand_CombatLogEvent(event,...)
 	end;
 
 	if eventType == "SPELL_MISSED" then
-		spellId, spellName, spellSchool, missType = select(9, ...);
+		spellId, spellName, spellSchool, missType = select(12, ...);
 		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) and spellName then
 			if missType == "RESIST" then
 				Oldhand_AddMessage("**>>"..destName.."<<抵抗了"..sourceName.."的"..spellName.."!**");
@@ -1138,8 +1156,8 @@ function Oldhand_CombatLogEvent(event,...)
 	end;
 	if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) then
 		if (eventType == "SPELL_DAMAGE") then
-			spellId, spellName, spellSchool, amount, school, resisted, blocked, absorbed, critical, glancing, crushing = select(9, ...)
-			if spellName and amount > 500 then
+			spellId, spellName, spellSchool, amount, school, resisted, blocked, absorbed, critical, glancing, crushing = select(12, ...)
+			if spellName and amount > valve_health then
 				if critical then
 					Oldhand_AddMessage("你的|cffffff00"..spellName.."|r|cff00ff00对|r|cffffff00"..destName.."|r|cff00ff00造成|r|cffffff00"..amount.."|r|cff00ff00伤害(|r|cffffff00爆击|r|cff00ff00)...|r");
 				else
@@ -1149,8 +1167,8 @@ function Oldhand_CombatLogEvent(event,...)
 		end
 	end
 	if eventType == "SPELL_HEAL" then
-		spellId, spellName, spellSchool, amount, critical = select(9, ...);
-		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) and amount > 300 and destName and sourceName then
+		spellId, spellName, spellSchool, amount, critical = select(12, ...);
+		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) and amount > valve_health and destName and sourceName then
 			if critical then
 				Oldhand_AddMessage("|cff00ff00你的|cffffff00"..spellName.."|r|cff00ff00给|r|cffffff00"..destName.."|r|cff00ff00恢复|r|cffffff00"..amount.."|r|cff00ff00点生命(|r|cffffff00爆击|r|cff00ff00)...|r");
 			else
@@ -1158,7 +1176,7 @@ function Oldhand_CombatLogEvent(event,...)
 			end
 			return;
 		end;
-		if CombatLog_Object_IsA(destFlags, COMBATLOG_FILTER_MINE) and amount > 300 and destName and sourceName then
+		if CombatLog_Object_IsA(destFlags, COMBATLOG_FILTER_MINE) and amount > valve_health and destName and sourceName then
 			if critical then
 				Oldhand_AddMessage("|cffffff00"..sourceName.."|r|cff00ff00的|cffffff00"..spellName.."|r|cff00ff00给我|cff00ff00恢复|r|cffffff00"..amount.."|r|cff00ff00点生命(|r|cffffff00爆击|r|cff00ff00)...|r");
 			else

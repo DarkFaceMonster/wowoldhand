@@ -32,6 +32,9 @@ warrior_action_table["暴怒"] = 132352;
 warrior_action_table["狂怒回复"] = 132345;
 warrior_action_table["拳击"] = 132938;
 warrior_action_table["旋风斩"] = 132369;
+warrior_action_table["战吼"] = 458972;
+warrior_action_table["英勇投掷"] = 132453;
+
 -- 防护
 warrior_action_table["毁灭打击"] = 135291;
 warrior_action_table["盾牌猛击"] = 134951;
@@ -416,6 +419,11 @@ function Warrior_DpsOut2()
 	  --Oldhand_AddMessage("发脾气.................................")
 		if Oldhand_CastSpell("怒击", warrior_action_table["怒击"]) then return true; end;
 	end
+	
+	if not Oldhand_PlayerBU("战吼") then
+		if Oldhand_CastSpell_IgnoreRange("战吼", warrior_action_table["战吼"]) then return true; end;
+	end
+	
 	if (isNearAction and Oldhand_TargetCount() >= 3 and not Oldhand_PlayerBU("血肉顺劈")) or Oldhand_PlayerBU("摧枯拉朽") then
 	  if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
 	end;	  
@@ -429,6 +437,8 @@ function Warrior_DpsOut2()
 
   if Oldhand_CastSpell("嗜血", warrior_action_table["嗜血"]) then return true; end;
   if Oldhand_CastSpell("狂暴挥砍", warrior_action_table["狂暴挥砍"]) then return true; end;
+  
+  if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
 
 	Oldhand_SetText("无动作",0);
 	return;

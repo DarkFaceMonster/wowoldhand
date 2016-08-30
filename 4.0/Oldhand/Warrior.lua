@@ -407,39 +407,47 @@ function Warrior_DpsOut2()
 	
 	if not isNearAction then
 	  if Oldhand_CastSpell("冲锋", warrior_action_table["冲锋"]) then return true; end;
+	  if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
+	else
+  	-- local partyNum = GetNumGroupMembers();
+  	
+    if power >= 85 then
+      if Oldhand_CastSpell("暴怒", warrior_action_table["暴怒"]) then return true; end;
+    end
+    
+  	if not Oldhand_PlayerBU("战吼") then
+  		if Oldhand_CastSpell_IgnoreRange("战吼", warrior_action_table["战吼"]) then return true; end;
+  	end
+  	
+  	if Oldhand_PlayerBU("摧枯拉朽") then
+  	  if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
+  	end;  	
+  	
+    if Oldhand_PlayerBU("血肉顺劈") then
+  		if Oldhand_CastSpell("嗜血", warrior_action_table["嗜血"]) then return true; end;
+  	end
+      
+  	if Oldhand_PlayerBU("激怒") then
+  	  --Oldhand_AddMessage("发脾气.................................")
+  		if Oldhand_CastSpell("怒击", warrior_action_table["怒击"]) then return true; end;
+  	end
+  	
+  	if (isNearAction and Oldhand_TargetCount() >= 3 and not Oldhand_PlayerBU("血肉顺劈")) or Oldhand_PlayerBU("摧枯拉朽") then
+  	  if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
+  	end;	  
+  
+    if Oldhand_CastSpell("嗜血", warrior_action_table["嗜血"]) then return true; end;
+    
+    if Oldhand_TargetCount() >= 4 then
+      if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
+    end;
+    if Oldhand_CastSpell("狂暴挥砍", warrior_action_table["狂暴挥砍"]) then return true; end;
 	end;
 
-  local partyNum = GetNumGroupMembers();
-  if Oldhand_PlayerBU("血肉顺劈") then
-		if Oldhand_CastSpell("暴怒", warrior_action_table["暴怒"]) then return true; end;
-		if Oldhand_CastSpell("嗜血", warrior_action_table["嗜血"]) then return true; end;
-	end
-    
-	if Oldhand_PlayerBU("激怒") then
-	  --Oldhand_AddMessage("发脾气.................................")
-		if Oldhand_CastSpell("怒击", warrior_action_table["怒击"]) then return true; end;
-	end
-	
-	if not Oldhand_PlayerBU("战吼") then
-		if Oldhand_CastSpell_IgnoreRange("战吼", warrior_action_table["战吼"]) then return true; end;
-	end
-	
-	if (isNearAction and Oldhand_TargetCount() >= 3 and not Oldhand_PlayerBU("血肉顺劈")) or Oldhand_PlayerBU("摧枯拉朽") then
-	  if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
-	end;	  
-  if power >= 85 then
-    if Oldhand_CastSpell("暴怒", warrior_action_table["暴怒"]) then return true; end;
-  elseif power >= 60 then
-    if Oldhand_CastSpell("毁灭闪电", warrior_action_table["毁灭闪电"]) then return true; end;
-  elseif power >= 20 then
-    if Oldhand_CastSpell("风暴打击", warrior_action_table["风暴打击"]) then return true; end;
-  end
-
-  if Oldhand_CastSpell("嗜血", warrior_action_table["嗜血"]) then return true; end;
-  if Oldhand_CastSpell("狂暴挥砍", warrior_action_table["狂暴挥砍"]) then return true; end;
+  if Oldhand_TargetCount() >= 4 then
+    if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
+  end;
   
-  if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
-
 	Oldhand_SetText("无动作",0);
 	return;
 

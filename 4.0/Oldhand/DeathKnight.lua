@@ -81,6 +81,7 @@ local deathknight_action_table = {};
 
 deathknight_action_table["自动攻击"] = 1087637;
 deathknight_action_table["血性狂怒"] = 135726;
+deathknight_action_table["天启"] = 1392565;
 
 -- 鲜血
 
@@ -637,6 +638,7 @@ function DeathKnight_DpsOut2()
 	return;		
 
 end;
+
 -- 邪恶攻击
 function DeathKnight_DpsOut3()
   if Oldhand_Test_Target_Debuff() then 
@@ -761,7 +763,6 @@ function DeathKnight_DpsOut3()
 		end
 	end;
 
-  
   local partyNum = GetNumGroupMembers();
 	-- 没有恶性瘟疫则施放爆发
 	if (not debuff4) then
@@ -769,8 +770,10 @@ function DeathKnight_DpsOut3()
 	elseif Oldhand_TargetCount() >= 3 then
 	  if Oldhand_CastSpell("传染", deathknight_action_table["传染"]) then return true; end;
 	end
+	
 	-- 溃烂之伤达到5层
   if (debuff3 and count3 >= 5) then
+    if Oldhand_CastSpell("天启", deathknight_action_table["天启"]) then return true; end;
     if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
   end;
   

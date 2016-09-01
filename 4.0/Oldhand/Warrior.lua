@@ -411,10 +411,6 @@ function Warrior_DpsOut2()
 	else
   	-- local partyNum = GetNumGroupMembers();
   	
-    if power >= 85 then
-      if Oldhand_CastSpell("暴怒", warrior_action_table["暴怒"]) then return true; end;
-    end
-    
   	if not Oldhand_PlayerBU("战吼") then
   		if Oldhand_CastSpell_IgnoreRange("战吼", warrior_action_table["战吼"]) then return true; end;
   	end
@@ -423,6 +419,10 @@ function Warrior_DpsOut2()
   		if Oldhand_CastSpell_IgnoreRange("浴血奋战", warrior_action_table["浴血奋战"]) then return true; end;
   	end
   	
+    if power >= 85 then
+      if Oldhand_CastSpell("暴怒", warrior_action_table["暴怒"]) then return true; end;
+    end
+    
   	if Oldhand_PlayerBU("摧枯拉朽") then
   	  if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
   	end;  	

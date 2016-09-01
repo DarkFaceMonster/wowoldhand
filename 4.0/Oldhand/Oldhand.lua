@@ -56,6 +56,7 @@ local 	Oldhand_CLASS_SHAMAN  = '萨满祭司';
 local 	Oldhand_CLASS_WARLOCK = '术士';
 local 	Oldhand_CLASS_WARRIOR = '战士';
 local 	Oldhand_CLASS_DEATHKNIGHT = '死亡骑士';
+local 	Oldhand_CLASS_DEMONHUNTER = '恶魔猎手';
 
 local Oldhand_SKIP_BY_CLASS_LIST = {
 		[Oldhand_CLASS_WARRIOR] = {
@@ -106,6 +107,10 @@ function Oldhand_AutoSelectMode()
 	if playerClass=="死亡骑士" and (DeathKnight_DpsOut1 ~= nil and DeathKnight_DpsOut2 ~= nil and DeathKnight_DpsOut3 ~= nil) then
 	  is_valid_class = true;
 	  oldhand_dps_module[englishClass] =  DeathKnight_DpsOut;
+	end;
+	if playerClass=="恶魔猎手" and (DemonHunter_DpsOut1 ~= nil and DemonHunter_DpsOut2 ~= nil and DemonHunter_DpsOut3 ~= nil) then
+	  is_valid_class = true;
+	  oldhand_dps_module[englishClass] =  DemonHunter_DpsOut;
 	end;
   if playerClass=="战士" and (Warrior_DpsOut1 ~= nil and Warrior_DpsOut2 ~= nil and Warrior_DpsOut3 ~= nil) then
     is_valid_class = true;
@@ -225,6 +230,10 @@ function Oldhand_RegisterEvents(self)
 	if playerClass=="死亡骑士" and (DeathKnight_DpsOut1 ~= nil and DeathKnight_DpsOut2 ~= nil and DeathKnight_DpsOut3 ~= nil) then
 	  is_valid_class = true;
 	  oldhand_dps_module[englishClass] =  DeathKnight_DpsOut;
+	end;
+	if playerClass=="恶魔猎手" and (DemonHunter_DpsOut1 ~= nil and DemonHunter_DpsOut2 ~= nil and DemonHunter_DpsOut3 ~= nil) then
+	  is_valid_class = true;
+	  oldhand_dps_module[englishClass] =  DemonHunter_DpsOut;
 	end;
   if playerClass=="战士" and (Warrior_DpsOut1 ~= nil and Warrior_DpsOut2 ~= nil and Warrior_DpsOut3 ~= nil) then
     is_valid_class = true;
@@ -428,6 +437,8 @@ function Oldhand_CreateMacro()
     Shaman_CreateMacro();
   elseif playerClass == "死亡骑士" then
     DeathKnight_CreateMacro();
+  elseif playerClass == "恶魔猎手" then
+    DemonHunter_CreateMacro();
   elseif playerClass == "战士" then
     Warrior_CreateMacro();
   elseif playerClass == "术士" then
@@ -727,6 +738,8 @@ function Oldhand_Frame_OnUpdate()
 	    Shaman_DpsOut(Oldhand_DPS);
 	  elseif playerClass == "死亡骑士" then
 	    DeathKnight_DpsOut(Oldhand_DPS);
+	  elseif playerClass == "恶魔猎手" then
+	    DemonHunter_DpsOut(Oldhand_DPS);	    
 	  elseif playerClass == "战士" then
 	    Warrior_DpsOut(Oldhand_DPS);
 	  elseif playerClass == "术士" then

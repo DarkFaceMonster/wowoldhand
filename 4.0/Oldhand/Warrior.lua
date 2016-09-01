@@ -34,7 +34,7 @@ warrior_action_table["拳击"] = 132938;
 warrior_action_table["旋风斩"] = 132369;
 warrior_action_table["战吼"] = 458972;
 warrior_action_table["英勇投掷"] = 132453;
-
+warrior_action_table["浴血奋战"] = 236304;
 -- 防护
 warrior_action_table["毁灭打击"] = 135291;
 warrior_action_table["盾牌猛击"] = 134951;
@@ -417,6 +417,10 @@ function Warrior_DpsOut2()
     
   	if not Oldhand_PlayerBU("战吼") then
   		if Oldhand_CastSpell_IgnoreRange("战吼", warrior_action_table["战吼"]) then return true; end;
+  	end
+  	
+   	if not Oldhand_PlayerBU("浴血奋战") then
+  		if Oldhand_CastSpell_IgnoreRange("浴血奋战", warrior_action_table["浴血奋战"]) then return true; end;
   	end
   	
   	if Oldhand_PlayerBU("摧枯拉朽") then

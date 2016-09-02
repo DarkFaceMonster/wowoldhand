@@ -768,7 +768,7 @@ function DeathKnight_DpsOut3()
 	if (not debuff4) then
 	  if Oldhand_CastSpell("爆发", deathknight_action_table["爆发"]) then return true; end;
 	elseif Oldhand_TargetCount() >= 3 then
-	  if Oldhand_CastSpell("传染", deathknight_action_table["传染"]) then return true; end;
+	  if Oldhand_CastSpell_IgnoreRange("传染", deathknight_action_table["传染"]) then return true; end;
 	end
 	
 	-- 溃烂之伤达到5层

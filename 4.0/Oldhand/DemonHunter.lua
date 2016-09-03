@@ -26,8 +26,10 @@ DemonHunter_action_table["»ìÂÒ´ò»÷"] = 1305152;
 DemonHunter_action_table["ÓÄÁéÊÓ¾õ"] = 1247266;
 DemonHunter_action_table["ÑÛÀâ"] = 1305156;
 DemonHunter_action_table["Ğ°ÄÜ³å×²"] = 1247261;
-DemonHunter_action_table["Í¶ÖÀÀûÈĞ"] = 130515;
+DemonHunter_action_table["Í¶ÖÀÀûÈĞ"] = 1305159;
+DemonHunter_action_table["ÈĞÎè"] = 1305149;
 DemonHunter_action_table["ÍÌÊÉÄ§·¨"] = 1305153;
+DemonHunter_action_table["¶ñÄ§±äĞÎ"] = 1247262;
 
 -- ¸´³ğ
 DemonHunter_action_table["»ÙÃğ´ò»÷"] = 135291;
@@ -306,24 +308,24 @@ function DemonHunter_DpsOut1()
 	if DemonHunter_Auto_Trinket() then return true; end;
 	
 	-- ½üÕ½·¶Î§		
-	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["¿ñ±©»Ó¿³"]));
+	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["¶ñÄ§Ö®Ò§"]));
 	
 	if not isNearAction then
 	  if Oldhand_CastSpell("Í¶ÖÀÀûÈĞ", DemonHunter_action_table["Í¶ÖÀÀûÈĞ"]) then return true; end;
 	else
   	-- local partyNum = GetNumGroupMembers();
+
+  	if (isNearAction and Oldhand_TargetCount() >= 3 and power >= 50) then
+  	  if Oldhand_CastSpell_IgnoreRange("ÑÛÀâ", DemonHunter_action_table["ÑÛÀâ"]) then return true; end;
+  	end;	
   	
     if power >= 40 then
       if Oldhand_CastSpell("»ìÂÒ´ò»÷", DemonHunter_action_table["»ìÂÒ´ò»÷"]) then return true; end;
     end
     
-  	if not Oldhand_PlayerBU("Õ½ºğ") then
-  		if Oldhand_CastSpell_IgnoreRange("Õ½ºğ", DemonHunter_action_table["Õ½ºğ"]) then return true; end;
-  	end
- 
-  	if (isNearAction and Oldhand_TargetCount() >= 3 and power >= 50) then
-  	  if Oldhand_CastSpell_IgnoreRange("ÑÛÀâ", DemonHunter_action_table["ÑÛÀâ"]) then return true; end;
-  	end;	  
+----if not Oldhand_PlayerBU("Õ½ºğ") then
+----	if Oldhand_CastSpell_IgnoreRange("Õ½ºğ", DemonHunter_action_table["Õ½ºğ"]) then return true; end;
+----end  
   
     if Oldhand_CastSpell("¶ñÄ§Ö®Ò§", DemonHunter_action_table["¶ñÄ§Ö®Ò§"]) then return true; end;
     

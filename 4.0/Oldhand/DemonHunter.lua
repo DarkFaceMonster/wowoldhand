@@ -6,131 +6,136 @@ DemonHunter_PlayerTalentInfoDatas = {};
 
 local dynamicMicroID = 72;
 local playerClass;
-local DemonHunter_DPS = 1; -- Ä¬ÈÏºÆ½Ù£¬1ºÆ½Ù£¬2¸´³ğ£¬3
+local DemonHunter_DPS = 1; -- é»˜è®¤æµ©åŠ«ï¼Œ1æµ©åŠ«ï¼Œ2å¤ä»‡ï¼Œ3
 local DemonHunter_Reincarnation  = false;
 local DemonHunter_Free  = false;
 local DemonHunter_RaidFlag = 0;
 local DemonHunter_Old_UnitPopup_OnClick;
 local DemonHunter_AutoFollowName="";
 local TestHelpTarget = "";
-local target_count = 0;		-- Ä¿±ê¸öÊı
+local target_count = 0;		-- ç›®æ ‡ä¸ªæ•°
 local target_table = {};	
 
 local DemonHunter_action_table = {};
 
-DemonHunter_action_table["×Ô¶¯¹¥»÷"] = 1302006;
+DemonHunter_action_table["è‡ªåŠ¨æ”»å‡»"] = 1278164;
 
--- ºÆ½Ù
-DemonHunter_action_table["¶ñÄ§Ö®Ò§"] = 135561;
-DemonHunter_action_table["»ìÂÒ´ò»÷"] = 1305152;
-DemonHunter_action_table["ÓÄÁéÊÓ¾õ"] = 1247266;
-DemonHunter_action_table["ÑÛÀâ"] = 1305156;
-DemonHunter_action_table["Ğ°ÄÜ³å×²"] = 1247261;
-DemonHunter_action_table["Í¶ÖÀÀûÈĞ"] = 1305159;
-DemonHunter_action_table["ÈĞÎè"] = 1305149;
-DemonHunter_action_table["ÍÌÊÉÄ§·¨"] = 1305153;
-DemonHunter_action_table["¶ñÄ§±äĞÎ"] = 1247262;
+-- æµ©åŠ«
+DemonHunter_action_table["æ¶é­”ä¹‹å’¬"] = 135561;
+DemonHunter_action_table["æ··ä¹±æ‰“å‡»"] = 1305152;
+DemonHunter_action_table["å¹½çµè§†è§‰"] = 1247266;
+DemonHunter_action_table["çœ¼æ£±"] = 1305156;
+DemonHunter_action_table["é‚ªèƒ½å†²æ’"] = 1247261;
+DemonHunter_action_table["æŠ•æ·åˆ©åˆƒ"] = 1305159;
+DemonHunter_action_table["åˆƒèˆ"] = 1305149;
+DemonHunter_action_table["åå™¬é­”æ³•"] = 1305153;
+DemonHunter_action_table["æ¶é­”å˜å½¢"] = 1247262;
+DemonHunter_action_table["ç–¾å½±"] = 1305150;
+DemonHunter_action_table["å¹»å½±æ‰“å‡»"] = 1305154;
+DemonHunter_action_table["æ··ä¹±æ–°æ˜Ÿ"] = 1305159;
 
--- ¸´³ğ
-DemonHunter_action_table["»ÙÃğ´ò»÷"] = 135291;
 
--- ÊÎÆ·
-DemonHunter_action_table["ÁÙ½ü·ç±©Ö®Å­"] = 236164;
-DemonHunter_action_table["ÒÁÈøÅµË¹¼×³æ"] = 236164;
+
+-- å¤ä»‡
+DemonHunter_action_table["æ¯ç­æ‰“å‡»"] = 135291;
+
+-- é¥°å“
+DemonHunter_action_table["ä¸´è¿‘é£æš´ä¹‹æ€’"] = 236164;
+DemonHunter_action_table["ä¼Šè¨è¯ºæ–¯ç”²è™«"] = 236164;
 
 function DemonHunter_CreateMacro()	
---	if GetMacroIndexByName("´ò¶ÏÊ©·¨") == 0 then
---		CreateMacro("´ò¶ÏÊ©·¨", 67, "/stopcasting", 1, 1);
+--	if GetMacroIndexByName("æ‰“æ–­æ–½æ³•") == 0 then
+--		CreateMacro("æ‰“æ–­æ–½æ³•", 67, "/stopcasting", 1, 1);
 --	end;	
---	PickupMacro("´ò¶ÏÊ©·¨");
+--	PickupMacro("æ‰“æ–­æ–½æ³•");
 --	--PlaceAction(61);
 --	ClearCursor();
 
-	if GetMacroIndexByName("¿ªÊ¼¹¥»÷") == 0 then
-		CreateMacro("¿ªÊ¼¹¥»÷", 60, "/startattack", 1, 1);
+	if GetMacroIndexByName("å¼€å§‹æ”»å‡»") == 0 then
+		CreateMacro("å¼€å§‹æ”»å‡»", 60, "/startattack", 1, 1);
 	end;
-	--PickupMacro("¿ªÊ¼¹¥»÷");
+	--PickupMacro("å¼€å§‹æ”»å‡»");
 	--PlaceAction(1);
 	--ClearCursor();
 
-	if GetMacroIndexByName("Õ½Õù¼ùÌ¤") == 0 then
-		CreateMacro("Õ½Õù¼ùÌ¤", 66, "/cast Õ½Õù¼ùÌ¤", 1, 0);
+	if GetMacroIndexByName("æˆ˜äº‰è·µè¸") == 0 then
+		CreateMacro("æˆ˜äº‰è·µè¸", 66, "/cast æˆ˜äº‰è·µè¸", 1, 0);
 	end;
 
-	if GetMacroIndexByName("¸ü»»Ä£Ê½") == 0 then
-		CreateMacro("¸ü»»Ä£Ê½", 61, "/script DemonHunter_Input(1);", 1, 1);
+	if GetMacroIndexByName("æ›´æ¢æ¨¡å¼") == 0 then
+		CreateMacro("æ›´æ¢æ¨¡å¼", 61, "/script DemonHunter_Input(1);", 1, 1);
 	end;	
-	PickupMacro("¸ü»»Ä£Ê½");
+	PickupMacro("æ›´æ¢æ¨¡å¼");
 	PlaceAction(49);
 	ClearCursor();	
 	if DemonHunter_DPS == 1 then
-		if GetMacroIndexByName("ºÆ½ÙÄ£Ê½") == 0 then
-			CreateMacro("ºÆ½ÙÄ£Ê½", 62, "/script DemonHunter_Input(1);", 0, 0);
+		if GetMacroIndexByName("æµ©åŠ«æ¨¡å¼") == 0 then
+			CreateMacro("æµ©åŠ«æ¨¡å¼", 62, "/script DemonHunter_Input(1);", 0, 0);
 		end;
-		PickupMacro("ºÆ½ÙÄ£Ê½");
+		PickupMacro("æµ©åŠ«æ¨¡å¼");
 	elseif DemonHunter_DPS == 1 then
-		if GetMacroIndexByName("¸´³ğÄ£Ê½") == 0 then
-			CreateMacro("¸´³ğÄ£Ê½", 62, "/script DemonHunter_Input(1);", 0, 0);
+		if GetMacroIndexByName("å¤ä»‡æ¨¡å¼") == 0 then
+			CreateMacro("å¤ä»‡æ¨¡å¼", 62, "/script DemonHunter_Input(1);", 0, 0);
 		end;
-		PickupMacro("¸´³ğÄ£Ê½");
+		PickupMacro("å¤ä»‡æ¨¡å¼");
 	elseif DemonHunter_DPS == 3 then
-		if GetMacroIndexByName("·À»¤Ä£Ê½") == 0 then
-			CreateMacro("·À»¤Ä£Ê½", 62, "/script DemonHunter_Input(1);", 0, 0);
+		if GetMacroIndexByName("é˜²æŠ¤æ¨¡å¼") == 0 then
+			CreateMacro("é˜²æŠ¤æ¨¡å¼", 62, "/script DemonHunter_Input(1);", 0, 0);
 		end;
-		PickupMacro("·À»¤Ä£Ê½");
+		PickupMacro("é˜²æŠ¤æ¨¡å¼");
 	end
 	PlaceAction(50);
 	ClearCursor();
 
-  Oldhand_PutAction("×Ô¶¯¹¥»÷", 1);
-  Oldhand_PutAction("³å·æ", 61);
+  Oldhand_PutAction("è‡ªåŠ¨æ”»å‡»", 1);
+  Oldhand_PutAction("å†²é”‹", 61);
  
   if DemonHunter_DPS == 1 then
   elseif DemonHunter_DPS == 2 then
-    Oldhand_PutAction("ÊÈÑª", 2);
-    Oldhand_PutAction("¿ñ±©»Ó¿³", 3);
-    Oldhand_PutAction("±©Å­", 4);
-    Oldhand_PutAction("¿ñÅ­»Ø¸´", 7);    
-    Oldhand_PutAction("Õ¶É±", 62);
-    Oldhand_PutAction("Å­»÷", 63);
+    Oldhand_PutAction("å—œè¡€", 2);
+    Oldhand_PutAction("ç‹‚æš´æŒ¥ç ", 3);
+    Oldhand_PutAction("æš´æ€’", 4);
+    Oldhand_PutAction("ç‹‚æ€’å›å¤", 7);    
+    Oldhand_PutAction("æ–©æ€", 62);
+    Oldhand_PutAction("æ€’å‡»", 63);
     
   elseif DemonHunter_DPS == 3 then
-    Oldhand_PutAction("»ÙÃğ´ò»÷", 2);
-    Oldhand_PutAction("¶ÜÅÆÃÍ»÷", 3);
-    Oldhand_PutAction("À×öªÒ»»÷", 4);
-    Oldhand_PutAction("¶ÜÅÆ¸ñµ²", 7);    
-    Oldhand_PutAction("³°·í", 62);
-    Oldhand_PutAction("³ËÊ¤×·»÷", 63);  
+    Oldhand_PutAction("æ¯ç­æ‰“å‡»", 2);
+    Oldhand_PutAction("ç›¾ç‰ŒçŒ›å‡»", 3);
+    Oldhand_PutAction("é›·éœ†ä¸€å‡»", 4);
+    Oldhand_PutAction("ç›¾ç‰Œæ ¼æŒ¡", 7);    
+    Oldhand_PutAction("å˜²è®½", 62);
+    Oldhand_PutAction("ä¹˜èƒœè¿½å‡»", 63);  
   end;
 
-	if Oldhand_TestTrinket("²¿ÂäÑ«ÕÂ") then
-		Oldhand_PutAction("²¿ÂäÑ«ÕÂ", 71);
-	elseif Oldhand_TestTrinket("´ó¸±µÄ»³±í") then
-		Oldhand_PutAction("´ó¸±µÄ»³±í", 72);
-	elseif Oldhand_TestTrinket("·ÆË¹¿ËµÄ»³±í") then
-		Oldhand_PutAction("·ÆË¹¿ËµÄ»³±í", 72);
-	elseif Oldhand_TestTrinket("¿Ö¾åĞ¡ºĞ") then
-		Oldhand_PutAction("¿Ö¾åĞ¡ºĞ", 71);
-	elseif Oldhand_TestTrinket("¿Ö¾åĞ¡ºĞ") then
-		Oldhand_PutAction("Õ½¸èµÄÈÈÇé", 71);
-	elseif Oldhand_TestTrinket("Ì¦Ô­»¤·û") then
-		Oldhand_PutAction("Ì¦Ô­»¤·û", 71);
-	elseif Oldhand_TestTrinket("Ê³ÈËÄ§Å¹¶·ÕßµÄ»ÕÕÂ") then
-		Oldhand_PutAction("Ê³ÈËÄ§Å¹¶·ÕßµÄ»ÕÕÂ", 71);
+	if Oldhand_TestTrinket("éƒ¨è½å‹‹ç« ") then
+		Oldhand_PutAction("éƒ¨è½å‹‹ç« ", 71);
+	elseif Oldhand_TestTrinket("å¤§å‰¯çš„æ€€è¡¨") then
+		Oldhand_PutAction("å¤§å‰¯çš„æ€€è¡¨", 72);
+	elseif Oldhand_TestTrinket("è²æ–¯å…‹çš„æ€€è¡¨") then
+		Oldhand_PutAction("è²æ–¯å…‹çš„æ€€è¡¨", 72);
+	elseif Oldhand_TestTrinket("ææƒ§å°ç›’") then
+		Oldhand_PutAction("ææƒ§å°ç›’", 71);
+	elseif Oldhand_TestTrinket("ææƒ§å°ç›’") then
+		Oldhand_PutAction("æˆ˜æ­Œçš„çƒ­æƒ…", 71);
+	elseif Oldhand_TestTrinket("è‹”åŸæŠ¤ç¬¦") then
+		Oldhand_PutAction("è‹”åŸæŠ¤ç¬¦", 71);
+	elseif Oldhand_TestTrinket("é£Ÿäººé­”æ®´æ–—è€…çš„å¾½ç« ") then
+		Oldhand_PutAction("é£Ÿäººé­”æ®´æ–—è€…çš„å¾½ç« ", 71);
 	end
-	if Oldhand_TestTrinket("Ê¤ÀûìºÆì") then
-		Oldhand_PutAction("Ê¤ÀûìºÆì", 72);
-	elseif Oldhand_TestTrinket("ÁÙ½ü·ç±©Ö®Å­") then
-		Oldhand_PutAction("ÁÙ½ü·ç±©Ö®Å­", 71);
-	elseif Oldhand_TestTrinket("Ó¢ĞÛÑ«ÕÂ") then
-		Oldhand_PutAction("Ó¢ĞÛÑ«ÕÂ", 72);
-	elseif Oldhand_TestTrinket("ÒÁÈøÅµË¹¼×³æ") then
-		Oldhand_PutAction("ÒÁÈøÅµË¹¼×³æ", 72);
-	elseif Oldhand_TestTrinket("ÈĞÈ­µÄ¿íÈİ") then
-		Oldhand_PutAction("ÈĞÈ­µÄ¿íÈİ", 72);
+	if Oldhand_TestTrinket("èƒœåˆ©æ—Œæ——") then
+		Oldhand_PutAction("èƒœåˆ©æ—Œæ——", 72);
+	elseif Oldhand_TestTrinket("ä¸´è¿‘é£æš´ä¹‹æ€’") then
+		Oldhand_PutAction("ä¸´è¿‘é£æš´ä¹‹æ€’", 71);
+	elseif Oldhand_TestTrinket("è‹±é›„å‹‹ç« ") then
+		Oldhand_PutAction("è‹±é›„å‹‹ç« ", 72);
+	elseif Oldhand_TestTrinket("ä¼Šè¨è¯ºæ–¯ç”²è™«") then
+		Oldhand_PutAction("ä¼Šè¨è¯ºæ–¯ç”²è™«", 72);
+	elseif Oldhand_TestTrinket("åˆƒæ‹³çš„å®½å®¹") then
+		Oldhand_PutAction("åˆƒæ‹³çš„å®½å®¹", 72);
 	end
 	
-	Oldhand_PutAction("Õ½Õù¼ùÌ¤", 51);
+	Oldhand_PutAction("æˆ˜äº‰è·µè¸", 51);
 
 	SetBinding("F1", "MULTIACTIONBAR1BUTTON1");
 	SetBinding("F2", "MULTIACTIONBAR1BUTTON2");
@@ -150,10 +155,10 @@ function DemonHunter_CreateMacro()
 	--SetBinding("\'", "TARGETPARTYMEMBER3");
 	--SetBinding(",", "TARGETPARTYMEMBER4");
 	
-	SetBindingMacro(",","Õ½Õù¼ùÌ¤");	-- 29
-	--SetBindingMacro("\'","»îÁ¦·ÖÁ÷");	-- 28
-	SetBindingMacro(";","´ò¶ÏÊ©·¨");	-- 27
-	--SetBindingMacro("\\","¿ªÊ¼¹¥»÷");	-- 26
+	SetBindingMacro(",","æˆ˜äº‰è·µè¸");	-- 29
+	--SetBindingMacro("\'","æ´»åŠ›åˆ†æµ");	-- 28
+	SetBindingMacro(";","æ‰“æ–­æ–½æ³•");	-- 27
+	--SetBindingMacro("\\","å¼€å§‹æ”»å‡»");	-- 26
 	
 	SaveBindings(1);
 end;
@@ -169,10 +174,10 @@ end
 function DemonHunter_RunCommand()
 	if UnitAffectingCombat("player") then
 		local id1 = Oldhand_GetActionID("Racial_Troll_Berserk");
-		if id1~=0 and null==Oldhand_PlayerBU("Õ½Õù¼ùÌ¤") then
-			if 0~=IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) then -- Áé½ç´ò»÷ÓĞĞ§
+		if id1~=0 and null==Oldhand_PlayerBU("æˆ˜äº‰è·µè¸") then
+			if 0~=IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) then -- çµç•Œæ‰“å‡»æœ‰æ•ˆ
 				if (GetActionCooldown(Oldhand_GetActionID("Racial_Troll_Berserk")) == 0) then 
-					Oldhand_SetText("Õ½Õù¼ùÌ¤",29);
+					Oldhand_SetText("æˆ˜äº‰è·µè¸",29);
 					return true;
 				end
 			end;
@@ -182,80 +187,80 @@ function DemonHunter_RunCommand()
 end;
 
 function DemonHunter_Auto_Trinket()
-  if not Oldhand_PlayerBU("Ë®ÊÖµÄÑ¸½İ") then
-		if Oldhand_TestTrinket("´ó¸±µÄ»³±í") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
-			if Oldhand_CastSpell("´ó¸±µÄ»³±í", "INV_Misc_PocketWatch_02") then return true; end		
+  if not Oldhand_PlayerBU("æ°´æ‰‹çš„è¿…æ·") then
+		if Oldhand_TestTrinket("å¤§å‰¯çš„æ€€è¡¨") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
+			if Oldhand_CastSpell("å¤§å‰¯çš„æ€€è¡¨", "INV_Misc_PocketWatch_02") then return true; end		
 		end
 	end
-	if not Oldhand_PlayerBU("¼¤ÁÒÅ­»ğ") then
-		if Oldhand_TestTrinket("ÁÙ½ü·ç±©Ö®Å­") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
-			if Oldhand_CastSpell_IgnoreRange("ÁÙ½ü·ç±©Ö®Å­", DemonHunter_action_table["ÁÙ½ü·ç±©Ö®Å­"]) then return true; end	
+	if not Oldhand_PlayerBU("æ¿€çƒˆæ€’ç«") then
+		if Oldhand_TestTrinket("ä¸´è¿‘é£æš´ä¹‹æ€’") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
+			if Oldhand_CastSpell_IgnoreRange("ä¸´è¿‘é£æš´ä¹‹æ€’", DemonHunter_action_table["ä¸´è¿‘é£æš´ä¹‹æ€’"]) then return true; end	
 		end
 	end
-	if not Oldhand_PlayerBU("ÒøÉ«Ó¢ÓÂ") then
-		if Oldhand_TestTrinket("·ÆË¹¿ËµÄ»³±í") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
-			if Oldhand_CastSpell("·ÆË¹¿ËµÄ»³±í", "INV_Misc_AhnQirajTrinket_03") then return true; end		
+	if not Oldhand_PlayerBU("é“¶è‰²è‹±å‹‡") then
+		if Oldhand_TestTrinket("è²æ–¯å…‹çš„æ€€è¡¨") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
+			if Oldhand_CastSpell("è²æ–¯å…‹çš„æ€€è¡¨", "INV_Misc_AhnQirajTrinket_03") then return true; end		
 		end
 	end
-	if not Oldhand_PlayerBU("Ò°ĞÔ¿ñÅ­") then
-		if Oldhand_TestTrinket("Õ½¸èµÄÈÈÇé") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
-			if Oldhand_CastSpell("Õ½¸èµÄÈÈÇé", "INV_Misc_Horn_02") then return true; end		
+	if not Oldhand_PlayerBU("é‡æ€§ç‹‚æ€’") then
+		if Oldhand_TestTrinket("æˆ˜æ­Œçš„çƒ­æƒ…") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
+			if Oldhand_CastSpell("æˆ˜æ­Œçš„çƒ­æƒ…", "INV_Misc_Horn_02") then return true; end		
 		end
 	end
-	if not Oldhand_PlayerBU("°ÂÊõ¹à×¢") then
-		if Oldhand_TestTrinket("ÒÁÈøÅµË¹¼×³æ") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
-			if Oldhand_CastSpell_IgnoreRange("ÒÁÈøÅµË¹¼×³æ", DemonHunter_action_table["ÒÁÈøÅµË¹¼×³æ"]) then return true; end		
+	if not Oldhand_PlayerBU("å¥¥æœ¯çŒæ³¨") then
+		if Oldhand_TestTrinket("ä¼Šè¨è¯ºæ–¯ç”²è™«") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
+			if Oldhand_CastSpell_IgnoreRange("ä¼Šè¨è¯ºæ–¯ç”²è™«", DemonHunter_action_table["ä¼Šè¨è¯ºæ–¯ç”²è™«"]) then return true; end		
 		end
 	end
 	
-	if not Oldhand_PlayerBU("¾«×¼´ò»÷") then
-		if Oldhand_TestTrinket("Ì¦Ô­»¤·û") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
-			if Oldhand_CastSpell("Ì¦Ô­»¤·û", "INV_Jewelcrafting_StarOfElune_03") then return true; end;
+	if not Oldhand_PlayerBU("ç²¾å‡†æ‰“å‡»") then
+		if Oldhand_TestTrinket("è‹”åŸæŠ¤ç¬¦") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
+			if Oldhand_CastSpell("è‹”åŸæŠ¤ç¬¦", "INV_Jewelcrafting_StarOfElune_03") then return true; end;
 		end
 	end
-	if not Oldhand_PlayerBU("Ğ×±©") then
-		if Oldhand_TestTrinket("ÈĞÈ­µÄ¿íÈİ") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
-			if Oldhand_CastSpell("ÈĞÈ­µÄ¿íÈİ", "INV_DataCrystal06") then return true; end		
+	if not Oldhand_PlayerBU("å‡¶æš´") then
+		if Oldhand_TestTrinket("åˆƒæ‹³çš„å®½å®¹") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
+			if Oldhand_CastSpell("åˆƒæ‹³çš„å®½å®¹", "INV_DataCrystal06") then return true; end		
 		end
 	end
-	if not Oldhand_PlayerBU("È¼ÉÕÖ®ºŞ") then
-		if Oldhand_TestTrinket("Ê³ÈËÄ§Å¹¶·ÕßµÄ»ÕÕÂ") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
-			if Oldhand_CastSpell("Ê³ÈËÄ§Å¹¶·ÕßµÄ»ÕÕÂ", "INV_Jewelry_Talisman_04") then return true; end		
+	if not Oldhand_PlayerBU("ç‡ƒçƒ§ä¹‹æ¨") then
+		if Oldhand_TestTrinket("é£Ÿäººé­”æ®´æ–—è€…çš„å¾½ç« ") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) ~= 0)  then
+			if Oldhand_CastSpell("é£Ÿäººé­”æ®´æ–—è€…çš„å¾½ç« ", "INV_Jewelry_Talisman_04") then return true; end		
 		end
 	end
 	
 	--if Oldhand_GetActionID("INV_Misc_MonsterScales_15") ~= 0 then
-	--	if Oldhand_TestTrinket("ÊÈÑªĞØÕë") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) == 1)  then
-	--		if Oldhand_CastSpell("ÊÈÑªĞØÕë", "INV_Misc_MonsterScales_15") then return true; end		
+	--	if Oldhand_TestTrinket("å—œè¡€èƒ¸é’ˆ") and (IsActionInRange(Oldhand_GetActionID("Ability_DemonHunter_Lavalash")) == 1)  then
+	--		if Oldhand_CastSpell("å—œè¡€èƒ¸é’ˆ", "INV_Misc_MonsterScales_15") then return true; end		
 	--	end
 	--end;
 	--if  Oldhand_GetActionID("INV_ValentinePerfumeBottle") ~= 0 then
-	--	if Oldhand_TestTrinket("Ñ³ÄÑÕß¾«»ª") and (IsActionInRange(Oldhand_GetActionID("Spell_Holy_HolyBolt")) == 1)  then
-	--		if Oldhand_CastSpell("Ñ³ÄÑÕß¾«»ª", "INV_ValentinePerfumeBottle") then return true; end		
+	--	if Oldhand_TestTrinket("æ®‰éš¾è€…ç²¾å") and (IsActionInRange(Oldhand_GetActionID("Spell_Holy_HolyBolt")) == 1)  then
+	--		if Oldhand_CastSpell("æ®‰éš¾è€…ç²¾å", "INV_ValentinePerfumeBottle") then return true; end		
 	--	end
 	--end  	
 	return false;
 end
 
 function DemonHunter_dps_playerSafe()
-	--if not DemonHunter_PlayerDeBU("¶Ï½î") or not DemonHunter_PlayerDeBU("¼õËÙÒ©¸à") or not DemonHunter_PlayerDeBU("º®±ù¼ı") or not DemonHunter_PlayerDeBU("±ù¶³") or not DemonHunter_PlayerDeBU("±ùËªÏİÚå¹â»·")
-	--	or not DemonHunter_PlayerDeBU("Ç¿»¯¶Ï½î") or not DemonHunter_PlayerDeBU("¼õËÙÊõ") or not DemonHunter_PlayerDeBU("Ë¤°í") or not DemonHunter_PlayerDeBU("Õğµ´Éä»÷")
-	--   	or not DemonHunter_PlayerDeBU("µØ¸¿Êõ") or not DemonHunter_PlayerDeBU("±ùËªÕğ»÷") or not DemonHunter_PlayerDeBU("Æ£ÀÍ×çÖä") 
-	--   	or not DemonHunter_PlayerDeBU("±ùËªĞÂĞÇ") or not DemonHunter_PlayerDeBU("¾À²ø¸ùĞë") or not DemonHunter_PlayerDeBU("Ëªº®´Ì¹Ç")  then
+	--if not DemonHunter_PlayerDeBU("æ–­ç­‹") or not DemonHunter_PlayerDeBU("å‡é€Ÿè¯è†") or not DemonHunter_PlayerDeBU("å¯’å†°ç®­") or not DemonHunter_PlayerDeBU("å†°å†»") or not DemonHunter_PlayerDeBU("å†°éœœé™·é˜±å…‰ç¯")
+	--	or not DemonHunter_PlayerDeBU("å¼ºåŒ–æ–­ç­‹") or not DemonHunter_PlayerDeBU("å‡é€Ÿæœ¯") or not DemonHunter_PlayerDeBU("æ‘”ç»Š") or not DemonHunter_PlayerDeBU("éœ‡è¡å°„å‡»")
+	--   	or not DemonHunter_PlayerDeBU("åœ°ç¼šæœ¯") or not DemonHunter_PlayerDeBU("å†°éœœéœ‡å‡»") or not DemonHunter_PlayerDeBU("ç–²åŠ³è¯…å’’") 
+	--   	or not DemonHunter_PlayerDeBU("å†°éœœæ–°æ˜Ÿ") or not DemonHunter_PlayerDeBU("çº ç¼ æ ¹é¡»") or not DemonHunter_PlayerDeBU("éœœå¯’åˆºéª¨")  then
 	   	
 	--end;
-	--if not DemonHunter_PlayerDeBU("ÍµÏ®") or not DemonHunter_PlayerDeBU("Éö»÷") or not DemonHunter_PlayerDeBU("ÖÆ²ÃÖ®´¸") then
+	--if not DemonHunter_PlayerDeBU("å·è¢­") or not DemonHunter_PlayerDeBU("è‚¾å‡»") or not DemonHunter_PlayerDeBU("åˆ¶è£ä¹‹é”¤") then
 	--end;
 	return false;
 end;
 
 --function DemonHunter_PunishingBlow_Debuff()
---	if not Oldhand_TargetDeBU("ÔÂ»ğÊõ") 
---	or not Oldhand_TargetDeBU("¸¯Ê´Êõ")
---	or not Oldhand_TargetDeBU("Ï×¼À")  
---	or not Oldhand_TargetDeBU("°µÑÔÊõ£ºÍ´") 
---	or not Oldhand_TargetDeBU("ÊÉÁéÎÁÒß") 
---	or not Oldhand_TargetDeBU("¶¾Éß¶¤´Ì") 
+--	if not Oldhand_TargetDeBU("æœˆç«æœ¯") 
+--	or not Oldhand_TargetDeBU("è…èš€æœ¯")
+--	or not Oldhand_TargetDeBU("çŒ®ç¥­")  
+--	or not Oldhand_TargetDeBU("æš—è¨€æœ¯ï¼šç—›") 
+--	or not Oldhand_TargetDeBU("å™¬çµç˜Ÿç–«") 
+--	or not Oldhand_TargetDeBU("æ¯’è›‡é’‰åˆº") 
 --	then
 --		return true;
 --	end
@@ -271,25 +276,25 @@ function DemonHunter_DpsOut(dps_mode)
   elseif dps_mode == 3 then
     DemonHunter_DpsOut3();
   else
-    Oldhand_AddMessage("´íÎóµÄÌì¸³Ä£Ê½£º"..dps_mode);
+    Oldhand_AddMessage("é”™è¯¯çš„å¤©èµ‹æ¨¡å¼ï¼š"..dps_mode);
   end;
 end;
 
--- ºÆ½ÙÄ£Ê½
+-- æµ©åŠ«æ¨¡å¼
 function DemonHunter_DpsOut1()
   if Oldhand_Test_Target_Debuff() then 
-		Oldhand_AddMessage(UnitName("target").."Ä¿±êÒÑ¾­±»¿ØÖÆ...");			
-		Oldhand_SetText("Ä¿±êÒÑ¾­±»¿ØÖÆ", 0);
+		Oldhand_AddMessage(UnitName("target").."ç›®æ ‡å·²ç»è¢«æ§åˆ¶...");			
+		Oldhand_SetText("ç›®æ ‡å·²ç»è¢«æ§åˆ¶", 0);
 		return;
 	end
 	
 	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Oldhand_Test_Target_Debuff()) then
-		--Oldhand_SetText("¿ªÊ¼¹¥»÷",26);	
-		Oldhand_SetText("×Ô¶¯¹¥»÷", 1);
+		--Oldhand_SetText("å¼€å§‹æ”»å‡»",26);	
+		Oldhand_SetText("è‡ªåŠ¨æ”»å‡»", 1);
 		return true;
 	end;
-	if not Oldhand_TargetDeBU("ì«·çÊõ") or not Oldhand_TargetBU("Ê¥¶ÜÊõ") or not  Oldhand_TargetBU("±£»¤Ö®ÊÖ") or  not Oldhand_TargetBU("º®±ùÆÁÕÏ") or not  Oldhand_TargetBU("·¨Êõ·´Éä") or not  Oldhand_TargetDeBU("·ÅÖğÊõ") then
-		Oldhand_SetText("Ä¿±êÎŞ·¨¹¥»÷", 0);
+	if not Oldhand_TargetDeBU("é£“é£æœ¯") or not Oldhand_TargetBU("åœ£ç›¾æœ¯") or not  Oldhand_TargetBU("ä¿æŠ¤ä¹‹æ‰‹") or  not Oldhand_TargetBU("å¯’å†°å±éšœ") or not  Oldhand_TargetBU("æ³•æœ¯åå°„") or not  Oldhand_TargetDeBU("æ”¾é€æœ¯") then
+		Oldhand_SetText("ç›®æ ‡æ— æ³•æ”»å‡»", 0);
 		return ;
 	end;
 	if DemonHunter_playerSafe() then return true;end;
@@ -298,67 +303,70 @@ function DemonHunter_DpsOut1()
   
 	local spellname = UnitCastingInfo("target") 
 	if null~=spellname then
-		if Oldhand_CastSpell("ÍÌÊÉÄ§·¨", DemonHunter_action_table["ÍÌÊÉÄ§·¨"]) then return true; end;
+		if Oldhand_CastSpell("åå™¬é­”æ³•", DemonHunter_action_table["åå™¬é­”æ³•"]) then return true; end;
 	end;
 	
-	-- ºÆ½Ù	Buff
+	-- æµ©åŠ«	Buff
 	if DemonHunter_RunCommand() then return true; end;
 
-	-- ºÆ½ÙÊÎÆ·
+	-- æµ©åŠ«é¥°å“
 	if DemonHunter_Auto_Trinket() then return true; end;
 	
-	-- ½üÕ½·¶Î§		
-	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["¶ñÄ§Ö®Ò§"]));
+	-- è¿‘æˆ˜èŒƒå›´		
+	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["æ¶é­”ä¹‹å’¬"]));
 	
 	if not isNearAction then
-	  if Oldhand_CastSpell("Í¶ÖÀÀûÈĞ", DemonHunter_action_table["Í¶ÖÀÀûÈĞ"]) then return true; end;
+	  if Oldhand_CastSpell("æŠ•æ·åˆ©åˆƒ", DemonHunter_action_table["æŠ•æ·åˆ©åˆƒ"]) then return true; end;
 	else
   	-- local partyNum = GetNumGroupMembers();
 
   	if (isNearAction and Oldhand_TargetCount() >= 3 and power >= 50) then
-  	  if Oldhand_CastSpell_IgnoreRange("ÑÛÀâ", DemonHunter_action_table["ÑÛÀâ"]) then return true; end;
+  	  if Oldhand_CastSpell_IgnoreRange("çœ¼æ£±", DemonHunter_action_table["çœ¼æ£±"]) then return true; end;
+  	  if Oldhand_CastSpell_IgnoreRange("åˆƒèˆ", DemonHunter_action_table["åˆƒèˆ"]) then return true; end;
   	end;	
   	
     if power >= 40 then
-      if Oldhand_CastSpell("»ìÂÒ´ò»÷", DemonHunter_action_table["»ìÂÒ´ò»÷"]) then return true; end;
+      if Oldhand_CastSpell("æ··ä¹±æ‰“å‡»", DemonHunter_action_table["æ··ä¹±æ‰“å‡»"]) then return true; end;
     end
     
-----if not Oldhand_PlayerBU("Õ½ºğ") then
-----	if Oldhand_CastSpell_IgnoreRange("Õ½ºğ", DemonHunter_action_table["Õ½ºğ"]) then return true; end;
+----if not Oldhand_PlayerBU("æˆ˜å¼") then
+----	if Oldhand_CastSpell_IgnoreRange("æˆ˜å¼", DemonHunter_action_table["æˆ˜å¼"]) then return true; end;
 ----end  
-  
-    if Oldhand_CastSpell("¶ñÄ§Ö®Ò§", DemonHunter_action_table["¶ñÄ§Ö®Ò§"]) then return true; end;
+    if Oldhand_CastSpell("æŠ•æ·åˆ©åˆƒ", DemonHunter_action_table["æŠ•æ·åˆ©åˆƒ"]) then return true; end;
+    
+    if Oldhand_CastSpell("æ¶é­”ä¹‹å’¬", DemonHunter_action_table["æ¶é­”ä¹‹å’¬"]) then return true; end;
     
     if Oldhand_TargetCount() >= 4 then
-      if Oldhand_CastSpell_IgnoreRange("ÑÛÀâ", DemonHunter_action_table["ÑÛÀâ"]) then return true; end;
+      if Oldhand_CastSpell_IgnoreRange("çœ¼æ£±", DemonHunter_action_table["çœ¼æ£±"]) then return true; end;
+      if Oldhand_CastSpell_IgnoreRange("åˆƒèˆ", DemonHunter_action_table["åˆƒèˆ"]) then return true; end;
     end;
-    if Oldhand_CastSpell("¶ñÄ§Ö®Ò§", DemonHunter_action_table["¶ñÄ§Ö®Ò§"]) then return true; end;
+    if Oldhand_CastSpell("æ¶é­”ä¹‹å’¬", DemonHunter_action_table["æ¶é­”ä¹‹å’¬"]) then return true; end;
 	end;
 
   if Oldhand_TargetCount() >= 4 then
-    if Oldhand_CastSpell_IgnoreRange("ÑÛÀâ", DemonHunter_action_table["ÑÛÀâ"]) then return true; end;
+    if Oldhand_CastSpell_IgnoreRange("çœ¼æ£±", DemonHunter_action_table["çœ¼æ£±"]) then return true; end;
   end;
   
-	Oldhand_SetText("ÎŞ¶¯×÷",0);
+	Oldhand_SetText("æ— åŠ¨ä½œ",0);
 	return;
 
 end;
 
--- ¸´³ğÄ£Ê½
+-- å¤ä»‡æ¨¡å¼
 function DemonHunter_DpsOut2()
   if Oldhand_Test_Target_Debuff() then 
-		Oldhand_AddMessage(UnitName("target").."Ä¿±êÒÑ¾­±»¿ØÖÆ...");			
-		Oldhand_SetText("Ä¿±êÒÑ¾­±»¿ØÖÆ", 0);
+		Oldhand_AddMessage(UnitName("target").."ç›®æ ‡å·²ç»è¢«æ§åˆ¶...");			
+		Oldhand_SetText("ç›®æ ‡å·²ç»è¢«æ§åˆ¶", 0);
 		return;
 	end
 	
 	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Oldhand_Test_Target_Debuff()) then
-		--Oldhand_SetText("¿ªÊ¼¹¥»÷",26);	
-		Oldhand_SetText("×Ô¶¯¹¥»÷", 1);
+		--Oldhand_SetText("å¼€å§‹æ”»å‡»",26);	
+		Oldhand_SetText("è‡ªåŠ¨æ”»å‡»", 1);
 		return true;
 	end;
-	if not Oldhand_TargetDeBU("ì«·çÊõ") or not Oldhand_TargetBU("Ê¥¶ÜÊõ") or not  Oldhand_TargetBU("±£»¤Ö®ÊÖ") or  not Oldhand_TargetBU("º®±ùÆÁÕÏ") or not  Oldhand_TargetBU("·¨Êõ·´Éä") or not  Oldhand_TargetDeBU("·ÅÖğÊõ") then
-		Oldhand_SetText("Ä¿±êÎŞ·¨¹¥»÷", 0);
+	if not Oldhand_TargetDeBU("é£“é£æœ¯") or not Oldhand_TargetBU("åœ£ç›¾æœ¯") or not  Oldhand_TargetBU("ä¿æŠ¤ä¹‹æ‰‹") or  not Oldhand_TargetBU("å¯’å†°å±éšœ") or not  Oldhand_TargetBU("æ³•æœ¯åå°„") or not  Oldhand_TargetDeBU("æ”¾é€æœ¯") then
+		Oldhand_SetText("ç›®æ ‡æ— æ³•æ”»å‡»", 0);
 		return ;
 	end;
 	if DemonHunter_playerSafe() then return true;end;
@@ -367,71 +375,71 @@ function DemonHunter_DpsOut2()
 	
 	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
 	if target_health_percent <= 20 and power >= 25 then
-  	if Oldhand_CastSpell("Õ¶É±", DemonHunter_action_table["Õ¶É±"]) then return true; end;
+  	if Oldhand_CastSpell("æ–©æ€", DemonHunter_action_table["æ–©æ€"]) then return true; end;
   end;
   
 	local spellname = UnitCastingInfo("target") 
 	if null~=spellname then
-		if Oldhand_CastSpell("È­»÷", DemonHunter_action_table["È­»÷"]) then return true; end;
+		if Oldhand_CastSpell("æ‹³å‡»", DemonHunter_action_table["æ‹³å‡»"]) then return true; end;
 	end;
 	
-	-- ¸´³ğ	Buff
+	-- å¤ä»‡	Buff
 	if DemonHunter_RunCommand() then return true; end;
 
-	-- ¸´³ğÊÎÆ·
+	-- å¤ä»‡é¥°å“
 	if DemonHunter_Auto_Trinket() then return true; end;
 	
-	-- ½üÕ½·¶Î§		
-	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["¿ñ±©»Ó¿³"]));
+	-- è¿‘æˆ˜èŒƒå›´		
+	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["ç‹‚æš´æŒ¥ç "]));
 	
 	if not isNearAction then
-	  if Oldhand_CastSpell("³å·æ", DemonHunter_action_table["³å·æ"]) then return true; end;
-	  if Oldhand_CastSpell("Ó¢ÓÂÍ¶ÖÀ", DemonHunter_action_table["Ó¢ÓÂÍ¶ÖÀ"]) then return true; end;
+	  if Oldhand_CastSpell("å†²é”‹", DemonHunter_action_table["å†²é”‹"]) then return true; end;
+	  if Oldhand_CastSpell("è‹±å‹‡æŠ•æ·", DemonHunter_action_table["è‹±å‹‡æŠ•æ·"]) then return true; end;
 	else
   	-- local partyNum = GetNumGroupMembers();
   	
     if power >= 85 then
-      if Oldhand_CastSpell("±©Å­", DemonHunter_action_table["±©Å­"]) then return true; end;
+      if Oldhand_CastSpell("æš´æ€’", DemonHunter_action_table["æš´æ€’"]) then return true; end;
     end
     
-  	if not Oldhand_PlayerBU("Õ½ºğ") then
-  		if Oldhand_CastSpell_IgnoreRange("Õ½ºğ", DemonHunter_action_table["Õ½ºğ"]) then return true; end;
+  	if not Oldhand_PlayerBU("æˆ˜å¼") then
+  		if Oldhand_CastSpell_IgnoreRange("æˆ˜å¼", DemonHunter_action_table["æˆ˜å¼"]) then return true; end;
   	end
   	
-   	if not Oldhand_PlayerBU("Ô¡Ñª·ÜÕ½") then
-  		if Oldhand_CastSpell_IgnoreRange("Ô¡Ñª·ÜÕ½", DemonHunter_action_table["Ô¡Ñª·ÜÕ½"]) then return true; end;
+   	if not Oldhand_PlayerBU("æµ´è¡€å¥‹æˆ˜") then
+  		if Oldhand_CastSpell_IgnoreRange("æµ´è¡€å¥‹æˆ˜", DemonHunter_action_table["æµ´è¡€å¥‹æˆ˜"]) then return true; end;
   	end
   	
-  	if Oldhand_PlayerBU("´İ¿İÀ­Ğà") then
-  	  if Oldhand_CastSpell_IgnoreRange("Ğı·çÕ¶", DemonHunter_action_table["Ğı·çÕ¶"]) then return true; end;
+  	if Oldhand_PlayerBU("æ‘§æ¯æ‹‰æœ½") then
+  	  if Oldhand_CastSpell_IgnoreRange("æ—‹é£æ–©", DemonHunter_action_table["æ—‹é£æ–©"]) then return true; end;
   	end;  	
   	
-    if Oldhand_PlayerBU("ÑªÈâË³Åü") then
-  		if Oldhand_CastSpell("ÊÈÑª", DemonHunter_action_table["ÊÈÑª"]) then return true; end;
+    if Oldhand_PlayerBU("è¡€è‚‰é¡ºåŠˆ") then
+  		if Oldhand_CastSpell("å—œè¡€", DemonHunter_action_table["å—œè¡€"]) then return true; end;
   	end
       
-  	if Oldhand_PlayerBU("¼¤Å­") then
-  	  --Oldhand_AddMessage("·¢Æ¢Æø.................................")
-  		if Oldhand_CastSpell("Å­»÷", DemonHunter_action_table["Å­»÷"]) then return true; end;
+  	if Oldhand_PlayerBU("æ¿€æ€’") then
+  	  --Oldhand_AddMessage("å‘è„¾æ°”.................................")
+  		if Oldhand_CastSpell("æ€’å‡»", DemonHunter_action_table["æ€’å‡»"]) then return true; end;
   	end
   	
-  	if (isNearAction and Oldhand_TargetCount() >= 3 and not Oldhand_PlayerBU("ÑªÈâË³Åü")) or Oldhand_PlayerBU("´İ¿İÀ­Ğà") then
-  	  if Oldhand_CastSpell_IgnoreRange("Ğı·çÕ¶", DemonHunter_action_table["Ğı·çÕ¶"]) then return true; end;
+  	if (isNearAction and Oldhand_TargetCount() >= 3 and not Oldhand_PlayerBU("è¡€è‚‰é¡ºåŠˆ")) or Oldhand_PlayerBU("æ‘§æ¯æ‹‰æœ½") then
+  	  if Oldhand_CastSpell_IgnoreRange("æ—‹é£æ–©", DemonHunter_action_table["æ—‹é£æ–©"]) then return true; end;
   	end;	  
   
-    if Oldhand_CastSpell("ÊÈÑª", DemonHunter_action_table["ÊÈÑª"]) then return true; end;
+    if Oldhand_CastSpell("å—œè¡€", DemonHunter_action_table["å—œè¡€"]) then return true; end;
     
     if Oldhand_TargetCount() >= 4 then
-      if Oldhand_CastSpell_IgnoreRange("Ğı·çÕ¶", DemonHunter_action_table["Ğı·çÕ¶"]) then return true; end;
+      if Oldhand_CastSpell_IgnoreRange("æ—‹é£æ–©", DemonHunter_action_table["æ—‹é£æ–©"]) then return true; end;
     end;
-    if Oldhand_CastSpell("¿ñ±©»Ó¿³", DemonHunter_action_table["¿ñ±©»Ó¿³"]) then return true; end;
+    if Oldhand_CastSpell("ç‹‚æš´æŒ¥ç ", DemonHunter_action_table["ç‹‚æš´æŒ¥ç "]) then return true; end;
 	end;
 
   if Oldhand_TargetCount() >= 4 then
-    if Oldhand_CastSpell_IgnoreRange("Ğı·çÕ¶", DemonHunter_action_table["Ğı·çÕ¶"]) then return true; end;
+    if Oldhand_CastSpell_IgnoreRange("æ—‹é£æ–©", DemonHunter_action_table["æ—‹é£æ–©"]) then return true; end;
   end;
   
-	Oldhand_SetText("ÎŞ¶¯×÷",0);
+	Oldhand_SetText("æ— åŠ¨ä½œ",0);
 	return;
 
 end;
@@ -440,9 +448,15 @@ function DemonHunter_DpsOut3()
 end;
 function DemonHunter_playerSafe()
   local HealthPercent = Oldhand_GetPlayerHealthPercent("player");
-  if (DemonHunter_DPS == 2 and HealthPercent < 50) then
-	  Oldhand_AddMessage('ÑªÁ¿¹ıµÍ '..HealthPercent);
-	  if Oldhand_CastSpellIgnoreRange("¿ñÅ­»Ø¸´", DemonHunter_action_table["¿ñÅ­»Ø¸´"]) then return true; end;
+  if (DemonHunter_DPS == 1 and HealthPercent < 70) then
+	  Oldhand_AddMessage('è¡€é‡è¿‡ä½ '..HealthPercent);
+	  if Oldhand_CastSpellIgnoreRange("ç–¾å½±", DemonHunter_action_table["ç–¾å½±"]) then return true; end;
+  elseif (DemonHunter_DPS == 1 and HealthPercent < 60) then
+	  Oldhand_AddMessage('è¡€é‡è¿‡ä½ '..HealthPercent);
+	  if Oldhand_CastSpellIgnoreRange("å¹»å½±æ‰“å‡»", DemonHunter_action_table["å¹»å½±æ‰“å‡»"]) then return true; end;
+  elseif (DemonHunter_DPS == 1 and HealthPercent < 40) then
+	  Oldhand_AddMessage('è¡€é‡è¿‡ä½ '..HealthPercent);
+	  if Oldhand_CastSpellIgnoreRange("æ··ä¹±æ–°æ˜Ÿ", DemonHunter_action_table["æ··ä¹±æ–°æ˜Ÿ"]) then return true; end;
 	end;
 	return false;
 end;
@@ -491,14 +505,14 @@ end;
 function DemonHunter_Use_INV_Jewelry_TrinketPVP_02()
 	if UnitIsPlayer("playertarget") then 
 		if DemonHunter_NoControl_Debuff() then
-			if Oldhand_TestTrinket("²¿Âä»Õ¼Ç") or Oldhand_TestTrinket("²¿ÂäÑ«ÕÂ")  then 
-				if Oldhand_CastSpell("²¿Âä»Õ¼Ç","INV_Jewelry_TrinketPVP_02") then 
+			if Oldhand_TestTrinket("éƒ¨è½å¾½è®°") or Oldhand_TestTrinket("éƒ¨è½å‹‹ç« ")  then 
+				if Oldhand_CastSpell("éƒ¨è½å¾½è®°","INV_Jewelry_TrinketPVP_02") then 
 					--StartTimer("INV_Jewelry_TrinketPVP")
 					return true; 
 				end		
 			end	
-			if Oldhand_TestTrinket("ÁªÃË»Õ¼Ç") or Oldhand_TestTrinket("ÁªÃËÑ«ÕÂ")  then
-				if Oldhand_CastSpell("ÁªÃË»Õ¼Ç","INV_Jewelry_TrinketPVP_01") then 
+			if Oldhand_TestTrinket("è”ç›Ÿå¾½è®°") or Oldhand_TestTrinket("è”ç›Ÿå‹‹ç« ")  then
+				if Oldhand_CastSpell("è”ç›Ÿå¾½è®°","INV_Jewelry_TrinketPVP_01") then 
 					--StartTimer("INV_Jewelry_TrinketPVP")
 					return true; 
 				end		

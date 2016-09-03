@@ -948,7 +948,7 @@ function DeathKnight_playerSafe()
 		local debufftype = Oldhand_TestPlayerDebuff("player");
 		if debufftype == 1 or debufftype == 3 then
 			if Oldhand_PunishingBlow_Debuff() or (UnitClass("target")~="战士" and UnitClass("target")~="猎人" and UnitClass("target")~= "盗贼" and UnitClass("target")~="死亡骑士") then
-				if Oldhand_CastSpell("反魔法护盾", deathknight_action_table["反魔法护盾"]) then return true; end;
+				if Oldhand_CastSpell_IgnoreRange("反魔法护盾", deathknight_action_table["反魔法护盾"]) then return true; end;
 			end
 		end
 	end;
@@ -958,6 +958,7 @@ function DeathKnight_playerSafe()
 		end
 		if Oldhand_CastSpell("灵界打击", deathknight_action_table["灵界打击"]) then return true; end;
 		--if Oldhand_CastSpell("治疗石", deathknight_action_table["治疗石"]) then return true; end;
+		if Oldhand_CastSpell_IgnoreRange("反魔法护盾", deathknight_action_table["反魔法护盾"]) then return true; end;
 	end
 	if HealthPercent < 70 then
 		--if Oldhand_CastSpell("生命之血", "Spell_Nature_WispSplodeGreen") then return true; end;

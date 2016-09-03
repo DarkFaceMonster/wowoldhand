@@ -153,11 +153,11 @@ function Oldhand_BreakCasting(myspell)
 
 		if not isPlayer then
 			local g_FindNpcName = false;
-			for k, v in pairs(DeathKnight_SaveData) do
-				if v["npcname"] == target_name and  v["spellname"] == myspell and v["targetspellname"] == target_spellname then
-			    	g_FindNpcName = true;
-			  	end
-			end
+			--for k, v in pairs(DeathKnight_SaveData) do
+			--	if v["npcname"] == target_name and  v["spellname"] == myspell and v["targetspellname"] == target_spellname then
+			--    	g_FindNpcName = true;
+			--  	end
+			--end
 			if g_FindNpcName then
 				--DeathKnight_AddMessage(string.format("%s 正在施放 %s，无法打断。",target_name,spell));
 				return 0;

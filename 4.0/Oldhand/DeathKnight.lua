@@ -104,6 +104,8 @@ deathknight_action_table["黑暗突变"] = 342913;
 deathknight_action_table["反魔法护罩"] = 136120;
 
 deathknight_action_table["死亡之握"] = 237532;
+deathknight_action_table["传染"] = 135775;
+
 deathknight_action_table["爆发"] = 348565;
 deathknight_action_table["心灵冰冻"] = 237527;
 deathknight_action_table["寒冰锁链"] = 135834;
@@ -767,13 +769,15 @@ function DeathKnight_DpsOut3()
 	-- 没有恶性瘟疫则施放爆发
 	if (not debuff4) then
 	  if Oldhand_CastSpell("爆发", deathknight_action_table["爆发"]) then return true; end;
-	elseif Oldhand_TargetCount() >= 3 then
+	elseif Oldhand_TargetCount() >= 3 then                          
 	  if Oldhand_CastSpell_IgnoreRange("传染", deathknight_action_table["传染"]) then return true; end;
 	end
 	
 	-- 溃烂之伤达到5层
   if (debuff3 and count3 >= 5) then
-    if Oldhand_CastSpell("天启", deathknight_action_table["天启"]) then return true; end;
+    if target_health_percent > 40 and target_health > player_health / 2 then
+      if Oldhand_CastSpell("天启", deathknight_action_table["天启"]) then return true; end;
+    end;
     if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
   end;
   

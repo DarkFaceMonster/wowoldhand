@@ -33,8 +33,7 @@ DemonHunter_action_table["恶魔变形"] = 1247262;
 DemonHunter_action_table["疾影"] = 1305150;
 DemonHunter_action_table["幻影打击"] = 1305154;
 DemonHunter_action_table["混乱新星"] = 1305159;
-
-
+DemonHunter_action_table["伊利达雷之怒"] = 1117778;
 
 -- 复仇
 DemonHunter_action_table["毁灭打击"] = 135291;
@@ -319,14 +318,15 @@ function DemonHunter_DpsOut1()
 	  if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
 	else
   	-- local partyNum = GetNumGroupMembers();
-
-  	if (isNearAction and Oldhand_TargetCount() >= 3 and power >= 50) then
-  	  if Oldhand_CastSpell_IgnoreRange("眼棱", DemonHunter_action_table["眼棱"]) then return true; end;
-  	  if Oldhand_CastSpell_IgnoreRange("刃舞", DemonHunter_action_table["刃舞"]) then return true; end;
-  	end;	
+    if Oldhand_CastSpell_IgnoreRange("伊利达雷之怒", DemonHunter_action_table["伊利达雷之怒"]) then return true; end;
+    
+    if (isNearAction and Oldhand_TargetCount() >= 3 and power >= 50) then
+  	   if Oldhand_CastSpell_IgnoreRange("眼棱", DemonHunter_action_table["眼棱"]) then return true; end;
+  	   if Oldhand_CastSpell_IgnoreRange("刃舞", DemonHunter_action_table["刃舞"]) then return true; end;
+    end;	
   	
     if power >= 40 then
-      if Oldhand_CastSpell("混乱打击", DemonHunter_action_table["混乱打击"]) then return true; end;
+       if Oldhand_CastSpell("混乱打击", DemonHunter_action_table["混乱打击"]) then return true; end;
     end
     
 ----if not Oldhand_PlayerBU("战吼") then

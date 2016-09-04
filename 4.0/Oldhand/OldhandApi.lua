@@ -482,7 +482,7 @@ function  Oldhand_Auto_Attack()
 end
 
 function Oldhand_GetActionID(texture)
-	for i = 1, 120 do
+	for i = 2, 120 do
 		if ( HasAction(i) ) then
 			local temptexture = GetActionTexture(i);
 			if temptexture == texture then
@@ -506,7 +506,7 @@ function Oldhand_GetActionIDbyName(text)
 end
 
 function Oldhand_CastSpell(text, texture)
-	for i = 1, 12 do
+	for i = 2, 12 do
 	  -- Oldhand_AddMessage("for do text: "..text..", i: "..i..", texture: "..texture); 
 		if ( HasAction(i) ) then
 		  -- Oldhand_AddMessage("HasAction text: "..text..", i: "..i..", texture: "..texture); 
@@ -548,7 +548,7 @@ function Oldhand_CastSpell_IgnoreRange(text, texture)
 			end
 		end
 	end
-	for i = 1, 12 do
+	for i = 2, 12 do
 		if ( HasAction(i) ) then
 			local temptexture = GetActionTexture(i);
 			
@@ -592,7 +592,7 @@ function Oldhand_CastSpellIgnoreRange(text, texture)
 			end
 		end
 	end
-	for i = 1, 12 do
+	for i = 2, 12 do
 		if ( HasAction(i) ) then
 			local temptexture = GetActionTexture(i);
 			if temptexture == texture then

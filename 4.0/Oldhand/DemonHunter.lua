@@ -57,8 +57,8 @@ function DemonHunter_CreateMacro()
 	--PlaceAction(1);
 	--ClearCursor();
 
-	if GetMacroIndexByName("战争践踏") == 0 then
-		CreateMacro("战争践踏", 66, "/cast 战争践踏", 1, 0);
+	if GetMacroIndexByName("法术洪流") == 0 then
+		CreateMacro("法术洪流", 53, "/cast 法术洪流", 1, 0);
 	end;
 
 	if GetMacroIndexByName("更换模式") == 0 then
@@ -87,24 +87,25 @@ function DemonHunter_CreateMacro()
 	ClearCursor();
 
   Oldhand_PutAction("自动攻击", 1);
-  Oldhand_PutAction("冲锋", 61);
  
   if DemonHunter_DPS == 1 then
-  elseif DemonHunter_DPS == 2 then
-    Oldhand_PutAction("嗜血", 2);
-    Oldhand_PutAction("狂暴挥砍", 3);
-    Oldhand_PutAction("暴怒", 4);
-    Oldhand_PutAction("狂怒回复", 7);    
-    Oldhand_PutAction("斩杀", 62);
-    Oldhand_PutAction("怒击", 63);
+    Oldhand_PutAction("恶魔之咬", 2);
+    Oldhand_PutAction("混乱打击", 3);
+    Oldhand_PutAction("刃舞", 4);
+    Oldhand_PutAction("眼棱", 5);    
+    Oldhand_PutAction("伊利达雷之怒", 6);
+    Oldhand_PutAction("疾影", 7);
+    Oldhand_PutAction("幻影打击", 8);
+    Oldhand_PutAction("恶魔变形", 12);
+    Oldhand_PutAction("邪能冲撞", 62);
+    Oldhand_PutAction("吞噬魔法", 64);
+    Oldhand_PutAction("混乱新星", 65);
+    Oldhand_PutAction("幽灵视觉", 72);
     
+  elseif DemonHunter_DPS == 2 then
+
   elseif DemonHunter_DPS == 3 then
-    Oldhand_PutAction("毁灭打击", 2);
-    Oldhand_PutAction("盾牌猛击", 3);
-    Oldhand_PutAction("雷霆一击", 4);
-    Oldhand_PutAction("盾牌格挡", 7);    
-    Oldhand_PutAction("嘲讽", 62);
-    Oldhand_PutAction("乘胜追击", 63);  
+
   end;
 
 	if Oldhand_TestTrinket("部落勋章") then
@@ -354,98 +355,13 @@ end;
 
 -- 复仇模式
 function DemonHunter_DpsOut2()
-  if Oldhand_Test_Target_Debuff() then 
-		Oldhand_AddMessage(UnitName("target").."目标已经被控制...");			
-		Oldhand_SetText("目标已经被控制", 0);
-		return;
-	end
-	
-	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Oldhand_Test_Target_Debuff()) then
-		--Oldhand_SetText("开始攻击",26);	
-		Oldhand_SetText("自动攻击", 1);
-		return true;
-	end;
-	if not Oldhand_TargetDeBU("飓风术") or not Oldhand_TargetBU("圣盾术") or not  Oldhand_TargetBU("保护之手") or  not Oldhand_TargetBU("寒冰屏障") or not  Oldhand_TargetBU("法术反射") or not  Oldhand_TargetDeBU("放逐术") then
-		Oldhand_SetText("目标无法攻击", 0);
-		return ;
-	end;
-	if DemonHunter_playerSafe() then return true;end;
-	
-	local power = UnitPower("player");
-	
-	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
-	if target_health_percent <= 20 and power >= 25 then
-  	if Oldhand_CastSpell("斩杀", DemonHunter_action_table["斩杀"]) then return true; end;
-  end;
-  
-	local spellname = UnitCastingInfo("target") 
-	if null~=spellname then
-		if Oldhand_CastSpell("拳击", DemonHunter_action_table["拳击"]) then return true; end;
-	end;
-	
-	-- 复仇	Buff
-	if DemonHunter_RunCommand() then return true; end;
-
-	-- 复仇饰品
-	if DemonHunter_Auto_Trinket() then return true; end;
-	
-	-- 近战范围		
-	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["狂暴挥砍"]));
-	
-	if not isNearAction then
-	  if Oldhand_CastSpell("冲锋", DemonHunter_action_table["冲锋"]) then return true; end;
-	  if Oldhand_CastSpell("英勇投掷", DemonHunter_action_table["英勇投掷"]) then return true; end;
-	else
-  	-- local partyNum = GetNumGroupMembers();
-  	
-    if power >= 85 then
-      if Oldhand_CastSpell("暴怒", DemonHunter_action_table["暴怒"]) then return true; end;
-    end
-    
-  	if not Oldhand_PlayerBU("战吼") then
-  		if Oldhand_CastSpell_IgnoreRange("战吼", DemonHunter_action_table["战吼"]) then return true; end;
-  	end
-  	
-   	if not Oldhand_PlayerBU("浴血奋战") then
-  		if Oldhand_CastSpell_IgnoreRange("浴血奋战", DemonHunter_action_table["浴血奋战"]) then return true; end;
-  	end
-  	
-  	if Oldhand_PlayerBU("摧枯拉朽") then
-  	  if Oldhand_CastSpell_IgnoreRange("旋风斩", DemonHunter_action_table["旋风斩"]) then return true; end;
-  	end;  	
-  	
-    if Oldhand_PlayerBU("血肉顺劈") then
-  		if Oldhand_CastSpell("嗜血", DemonHunter_action_table["嗜血"]) then return true; end;
-  	end
-      
-  	if Oldhand_PlayerBU("激怒") then
-  	  --Oldhand_AddMessage("发脾气.................................")
-  		if Oldhand_CastSpell("怒击", DemonHunter_action_table["怒击"]) then return true; end;
-  	end
-  	
-  	if (isNearAction and Oldhand_TargetCount() >= 3 and not Oldhand_PlayerBU("血肉顺劈")) or Oldhand_PlayerBU("摧枯拉朽") then
-  	  if Oldhand_CastSpell_IgnoreRange("旋风斩", DemonHunter_action_table["旋风斩"]) then return true; end;
-  	end;	  
-  
-    if Oldhand_CastSpell("嗜血", DemonHunter_action_table["嗜血"]) then return true; end;
-    
-    if Oldhand_TargetCount() >= 4 then
-      if Oldhand_CastSpell_IgnoreRange("旋风斩", DemonHunter_action_table["旋风斩"]) then return true; end;
-    end;
-    if Oldhand_CastSpell("狂暴挥砍", DemonHunter_action_table["狂暴挥砍"]) then return true; end;
-	end;
-
-  if Oldhand_TargetCount() >= 4 then
-    if Oldhand_CastSpell_IgnoreRange("旋风斩", DemonHunter_action_table["旋风斩"]) then return true; end;
-  end;
-  
-	Oldhand_SetText("无动作",0);
-	return;
 
 end;
 
 function DemonHunter_DpsOut3()
+
 end;
+
 function DemonHunter_playerSafe()
   local HealthPercent = Oldhand_GetPlayerHealthPercent("player");
   if (DemonHunter_DPS == 1 and HealthPercent < 70) then

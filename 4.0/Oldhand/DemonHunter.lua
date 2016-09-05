@@ -99,7 +99,8 @@ function DemonHunter_CreateMacro()
     Oldhand_PutAction("恶魔变形", 12);
     Oldhand_PutAction("邪能冲撞", 62);
     Oldhand_PutAction("吞噬魔法", 64);
-    Oldhand_PutAction("混乱新星", 65);
+    Oldhand_PutAction("投掷利刃", 65);
+    Oldhand_PutAction("混乱新星", 66);
     Oldhand_PutAction("幽灵视觉", 72);
     
   elseif DemonHunter_DPS == 2 then
@@ -135,7 +136,7 @@ function DemonHunter_CreateMacro()
 		Oldhand_PutAction("刃拳的宽容", 72);
 	end
 	
-	Oldhand_PutAction("战争践踏", 51);
+	Oldhand_PutAction("奥术洪流", 51);
 
 	SetBinding("F1", "MULTIACTIONBAR1BUTTON1");
 	SetBinding("F2", "MULTIACTIONBAR1BUTTON2");

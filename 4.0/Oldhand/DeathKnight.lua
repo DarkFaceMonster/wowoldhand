@@ -45,7 +45,7 @@ local 	DeathKnight_CURSE   = '诅咒';
 -- 9 INV_Weapon_Shortblade_40     	心脏打击                                             
 -- 9 Spell_DeathKnight_ScourgeStrike 天灾打击    Spell_Frost_ArcticWinds  凛风冲击                    
 -- 10 Spell_Shadow_SoulLeech_3                                                 
--- 11 Spell_Shadow_AntiMagicShell 反魔法护盾                                   
+-- 11 Spell_Shadow_AntiMagicShell 反魔法护罩                                   
 -- 12 Spell_DeathKnight_BloodBoil                                              
 -- 11 Racial_Orc_BerserkerStrenth	血性狂怒                                   
 --  INV_Jewelcrafting_StarOfElune_02 苔原护符                                  
@@ -664,7 +664,9 @@ function DeathKnight_DpsOut3()
   if DeathKnight_playerSafe() then return true; end;
   
 	-- 是否在近战范围（使用灵界打击）
-	local isNearAction = IsActionInRange(Oldhand_GetActionID(237517)) == true; 
+	local isNearAction = IsActionInRange(Oldhand_GetActionID(237517)) == true;
+	
+	local partyNum = GetNumGroupMembers();
 	
 	if (UnitIsPlayer("target") and UnitCanAttack("player", "target")) or UnitName("target")=="炸弹机器人" then
 		if Oldhand_TargetDeBU("寒冰锁链") then
@@ -677,7 +679,16 @@ function DeathKnight_DpsOut3()
     end;
 	end;
 
-	if Oldhand_BreakCasting("心灵冰冻")==1 and Oldhand_CastSpell("心灵冰冻", deathknight_action_table["心灵冰冻"]) then return true; end;
+	if Oldhand_BreakCasting("心灵冰冻")==1 then
+	  Oldhand_AddMessage("快打断 1111111111111111111");
+	  if Oldhand_CastSpell("心灵冰冻", deathknight_action_table["心灵冰冻"]) then return true; end;
+	  Oldhand_AddMessage("快打断 22222222222222222");
+	  if partyNum <= 1 then
+	    Oldhand_AddMessage("快打断 3333333333333");
+	    if Oldhand_CastSpell("死亡之握", deathknight_action_table["死亡之握"]) then return true; end;
+	    Oldhand_AddMessage("快打断 44444444444444");
+	  end;
+	end;
 
   if (IsCurrentAction(Oldhand_GetActionID(deathknight_action_table["枯萎凋零"]))) then 
 		Oldhand_SetText("枯萎凋零",0);
@@ -765,7 +776,7 @@ function DeathKnight_DpsOut3()
 		end
 	end;
 
-  local partyNum = GetNumGroupMembers();
+  
 	-- 没有恶性瘟疫则施放爆发
 	if (not debuff4) then
 	  if Oldhand_CastSpell("爆发", deathknight_action_table["爆发"]) then return true; end;
@@ -948,7 +959,7 @@ function DeathKnight_playerSafe()
 		local debufftype = Oldhand_TestPlayerDebuff("player");
 		if debufftype == 1 or debufftype == 3 then
 			if Oldhand_PunishingBlow_Debuff() or (UnitClass("target")~="战士" and UnitClass("target")~="猎人" and UnitClass("target")~= "盗贼" and UnitClass("target")~="死亡骑士") then
-				if Oldhand_CastSpell_IgnoreRange("反魔法护盾", deathknight_action_table["反魔法护盾"]) then return true; end;
+				if Oldhand_CastSpell_IgnoreRange("反魔法护罩", deathknight_action_table["反魔法护罩"]) then return true; end;
 			end
 		end
 	end;
@@ -958,7 +969,7 @@ function DeathKnight_playerSafe()
 		end
 		if Oldhand_CastSpell("灵界打击", deathknight_action_table["灵界打击"]) then return true; end;
 		--if Oldhand_CastSpell("治疗石", deathknight_action_table["治疗石"]) then return true; end;
-		if Oldhand_CastSpell_IgnoreRange("反魔法护盾", deathknight_action_table["反魔法护盾"]) then return true; end;
+		if Oldhand_CastSpell_IgnoreRange("反魔法护罩", deathknight_action_table["反魔法护罩"]) then return true; end;
 	end
 	if HealthPercent < 70 then
 		--if Oldhand_CastSpell("生命之血", "Spell_Nature_WispSplodeGreen") then return true; end;

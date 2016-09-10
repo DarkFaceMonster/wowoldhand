@@ -132,20 +132,36 @@ end
 -- 判断是否需要打断目标施法
 function Oldhand_BreakCasting(myspell)
 	local target_name = UnitName("target");
-	local spell, _, displayName, _, startTime, endTime, _, _, notInterruptible = UnitCastingInfo("target");
-	if (spell == null) then currTargetCasting = null; return 0; end;
+	local spell,  _, displayName,  _, startTime,  endTime,  _, _, notInterruptible = UnitCastingInfo("target");
+	local spell2, _, displayName2, _, startTime2, endTime2, _, notInterruptible2 = UnitChannelInfo("target");
+	
+	if (spell == null and spell2 == null) then currTargetCasting = null; return 0; end;
+	
 	if (spell ~= null and spell ~= currTargetCasting) then
 	  if (notInterruptible) then
-	    --DeathKnight_AddMessage(string.format("目标 正在施放 %s 。。。无法打断", spell));
+	    Oldhand_AddMessage(string.format("目标 正在施放 %s 。。。无法打断", spell));
 	    return 0;
-	  else
---	    DeathKnight_AddMessage(string.format("目标 正在施放 %s 。。。", spell));
 	  end;
 	  currTargetCasting = spell;
+	elseif (spell2 ~= null and spell2 ~= currTargetCasting) then
+	  if (notInterruptible2) then
+	    Oldhand_AddMessage(string.format("目标 正在引导 %s 。。。无法打断", spell));
+	    return 0;
+	  end;
+	  currTargetCasting = spell2;
 	end;
+	
+	local remainTime = 1000;
+	
 	if endTime and startTime then
 		target_spellname = spell;
-
+		remainTime = endTime - GetTime() * 1000;
+  elseif endTime2 and startTime2 then
+    target_spellname = spell2;
+    remainTime = endTime2 - GetTime() * 1000;
+  end;
+  
+  if target_spellname then
 		local isPlayer = false;
 		if not (UnitIsPlayer("target") and UnitCanAttack("player","target")) then
 			isPlayer = true;
@@ -164,20 +180,20 @@ function Oldhand_BreakCasting(myspell)
 			end;
 		end
 
-		local remainTime = endTime - GetTime() * 1000;
-		--DeathKnight_AddMessage(string.format("%s 正在施放 %s。。。，剩余时间：%f",target_name,spell,remainTime));
 		if (remainTime <= 800.0) then
-			if (spell) then
+		  --Oldhand_AddMessage(string.format("%s 正在施放 %s。。。，剩余时间：%f", target_name, target_spellname, remainTime));
+		  return 1;
+			--if (spell) then
 				--DeathKnight_AddMessage(string.format("打断：%s 的 %s，还剩 %d 毫秒。",target_name,spell,remainTime));
-				return 1;
-			elseif displayName then
+			--	return 1;
+			--elseif displayName then
 				--DeathKnight_AddMessage(string.format("打断：%s 的 %s，还剩 %d 毫秒。",target_name,displayName,remainTime));
-				return 1;
-			end;
+			--	return 1;
+			--end;
 		end
 	else
 		target_spellname = "";
-	end
+	end;
 
 	return 0;
 end

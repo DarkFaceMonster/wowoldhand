@@ -133,9 +133,11 @@ end
 function Oldhand_BreakCasting(myspell)
 	local target_name = UnitName("target");
 	local spell,  _, displayName,  _, startTime,  endTime,  _, _, notInterruptible = UnitCastingInfo("target");
-	local spell2, _, displayName2, _, startTime2, endTime2, _, notInterruptible2 = UnitChannelInfo("target");
 	
-	if (spell == null and spell2 == null) then currTargetCasting = null; return 0; end;
+	if (spell == null) then
+	  spell,  _, displayName,  _, startTime,  endTime,  _, notInterruptible = UnitCastingInfo("target");
+	end;
+	if (spell == null) then currTargetCasting = null; return 0; end;
 	
 	if (spell ~= null and spell ~= currTargetCasting) then
 	  if (notInterruptible) then
@@ -143,12 +145,6 @@ function Oldhand_BreakCasting(myspell)
 	    return 0;
 	  end;
 	  currTargetCasting = spell;
-	elseif (spell2 ~= null and spell2 ~= currTargetCasting) then
-	  if (notInterruptible2) then
-	    Oldhand_AddMessage(string.format("目标 正在引导 %s 。。。无法打断", spell));
-	    return 0;
-	  end;
-	  currTargetCasting = spell2;
 	end;
 	
 	local remainTime = 1000;
@@ -156,9 +152,6 @@ function Oldhand_BreakCasting(myspell)
 	if endTime and startTime then
 		target_spellname = spell;
 		remainTime = endTime - GetTime() * 1000;
-  elseif endTime2 and startTime2 then
-    target_spellname = spell2;
-    remainTime = endTime2 - GetTime() * 1000;
   end;
   
   if target_spellname then

@@ -680,13 +680,9 @@ function DeathKnight_DpsOut3()
 	end;
 
 	if Oldhand_BreakCasting("心灵冰冻")==1 then
-	  Oldhand_AddMessage("快打断 1111111111111111111");
 	  if Oldhand_CastSpell("心灵冰冻", deathknight_action_table["心灵冰冻"]) then return true; end;
-	  Oldhand_AddMessage("快打断 22222222222222222");
 	  if partyNum <= 1 then
-	    Oldhand_AddMessage("快打断 3333333333333");
 	    if Oldhand_CastSpell("死亡之握", deathknight_action_table["死亡之握"]) then return true; end;
-	    Oldhand_AddMessage("快打断 44444444444444");
 	  end;
 	end;
 

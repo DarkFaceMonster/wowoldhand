@@ -23,11 +23,13 @@ DemonHunter_action_table["自动攻击"] = 1278164;
 -- 浩劫
 DemonHunter_action_table["恶魔之咬"] = 135561;
 DemonHunter_action_table["混乱打击"] = 1305152;
+DemonHunter_action_table["毁灭"] = 1303275;
 DemonHunter_action_table["幽灵视觉"] = 1247266;
 DemonHunter_action_table["眼棱"] = 1305156;
 DemonHunter_action_table["邪能冲撞"] = 1247261;
 DemonHunter_action_table["投掷利刃"] = 1305159;
 DemonHunter_action_table["刃舞"] = 1305149;
+DemonHunter_action_table["死亡横扫"] = 1309099;
 DemonHunter_action_table["吞噬魔法"] = 1305153;
 DemonHunter_action_table["恶魔变形"] = 1247262;
 DemonHunter_action_table["疾影"] = 1305150;
@@ -325,10 +327,12 @@ function DemonHunter_DpsOut1()
     if (isNearAction and Oldhand_TargetCount() >= 3 and power >= 50) then
   	   if Oldhand_CastSpell_IgnoreRange("眼棱", DemonHunter_action_table["眼棱"]) then return true; end;
   	   if Oldhand_CastSpell_IgnoreRange("刃舞", DemonHunter_action_table["刃舞"]) then return true; end;
+  	   if Oldhand_CastSpell_IgnoreRange("死亡横扫", DemonHunter_action_table["死亡横扫"]) then return true; end;
     end;	
   	
     if power >= 40 then
        if Oldhand_CastSpell("混乱打击", DemonHunter_action_table["混乱打击"]) then return true; end;
+       if Oldhand_CastSpell("毁灭", DemonHunter_action_table["毁灭"]) then return true; end;
     end
     
 ----if not Oldhand_PlayerBU("战吼") then
@@ -337,18 +341,9 @@ function DemonHunter_DpsOut1()
     if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
     
     if Oldhand_CastSpell("恶魔之咬", DemonHunter_action_table["恶魔之咬"]) then return true; end;
-    
-    if Oldhand_TargetCount() >= 4 then
-      if Oldhand_CastSpell_IgnoreRange("眼棱", DemonHunter_action_table["眼棱"]) then return true; end;
-      if Oldhand_CastSpell_IgnoreRange("刃舞", DemonHunter_action_table["刃舞"]) then return true; end;
-    end;
-    if Oldhand_CastSpell("恶魔之咬", DemonHunter_action_table["恶魔之咬"]) then return true; end;
-	end;
 
-  if Oldhand_TargetCount() >= 4 then
-    if Oldhand_CastSpell_IgnoreRange("眼棱", DemonHunter_action_table["眼棱"]) then return true; end;
-  end;
-  
+	end;
+ 
 	Oldhand_SetText("无动作",0);
 	return;
 

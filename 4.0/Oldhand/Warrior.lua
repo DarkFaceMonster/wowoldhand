@@ -22,7 +22,21 @@ warrior_action_table["自动攻击"] = 132400;
 
 warrior_action_table["冲锋"] = 132337;
 warrior_action_table["嘲讽"] = 136080;
-
+warrior_action_table["旋风斩"] = 132369;
+warrior_action_table["战吼"] = 458972;
+warrior_action_table["命令怒吼"] = 132351;
+warrior_action_table["拳击"] = 132938;
+-- 武器
+warrior_action_table["致死打击"] = 132355;
+warrior_action_table["巨人打击"] = 464973;
+warrior_action_table["猛击"] = 132340;
+warrior_action_table["顺劈斩"] = 132338;
+warrior_action_table["剑在人在"] = 132336;
+warrior_action_table["风暴之锤"] = 613635;
+warrior_action_table["战吼"] = 458972;
+warrior_action_table["剑刃风暴"] = 236303;
+warrior_action_table["乘胜追击"] = 132342;
+warrior_action_table["剑刃风暴"] = 458972;
 -- 狂怒
 warrior_action_table["嗜血"] = 136012;
 warrior_action_table["狂暴挥砍"] = 132367;
@@ -30,9 +44,6 @@ warrior_action_table["怒击"] = 589119;
 warrior_action_table["斩杀"] = 135358;
 warrior_action_table["暴怒"] = 132352;
 warrior_action_table["狂怒回复"] = 132345;
-warrior_action_table["拳击"] = 132938;
-warrior_action_table["旋风斩"] = 132369;
-warrior_action_table["战吼"] = 458972;
 warrior_action_table["英勇投掷"] = 132453;
 warrior_action_table["浴血奋战"] = 236304;
 -- 防护
@@ -285,83 +296,82 @@ end;
 
 -- 武器模式
 function Warrior_DpsOut1()
-  if Warrior_Test_Target_Debuff() then 
+  if Oldhand_Test_Target_Debuff() then 
 		Oldhand_AddMessage(UnitName("target").."目标已经被控制...");			
-    Oldhand_SetText("目标已经被控制",0);
+		Oldhand_SetText("目标已经被控制", 0);
 		return;
 	end
 	
-	if not Oldhand_TargetDeBU("飓风术") or not Oldhand_TargetBU("圣盾术") or not  Oldhand_TargetBU("保护之手") or  not Oldhand_TargetBU("寒冰屏障") or not  Oldhand_TargetBU("法术反射") or not  Oldhand_TargetDeBU("放逐术") then
-		Oldhand_SetText("目标无法攻击",0);
-		return ;
-	end;
-	
-	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Warrior_Test_Target_Debuff()) then
+	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Oldhand_Test_Target_Debuff()) then
 		--Oldhand_SetText("开始攻击",26);	
-		Oldhand_SetText("攻击", 1);
+		Oldhand_SetText("自动攻击", 1);
 		return true;
 	end;
-  
-	if Warrior_playerSafe() then return true; end;
-	
-	if 0~=IsActionInRange(Oldhand_GetActionID(warrior_action_table["风剪"])) then
-		local spellname = UnitCastingInfo("target") 
-		if null~=spellname then
-			if Oldhand_CastSpell("风剪", warrior_action_table["风剪"]) then return true; end;
-		end;
+	if not Oldhand_TargetDeBU("飓风术") or not Oldhand_TargetBU("圣盾术") or not  Oldhand_TargetBU("保护之手") or  not Oldhand_TargetBU("寒冰屏障") or not  Oldhand_TargetBU("法术反射") or not  Oldhand_TargetDeBU("放逐术") then
+		Oldhand_SetText("目标无法攻击", 0);
+		return ;
 	end;
+	if Warrior_playerSafe() then return true;end;
 	
-	if UnitIsPlayer("target") and UnitCanAttack("player","target") then
-		if Oldhand_TargetDeBU("冰霜震击") then
-			if Oldhand_CastSpell("冰霜震击", warrior_action_table["冰霜震击"]) then return true; end;
-		end;
-	end;
-	
-	-- 增强	Buff
-	if Warrior_RunCommand() then return true; end;
-  
-	-- 增强饰品
-	if Warrior_Auto_Trinket() then return true; end;
-
-  local partyNum = GetNumGroupMembers();
 	local power = UnitPower("player");
-	if (partyNum >= 1 and power >= 20) or power >= 40 then
-	  if Oldhand_CastSpell("大地震击", warrior_action_table["大地震击"]) then return true; end;
-	end;
+	
+  local partyNum = GetNumGroupMembers();
 
-	local debuff1, remainTime1 = Oldhand_CheckDebuffByPlayer("烈焰震击");
 	
-	if (not debuff1 or remainTime1 < 5) then
-	  --Oldhand_AddMessage("烈焰震击 remainTime1: "..remainTime1);
-	  if Oldhand_CastSpell("烈焰震击", warrior_action_table["烈焰震击"]) then return true; end;
-	end
-	
-	local buff1, remainTime1, count1 = Oldhand_PlayerBU("熔岩奔腾");
-	if buff1 then
-	  if Oldhand_CastSpell("熔岩爆裂", warrior_action_table["熔岩爆裂"]) then return true; end;
-	end;
-	
-	local healthPercent1, maxHealth1 = Oldhand_GetPlayerHealthPercent("player");
-	local healthPercent2, maxHealth2 = Oldhand_GetPlayerHealthPercent("target");
-	
-	if maxHealth2 > maxHealth1 then
-	  if Oldhand_CastSpell_IgnoreRange("火元素", warrior_action_table["火元素"]) then return true; end;
-	end;
+	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
   
-	if Oldhand_CastSpell_IgnoreRange("元素冲击", warrior_action_table["元素冲击"]) then return true; end;
-	
-	if Oldhand_CastSpell("熔岩爆裂", warrior_action_table["熔岩爆裂"]) then return true; end;
-	
-	
-	--Oldhand_AddMessage("tuandui : "..partyNum);
-	if partyNum >= 1 then
-	  if Oldhand_CastSpell("闪电链", warrior_action_table["闪电链"]) then return true; end;
-	else
-	  if Oldhand_CastSpell("闪电箭", warrior_action_table["闪电箭"]) then return true; end;
+	local spellname = UnitCastingInfo("target") 
+	if null~=spellname then
+		if Oldhand_CastSpell("拳击", warrior_action_table["拳击"]) then return true; end;
 	end;
 	
+	-- 狂怒	Buff
+	if Warrior_RunCommand() then return true; end;
+
+	-- 狂怒饰品
+	if Warrior_Auto_Trinket() then return true; end;
+	
+	-- 近战范围		
+	local isNearAction = IsActionInRange(Oldhand_GetActionID(warrior_action_table["猛击"]));
+	
+	if not isNearAction and partyNum <= 1 then
+	  if Oldhand_CastSpell("冲锋", warrior_action_table["冲锋"]) then return true; end;
+	  if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
+	else
+
+    if target_health_percent <= 20 and power >= 20 then
+  	  if Oldhand_CastSpell("斩杀", warrior_action_table["斩杀"]) then return true; end;
+    end;
+    
+  	if not Oldhand_PlayerBU("战吼") then
+  		if Oldhand_CastSpell_IgnoreRange("战吼", warrior_action_table["战吼"]) then return true; end;
+  	end
+
+    if Oldhand_TargetCount() >= 2 then
+      if Oldhand_CastSpell_IgnoreRange("剑刃风暴", warrior_action_table["剑刃风暴"]) then return true; end;
+    end;
+ 
+
+    if Oldhand_TargetCount() >= 3 then
+  	  if not Oldhand_PlayerBU("顺劈斩") then
+  	     if Oldhand_CastSpell_IgnoreRange("顺劈斩", warrior_action_table["顺劈斩"]) then return true; end;
+  	  end;
+  	  if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;  	     
+  	end;	  
+  
+    if Oldhand_CastSpell("巨人打击", warrior_action_table["巨人打击"]) then return true; end;
+
+    if power >= 16 then
+      if Oldhand_CastSpell("致死打击", warrior_action_table["致死打击"]) then return true; end;
+    end
+
+    if Oldhand_CastSpell("猛击", warrior_action_table["猛击"]) then return true; end;
+
+    if Oldhand_CastSpell("狂暴挥砍", warrior_action_table["狂暴挥砍"]) then return true; end;
+	end;
+ 
 	Oldhand_SetText("无动作",0);
-	return;		
+	return;
 
 end;
 

@@ -117,6 +117,7 @@ deathknight_action_table["战斗的召唤"] = 132485;
 deathknight_action_table["幽魂步"] = 110041;
 deathknight_action_table["亡者复生"] = 136119;
 
+deathknight_action_table["血肉之盾"] = 1100170;
 
 -- 饰品
 deathknight_action_table["霸权印记"] = 134086;
@@ -681,7 +682,7 @@ function DeathKnight_DpsOut3()
 
 	if Oldhand_BreakCasting("心灵冰冻")==1 then
 	  if Oldhand_CastSpell("心灵冰冻", deathknight_action_table["心灵冰冻"]) then return true; end;
-	  if partyNum <= 1 then
+	  if partyNum <= 1 and not isNearAction then
 	    if Oldhand_CastSpell("死亡之握", deathknight_action_table["死亡之握"]) then return true; end;
 	  end;
 	end;
@@ -732,6 +733,7 @@ function DeathKnight_DpsOut3()
 	local buff6 = Oldhand_PlayerBU("不洁之能");
 	local buff7 = Oldhand_PlayerBU("血性狂怒");
 	local buff8 = Oldhand_PlayerBU("狂怒");
+	local buff9 = Oldhand_PlayerBU("末日突降");
 	if buff1 then strenth = strenth + 200; end;		-- 不洁之力
 	if buff2 then strenth = strenth + 500; end;
 	if buff3 then strenth = strenth + 350; end;
@@ -782,7 +784,7 @@ function DeathKnight_DpsOut3()
 	
 	-- 溃烂之伤达到5层
   if (debuff3 and count3 >= 5) then
-    if target_health_percent > 40 and target_health > player_health / 2 then
+    if target_health_percent > 40 or target_health > player_health / 4 then
       if Oldhand_CastSpell("天启", deathknight_action_table["天启"]) then return true; end;
     end;
     if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
@@ -793,11 +795,15 @@ function DeathKnight_DpsOut3()
 		if Oldhand_CastSpell("黑暗仲裁者", deathknight_action_table["黑暗仲裁者"]) then return true; end;
 		if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
 	end
-
+	
 	if Oldhand_CastSpell("脓疮打击", deathknight_action_table["脓疮打击"]) then return true; end;
-	if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
-
+	
+  if Oldhand_PlayerBU("末日突降") or power > 80 then
+		if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
+	end
+	
 	if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
+	if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
 
 	--local id1 = Oldhand_GetActionID("Spell_Shadow_AnimateDead");
 	--if id1~=0 and Oldhand_PlayerBU("活力分流") then
@@ -940,9 +946,13 @@ end
 
 function DeathKnight_playerSafe()
 	local HealthPercent = Oldhand_GetPlayerHealthPercent("player");
-	if (HealthPercent < 50) then Oldhand_AddMessage('血量过低 '..HealthPercent); end;
+	--if (HealthPercent < 50) then Oldhand_AddMessage('血量过低 '..HealthPercent); end;
 	
-	if (DeathKnight_DPS == 0 or DeathKnight_DPS == 1) then
+	if DeathKnight_DPS == 3 then
+	  if HealthPercent < 40 then
+			if Oldhand_CastSpell_IgnoreRange("血肉之盾", deathknight_action_table["血肉之盾"]) then return true; end;
+		end
+	elseif (DeathKnight_DPS == 0 or DeathKnight_DPS == 1) then
 		if HealthPercent < 50 then
 			if Oldhand_CastSpell("吸血鬼之血", "Spell_Shadow_LifeDrain") then return true; end;
 			if Oldhand_CastSpell("符文分流", "Spell_DeathKnight_RuneTap") then return true; end;

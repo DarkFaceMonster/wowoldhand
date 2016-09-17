@@ -133,9 +133,10 @@ end
 function Oldhand_BreakCasting(myspell)
 	local target_name = UnitName("target");
 	local spell,  _, displayName,  _, startTime,  endTime,  _, _, notInterruptible = UnitCastingInfo("target");
-	
+	local is_channel = false;
 	if (spell == null) then
-	  spell,  _, displayName,  _, startTime,  endTime,  _, notInterruptible = UnitCastingInfo("target");
+	  spell,  _, displayName,  _, startTime,  endTime,  _, notInterruptible = UnitChannelInfo("target");
+	  is_channel = true;
 	end;
 	if (spell == null) then currTargetCasting = null; return 0; end;
 	
@@ -173,7 +174,7 @@ function Oldhand_BreakCasting(myspell)
 			end;
 		end
 
-		if (remainTime <= 800.0) then
+		if is_channel or (remainTime <= 800.0) then
 		  --Oldhand_AddMessage(string.format("%s 正在施放 %s。。。，剩余时间：%f", target_name, target_spellname, remainTime));
 		  return 1;
 			--if (spell) then

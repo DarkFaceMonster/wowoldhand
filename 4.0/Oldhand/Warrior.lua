@@ -26,6 +26,7 @@ warrior_action_table["旋风斩"] = 132369;
 warrior_action_table["战吼"] = 458972;
 warrior_action_table["命令怒吼"] = 132351;
 warrior_action_table["拳击"] = 132938;
+warrior_action_table["狂暴之怒"] = 136009;
 -- 武器
 warrior_action_table["致死打击"] = 132355;
 warrior_action_table["巨人打击"] = 464973;
@@ -37,6 +38,7 @@ warrior_action_table["战吼"] = 458972;
 warrior_action_table["剑刃风暴"] = 236303;
 warrior_action_table["乘胜追击"] = 132342;
 warrior_action_table["剑刃风暴"] = 458972;
+warrior_action_table["破胆怒吼"] = 132154;
 -- 狂怒
 warrior_action_table["嗜血"] = 136012;
 warrior_action_table["狂暴挥砍"] = 132367;
@@ -338,6 +340,11 @@ function Warrior_DpsOut1()
 	  if Oldhand_CastSpell("冲锋", warrior_action_table["冲锋"]) then return true; end;
 	  if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
 	else
+	  if UnitIsPlayer("target") and UnitCanAttack("player","target") then
+		  if Oldhand_TargetDeBU("风暴之锤") then
+			   if Oldhand_CastSpell("风暴之锤", deathknight_action_table["风暴之锤"]) then return true; end;
+			end;	  
+		end;
 
     if target_health_percent <= 20 and power >= 20 then
   	  if Oldhand_CastSpell("斩杀", warrior_action_table["斩杀"]) then return true; end;
@@ -543,10 +550,27 @@ end;
 
 function Warrior_playerSafe()
   local HealthPercent = Oldhand_GetPlayerHealthPercent("player");
+	if (UnitIsPlayer("target") and UnitCanAttack("player", "target")) then
+		if null==Oldhand_PlayerBU("狂暴之怒") then
+			if Oldhand_CastSpellIgnoreRange("狂暴之怒", deathknight_action_table["狂暴之怒"]) then return true; end;
+    end
+	end;
+  if (Warrior_DPS == 1 and HealthPercent < 50) then
+	  Oldhand_AddMessage('血量过低 '..HealthPercent);
+	  if Oldhand_CastSpellIgnoreRange("剑在人在", warrior_action_table["剑在人在"]) then return true; end;
+	end;
   if (Warrior_DPS == 2 and HealthPercent < 50) then
 	  Oldhand_AddMessage('血量过低 '..HealthPercent);
 	  if Oldhand_CastSpellIgnoreRange("狂怒回复", warrior_action_table["狂怒回复"]) then return true; end;
 	end;
+	if HealthPercent < 40 then
+	  Oldhand_AddMessage('血量过低 '..HealthPercent);
+	  if Oldhand_CastSpellIgnoreRange("命令怒吼", warrior_action_table["命令怒吼"]) then return true; end;
+	end;
+	if HealthPercent < 30 then
+	  Oldhand_AddMessage('血量过低 '..HealthPercent);
+	  if Oldhand_CastSpellIgnoreRange("破胆怒吼", warrior_action_table["破胆怒吼"]) then return true; end;
+	end;	
 	return false;
 end;
 

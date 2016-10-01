@@ -6,7 +6,7 @@ Shaman_PlayerTalentInfoDatas = {};
 
 local dynamicMicroID = 72;
 local playerClass;
-local Shaman_DPS = 1; -- 默认元素，1元素，2增强，3治疗
+local Shaman_DPS = 2; -- 默认元素，1元素，2增强，3治疗
 local Shaman_Reincarnation  = false;
 local Shaman_Free  = false;
 local Shaman_RaidFlag = 0;
@@ -243,6 +243,14 @@ end
 
 function Shaman_RunCommand()
 	if UnitAffectingCombat("player") then
+	  if Shaman_DPS == 2 then
+	    local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
+	    local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("player");
+	    if target_health_percent * target_health > player_health / 6 then
+	      if Oldhand_CastSpellIgnoreRange("野性狼魂", shaman_action_table["野性狼魂"]) then return true; end;
+	    end;
+	  end;
+	
 		local id1 = Oldhand_GetActionID("Racial_Troll_Berserk");
 		if id1~=0 and null==Oldhand_PlayerBU("狂暴") then
 			if 0~=IsActionInRange(Oldhand_GetActionID("Ability_Shaman_Lavalash")) then -- 灵界打击有效
@@ -461,7 +469,7 @@ function Shaman_DpsOut2()
 	local power = UnitPower("player");
 	
 	if Oldhand_TargetCount() >= 3 and power >= 20 then
-	  if Oldhand_CastSpell("毁灭闪电", shaman_action_table["毁灭闪电"]) then return true; end;
+	  if Oldhand_CastSpell_IgnoreRange("毁灭闪电", shaman_action_table["毁灭闪电"]) then return true; end;
 	end;
 
   local buff2, remainTime2, count2 = Oldhand_PlayerBU("石拳");
@@ -485,7 +493,7 @@ function Shaman_DpsOut2()
     if Oldhand_CastSpell("风暴打击", shaman_action_table["风暴打击"]) then return true; end;
   end
   
-  
+  if Oldhand_CastSpell("石拳", shaman_action_table["石拳"]) then return true; end;
   if Oldhand_CastSpell("闪电箭", shaman_action_table["闪电箭"]) then return true; end;
 
 	Oldhand_SetText("无动作",0);

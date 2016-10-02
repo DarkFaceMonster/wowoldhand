@@ -88,6 +88,7 @@ shaman_action_table["熔岩猛击"] = 236289;
 shaman_action_table["风暴打击"] = 132314;
 
 shaman_action_table["毁灭闪电"] = 1370984;
+shaman_action_table["毁灭之风"] = 1269862;
 
 shaman_action_table["野性狼魂"] = 237577;
 shaman_action_table["降雨"] = 136037;
@@ -472,6 +473,15 @@ function Shaman_DpsOut2()
 	  if Oldhand_CastSpell_IgnoreRange("毁灭闪电", shaman_action_table["毁灭闪电"]) then return true; end;
 	end;
 
+  local isNearAction = IsActionInRange(shaman_action_table["熔岩猛击"]) == true;
+  
+  local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
+	local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("player");
+
+  if isNearAction and target_health_percent * target_health > player_health / 4 then
+    if Oldhand_CastSpell_IgnoreRange("毁灭之风", shaman_action_table["毁灭之风"]) then return true; end;
+  end;
+  
   local buff2, remainTime2, count2 = Oldhand_PlayerBU("石拳");
   if not buff2 or remainTime2 < 1 then
     if Oldhand_CastSpell("石拳", shaman_action_table["石拳"]) then return true; end;

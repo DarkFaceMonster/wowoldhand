@@ -699,7 +699,7 @@ function DeathKnight_DpsOut3()
 	end;
 			
 	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
-	local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("target");
+	local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("player");
 	local debuff7, remainTime7 = Oldhand_CheckDebuffByPlayer("灵魂收割");
 	if not debuff7 then
   	if target_health_percent < 50 or target_health < 260000 then
@@ -784,7 +784,7 @@ function DeathKnight_DpsOut3()
 	
 	-- 溃烂之伤达到5层
   if (debuff3 and count3 >= 5) then
-    if target_health_percent > 40 or target_health > player_health / 4 then
+    if target_health * target_health_percent > player_health / 6 then
       if Oldhand_CastSpell("天启", deathknight_action_table["天启"]) then return true; end;
     end;
     if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;

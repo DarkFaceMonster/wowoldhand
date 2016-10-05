@@ -169,9 +169,12 @@ function DeathKnight_CreateMacro()
 	--PlaceAction(1);
 	--ClearCursor();
 
-	if GetMacroIndexByName("血性狂怒") == 0 then
-		CreateMacro("血性狂怒", 66, "/cast 血性狂怒", 1, 1);
-	end;
+  --local macroId = GetMacroIndexByName("血性狂怒");
+	--if macroId == 0 then
+	--	CreateMacro("血性狂怒", 66, "/cast 血性狂怒", 1, 1);
+	--else
+	--  Oldhand_AddMessage("血性狂怒 宏Id: "..macroId);
+	--end;
 	
 	if GetMacroIndexByName("活力分流") == 0 then
 		CreateMacro("活力分流", 943, "/cast 活力分流", 1, 0);
@@ -224,11 +227,13 @@ function DeathKnight_CreateMacro()
 		
 	if DeathKnight_DPS==1 then
 		Oldhand_PutAction("冰冷触摸", 3);
+		Oldhand_PutAction("血性狂怒", 6);
 		Oldhand_PutAction("符文刃舞", 71);
 	elseif DeathKnight_DPS==2 then
 	  Oldhand_PutAction("湮没", 2);
 		Oldhand_PutAction("凛风冲击", 3);
 		Oldhand_PutAction("冰霜打击", 5);
+		Oldhand_PutAction("血性狂怒", 6);
 		Oldhand_PutAction("冰霜之柱", 8);
 		Oldhand_PutAction("冷酷严冬", 9);
 	elseif DeathKnight_DPS==3 then
@@ -236,7 +241,8 @@ function DeathKnight_CreateMacro()
 		Oldhand_PutAction("脓疮打击", 3);   -- 879926
 		Oldhand_PutAction("凋零缠绕", 4);   -- 136145
 	  Oldhand_PutAction("灵魂收割", 6);
-		Oldhand_PutAction("白骨之盾", 8);
+	  Oldhand_PutAction("血性狂怒", 9);
+		--Oldhand_PutAction("白骨之盾", 8);
 		Oldhand_PutAction("黑暗突变", 10);
 		Oldhand_PutAction("传染", 62);
 		Oldhand_PutAction("爆发", 63);  -- spell_deathvortex
@@ -306,8 +312,18 @@ function DeathKnight_CreateMacro()
 	end
 	
 	spell_table["霸权印记"] = 72;
-	Oldhand_PutAction("血性狂怒", 51);
-
+	
+	--Oldhand_PutAction("血性狂怒", 51);
+  --
+	--local bindMacroResult = SetBindingMacro(",","血性狂怒");	-- 29
+	--if bindMacroResult == nil then bindMacroResult = "nil" end;
+	--if bindMacroResult == true then bindMacroResult = "true" end;
+	--Oldhand_AddMessage("血性狂怒 绑定结果: "..bindMacroResult);
+	
+	--SetBindingMacro("\'","活力分流");	-- 28
+	--SetBindingMacro(";","打断施法");	-- 27
+	--SetBindingMacro("\\","开始攻击");	-- 26
+	
 	SetBinding("F1", "MULTIACTIONBAR1BUTTON1");
 	SetBinding("F2", "MULTIACTIONBAR1BUTTON2");
 	SetBinding("F3", "MULTIACTIONBAR1BUTTON3");
@@ -326,10 +342,6 @@ function DeathKnight_CreateMacro()
 	--SetBinding("\'", "TARGETPARTYMEMBER3");
 	--SetBinding(",", "TARGETPARTYMEMBER4");
 	
-	SetBindingMacro(",","血性狂怒");	-- 29
-	--SetBindingMacro("\'","活力分流");	-- 28
-	--SetBindingMacro(";","打断施法");	-- 27
-	--SetBindingMacro("\\","开始攻击");	-- 26
 	
 	--SaveBindings(1);
 end;
@@ -348,16 +360,21 @@ function DeathKnight_RunCommand()
 	end;
 
 	if UnitAffectingCombat("player") then
-		local id1 = Oldhand_GetActionID(deathknight_action_table["血性狂怒"]);
-		if id1~=0 and null==Oldhand_PlayerBU("血性狂怒") then
-		  local isNearAction = IsActionInRange(Oldhand_GetActionID(deathknight_action_table["灵界打击"])) == true;
-			if isNearAction then -- 灵界打击有效
-				if (GetActionCooldown(Oldhand_GetActionID(deathknight_action_table["血性狂怒"])) == 0) then 
-					--Oldhand_SetText("血性狂怒", 29);
-					--return true;
-				end
-			end;
-		end
+		--local id1 = Oldhand_GetActionID(deathknight_action_table["血性狂怒"]);
+		--if id1~=0 and null==Oldhand_PlayerBU("血性狂怒") then
+		--  local isNearAction = IsActionInRange(Oldhand_GetActionID(deathknight_action_table["灵界打击"])) == true;
+		--	if isNearAction then -- 灵界打击有效
+		--		if (GetActionCooldown(id1) == 0) then 
+		--			Oldhand_SetText("血性狂怒", 29);
+		--			return true;
+		--		end
+		--	end;
+		--end
+		
+		local isNearAction = IsActionInRange(Oldhand_GetActionID(deathknight_action_table["灵界打击"])) == true;
+		if isNearAction then -- 灵界打击有效
+		  if Oldhand_CastSpellIgnoreRange("血性狂怒", deathknight_action_table["血性狂怒"]) then return true; end;
+		end;
 
 		if DeathKnight_DPS==2 then
 			local name, remainTime = Oldhand_PlayerBU("冰霜之柱");
@@ -784,7 +801,7 @@ function DeathKnight_DpsOut3()
 	
 	-- 溃烂之伤达到5层
   if (debuff3 and count3 >= 5) then
-    if target_health * target_health_percent > player_health / 6 then
+    if target_health * target_health_percent > player_health / 10 then
       if Oldhand_CastSpell("天启", deathknight_action_table["天启"]) then return true; end;
     end;
     if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;

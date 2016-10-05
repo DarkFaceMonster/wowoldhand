@@ -337,9 +337,12 @@ function Warrior_DpsOut1()
 	-- 近战范围		
 	local isNearAction = IsActionInRange(Oldhand_GetActionID(warrior_action_table["猛击"]));
 	
-	if not isNearAction and partyNum <= 1 then
-	  if Oldhand_CastSpell("冲锋", warrior_action_table["冲锋"]) then return true; end;
-	  if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
+	-- if not isNearAction and partyNum <= 1 then
+	if not isNearAction then
+	  if partyNum <= 1 then
+      if Oldhand_CastSpell("冲锋", warrior_action_table["冲锋"]) then return true; end;
+	    if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
+	  end
 	else
 	  if UnitIsPlayer("target") and UnitCanAttack("player","target") then
 		  if Oldhand_TargetDeBU("风暴之锤") then
@@ -351,7 +354,7 @@ function Warrior_DpsOut1()
   	  if Oldhand_CastSpell("斩杀", warrior_action_table["斩杀"]) then return true; end;
     end;
     
-  	if isNearAction and not Oldhand_PlayerBU("战吼") then
+  	if not Oldhand_PlayerBU("战吼") then
   		if Oldhand_CastSpell_IgnoreRange("战吼", warrior_action_table["战吼"]) then return true; end;
   	end
 
@@ -367,8 +370,8 @@ function Warrior_DpsOut1()
   	end;	  
   
     local debuff1, remainTime1 = Oldhand_CheckDebuffByPlayer("巨人打击");
-    if not debuff1 then
-      if Oldhand_CastSpell("灭战者", warrior_action_table["灭战者"]) then return true; end;
+    if isNearAction and not debuff1 then
+      if Oldhand_CastSpell_IgnoreRange("灭战者", warrior_action_table["灭战者"]) then return true; end;
       if Oldhand_CastSpell("巨人打击", warrior_action_table["巨人打击"]) then return true; end;
     end;
 
@@ -376,7 +379,7 @@ function Warrior_DpsOut1()
       if Oldhand_CastSpell("致死打击", warrior_action_table["致死打击"]) then return true; end;
     end
     
-    if Oldhand_CastSpell("灭战者", warrior_action_table["灭战者"]) then return true; end;
+    if Oldhand_CastSpell_IgnoreRange("灭战者", warrior_action_table["灭战者"]) then return true; end;
 
     if Oldhand_CastSpell("猛击", warrior_action_table["猛击"]) then return true; end;
 

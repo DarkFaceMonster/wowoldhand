@@ -13,6 +13,8 @@ local TestHelpTarget = "";
 local target_count = 0;		-- 目标个数
 local target_table = {};
 local is_valid_class = false; -- 是否有效职业
+local fishing_time = 0;       -- 最近钓上鱼的时间
+local fishing_id = 136245
 
 local oldhand_dps_module = {};
 
@@ -672,6 +674,20 @@ function Oldhand_Msg_OnUpdate()
 end;
 
 function Oldhand_Frame_OnUpdate()
+  
+	
+  if( IsFishingLoot() ) then
+    fishing_time = GetTime();
+  elseif fishing_time > 0 then
+    local x = GetTime();
+    if x - fishing_time < 1 then
+      if Oldhand_CastSpellIgnoreRange("钓鱼", fishing_id) then return true; end;
+    else
+      fishing_time = 0;
+    end;
+    
+  end;
+  
 	if not is_valid_class then return; end;
 
 	--if(ChatFrameEditBox:IsVisible()) then
@@ -712,6 +728,7 @@ function Oldhand_Frame_OnUpdate()
 	if spellname then
 	  Oldhand_AddMessage("UnitChannelInfo: "..spellname);
 		Oldhand_SetText("引导"..spellname, 0);
+		
 		return;
 	end
 

@@ -17,7 +17,7 @@ local needBloodTap = 0;  -- 需要活力分流
 
 local dynamicMicroID = 72;
 local playerClass;
-local DeathKnight_DPS = 3; -- 0,1鲜血坦克，2冰霜，3邪恶
+local DeathKnight_DPS = 2; -- 0,1鲜血坦克，2冰霜，3邪恶
 local DeathKnight_Reincarnation  = false;
 local DeathKnight_Free  = false;
 local DeathKnight_RaidFlag = 0;
@@ -86,13 +86,16 @@ deathknight_action_table["天启"] = 1392565;
 -- 鲜血
 
 -- 冰霜
-deathknight_action_table["湮灭"] = 135771;
+deathknight_action_table["湮没"] = 135771;
+deathknight_action_table["湮灭"] = 326443;
 deathknight_action_table["凛风冲击"] = 135833;
 deathknight_action_table["冰霜之镰"] = 1060569;
 deathknight_action_table["冰霜打击"] = 237520;
 deathknight_action_table["冰霜之柱"] = 458718;
 deathknight_action_table["符文武器增效"] = 135372;
 deathknight_action_table["冰霜突进"] = 537514;
+deathknight_action_table["冷酷严冬"] = 538770;
+deathknight_action_table["辛达苟萨之怒"] = 341980;
 
 -- 邪恶
 deathknight_action_table["暗影之爪"] = 615099;
@@ -233,9 +236,11 @@ function DeathKnight_CreateMacro()
 	  Oldhand_PutAction("湮没", 2);
 		Oldhand_PutAction("凛风冲击", 3);
 		Oldhand_PutAction("冰霜打击", 5);
-		Oldhand_PutAction("血性狂怒", 6);
+		Oldhand_PutAction("辛达苟萨之怒", 6);
 		Oldhand_PutAction("冰霜之柱", 8);
-		Oldhand_PutAction("冷酷严冬", 9);
+		Oldhand_PutAction("血性狂怒", 9);
+		Oldhand_PutAction("冷酷严冬", 10);
+		
 	elseif DeathKnight_DPS==3 then
 		Oldhand_PutAction("暗影之爪", 2);   -- 615099
 		Oldhand_PutAction("脓疮打击", 3);   -- 879926
@@ -353,7 +358,8 @@ function DeathKnight_NoTarget_RunCommand()
 	return false;
 end;
 
-function DeathKnight_RunCommand()
+function DeathKnight_RunCommand(isInRange)
+  isInRange = isInRange or false;
   local buff = Oldhand_PlayerBU("疯狂耳语");
 	if null==buff then
 		if Oldhand_CastSpellByIdIgnoreRange("奥拉留斯的低语水晶", spell_table["奥拉留斯的低语水晶"]) then return true; end;
@@ -378,13 +384,13 @@ function DeathKnight_RunCommand()
 
 		if DeathKnight_DPS==2 then
 			local name, remainTime = Oldhand_PlayerBU("冰霜之柱");
-			if name==null then
+			if name==null and isInRange then
 				--if Oldhand_CastSpell("铜墙铁壁","INV_Armor_Helm_Plate_Naxxramas_RaidWarrior_C_01") then return true; end;
 				if Oldhand_CastSpell("冰霜之柱","ability_deathknight_pillaroffrost") then return true; end;
-			elseif remainTime > 29 then
-				--Oldhand_SetText("活力分流",28); 
-				Oldhand_CastSpell("活力分流","Spell_DeathKnight_BloodTap");
-				return true;
+			--elseif remainTime > 29 then
+			--	--Oldhand_SetText("活力分流",28); 
+			--	Oldhand_CastSpell("活力分流","Spell_DeathKnight_BloodTap");
+			--	return true;
 			end
 		end
 	end
@@ -527,25 +533,26 @@ function DeathKnight_DpsOut2()
 		Oldhand_SetText("自动攻击", 1);
 		return true;
 	end;
+	if DeathKnight_playerSafe() then return true; end;
+	
 	-- 近战范围		
 	local isNearAction = IsActionInRange(Oldhand_GetActionID(237517));
+	local isInRange = IsActionInRange(Oldhand_GetActionID(deathknight_action_table["凛风冲击"]));
+	local power = UnitPower("player"); -- Oldhand_GetUnitPowerPercent("player");
 
 	if UnitIsPlayer("target") and UnitCanAttack("player","target") then
 		if Oldhand_TargetDeBU("寒冰锁链") then
 			if Oldhand_CastSpell("寒冰锁链", deathknight_action_table["寒冰锁链"]) then return true; end;
 		end;
-
-
 --		  if Oldhand_CastSpell("冷酷严冬","ability_deathknight_remoreslesswinters2") then return true; end;
 --    end;
 	end;
 	
-	if Oldhand_GetUnitPowerPercent("player") >= 75 then
+	--local id1, id2 = Oldhand_GetActionID("Spell_DeathKnight_MindFreeze"), Oldhand_GetActionID("Spell_Shadow_SoulLeech_3");
+	
+	if power >= 70 and isNearAction then
 		if Oldhand_CastSpell("冰霜打击", deathknight_action_table["冰霜打击"]) then return true; end;
 	end
-	
-	--local id1, id2 = Oldhand_GetActionID("Spell_DeathKnight_MindFreeze"), Oldhand_GetActionID("Spell_Shadow_SoulLeech_3");
-	if DeathKnight_playerSafe() then return true; end;
 	
 	if Oldhand_BreakCasting("心灵冰冻")==1 and Oldhand_CastSpell("心灵冰冻", deathknight_action_table["心灵冰冻"]) then return true; end;
 	if Oldhand_CastSpellIgnoreRange("冰霜之柱",deathknight_action_table["冰霜之柱"]) then return true; end;
@@ -554,14 +561,16 @@ function DeathKnight_DpsOut2()
 	if DeathKnight_Auto_Trinket() then return true; end;
   
 	-- 增强	Buff
-	if DeathKnight_RunCommand() then return true; end;
+	if DeathKnight_RunCommand(isInRange) then return true; end;
 	local debuff1,remainTime1 = Oldhand_CheckDebuffByPlayer("冰霜疫病");
-	local debuff2,remainTime2 = Oldhand_CheckDebuffByPlayer("血之疫病");
-	if not debuff1 then
-	  debuff1,remainTime1 = Oldhand_CheckDebuffByPlayer("锋锐之霜");
+	local debuff2,remainTime2 = Oldhand_CheckDebuffByPlayer("锋锐之霜");
+	local debuff3,remainTime3 = Oldhand_CheckDebuffByPlayer("冷酷严冬");
+	if not debuff1 or not debuff2 then
+	  if Oldhand_CastSpell("凛风冲击", deathknight_action_table["凛风冲击"]) then return true; end;
 	end;
-	if not debuff2 then
-	  debuff2,remainTime2 = Oldhand_CheckDebuffByPlayer("死疽");
+	
+	if not debuff3 then
+	  if Oldhand_CastSpellIgnoreRange("冷酷严冬", deathknight_action_table["冷酷严冬"]) then return true; end;
 	end;
 
 	local strenth = 0;
@@ -587,72 +596,63 @@ function DeathKnight_DpsOut2()
 	if buff9 then strenth = strenth + 765; end;
 	if buff10 then strenth = strenth + 1512; end;
 
-	if (debuff2 and debuff1) then 
-	  --Oldhand_AddMessage("两个疾病")
-		step = 1;
-		if plagueMode==1 and Oldhand_TargetCount() > 2 and ((GetTime() - plagueTime > 16) or (remainTime1>0 and remainTime1<2) or (remainTime2>0 and remainTime2<2)) then
-			if plageRune==0 then
-				if Api_CheckRune(1) then
-					if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then
-						Oldhand_AddMessage("使用鲜血符文传染，序号：1");
-						plageRune = 1;
-						return true;
-					end
-				elseif Api_CheckRune(2) then
-					if Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud") then
-						Oldhand_AddMessage("使用鲜血符文传染，序号：2");
-						plageRune = 2;
-						return true;
-					end
-				else
-					plageRune = Api_CheckDeathRune();
-					if plageRune>0 then
-						Oldhand_AddMessage("使用死亡符文传染，序号："..plageRune);
-						Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud");
-						return true;
-					end
-				end
-			elseif not Api_CheckRune(plageRune) then
-				local temp = GetTime() - plagueTime;
-				Oldhand_AddMessage("已使用符文 " ..plageRune.. " 施放传染...距离上次传染时间："..temp.." 秒");
-				plagueTime = GetTime();
-				
-				plageRune = 0;
-			else
-				return Oldhand_CastSpell("传染","Spell_Shadow_PlagueCloud");
-			end
-		end;
-	end;
+	if isNearAction then
+ 	  local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
+    local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("player");
+    
+    if Oldhand_TargetCount() >= 3 or target_health * target_health_percent > player_health * 0.4 then
+      if Oldhand_CastSpellIgnoreRange("辛达苟萨之怒", deathknight_action_table["辛达苟萨之怒"]) then return true; end;
+    end;
 
-	if Oldhand_PlayerBU("白霜") or Oldhand_PlayerBU("冰冻之雾") then
-	  Oldhand_AddMessage("白霜...................")
-		if Oldhand_CastSpell("凛风冲击", deathknight_action_table["凛风冲击"]) then return true; end;
-	end
-	if Oldhand_PlayerBU("杀戮机器") then
-		if Oldhand_CastSpell("湮灭", deathknight_action_table["湮灭"]) then return true; end;
-		if Oldhand_CastSpell("冰霜之镰", deathknight_action_table["冰霜之镰"]) then return true; end;
-		--if Oldhand_CastSpell("冰霜打击","Spell_DeathKnight_EmpowerRuneBlade2") then return true; end;
-	end
-	if (Oldhand_GetUnitPowerPercent("player") >= 50) then
-		--if Oldhand_CastSpell("湮灭","Spell_Deathknight_ClassIcon") then return true; end;
-		if Oldhand_CastSpell("冰霜打击", deathknight_action_table["冰霜打击"]) then return true; end;
-	end
+  	if Oldhand_PlayerBU("杀戮机器") then
+      if Oldhand_CastSpell("杀戮机器.湮没", deathknight_action_table["湮没"]) then return true; end;
+  	  if Oldhand_CastSpell("杀戮机器.冰霜之镰", deathknight_action_table["冰霜之镰"]) then return true; end;
+  	end;
+  	if Oldhand_PlayerBU("白霜") or Oldhand_PlayerBU("杀戮机器") then
+  	  if Oldhand_CastSpell("白霜.湮没", deathknight_action_table["湮没"]) then return true; end;
+  	end;
 
-  if isNearAction then
-    if Oldhand_CastSpell("冰川突进", deathknight_action_table["冰川突进"]) then return true; end;
-    if Oldhand_CastSpell("冰霜之镰", deathknight_action_table["冰霜之镰"]) then return true; end;
+  	if power >= 75 or Oldhand_PlayerBU("湮灭") then
+  		if Oldhand_CastSpell("冰霜打击", deathknight_action_table["冰霜打击"]) then return true; end;
+  	end
+  	
+  	if Oldhand_PlayerBU("湮灭") then
+  	  if Oldhand_CastSpell("湮灭.湮没", deathknight_action_table["湮没"]) then return true; end;
+  	end;
+  	
+  	if Oldhand_PlayerBU("冰冻之雾") then
+  	  if Oldhand_CastSpell("冰冻之雾.凛风冲击", deathknight_action_table["凛风冲击"]) then return true; end;
+  	end;
+  	
+  	--if Oldhand_CastSpellIgnoreRange("冷酷严冬", deathknight_action_table["冷酷严冬"]) then return true; end;
+  	
+  	
+  	if Oldhand_TargetCount() > 3 then
+  	  if Oldhand_CastSpellIgnoreRange("冰川突进", deathknight_action_table["冰川突进"]) then return true; end;
+  	  if Oldhand_CastSpell("凛风冲击", deathknight_action_table["凛风冲击"]) then return true; end;
+  	end;
+  	
+    if Oldhand_CastSpellIgnoreRange("湮灭", deathknight_action_table["湮灭"]) then return true; end;
+    
+    if Oldhand_CastSpell("湮没", deathknight_action_table["湮没"]) then return true; end;
+    --if Oldhand_CastSpell("冰霜之镰", deathknight_action_table["冰霜之镰"]) then return true; end;
+    
+    if Oldhand_CastSpell("冰霜打击", deathknight_action_table["冰霜打击"]) then return true; end;
+    if Oldhand_CastSpellIgnoreRange("冰川突进", deathknight_action_table["冰川突进"]) then return true; end;
+    
+    --if Oldhand_CastSpellIgnoreRange("冰川突进", deathknight_action_table["冰川突进"]) then return true; end;
+    --if Oldhand_CastSpell("冰霜之镰", deathknight_action_table["冰霜之镰"]) then return true; end;
+    
+
+  	--if Oldhand_CastSpellIgnoreRange("符文武器增效", deathknight_action_table["符文武器增效"]) then return true; end;
   end;
 
   if Oldhand_CastSpell("凛风冲击", deathknight_action_table["凛风冲击"]) then return true; end; -- Spell_ DeathKnight_ IceTouch
-	if not Api_CheckRunes() then
-		if Oldhand_CastSpell("符文武器增效","INV_Sword_62") then return true; end;
-	end
-	
 	--if Oldhand_CastSpell("冰霜打击","Spell_DeathKnight_EmpowerRuneBlade2") then return true; end;
 	
-	if Oldhand_CastSpell("湮灭", deathknight_action_table["湮灭"]) then return true; end;
-
-	if Oldhand_CastSpell("冰霜之镰", deathknight_action_table["冰霜之镰"]) then return true; end;
+	if isInRange and not Api_CheckRunes() then
+		if Oldhand_CastSpellIgnoreRange("符文武器增效", deathknight_action_table["符文武器增效"]) then return true; end;
+	end
 	
 	Oldhand_SetText("无动作",0);
 	return;		
@@ -804,10 +804,14 @@ function DeathKnight_DpsOut3()
     if target_health * target_health_percent > player_health / 10 then
       if Oldhand_CastSpell("天启", deathknight_action_table["天启"]) then return true; end;
     end;
-    if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
+    -- if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
   end;
-  
+
   local power = UnitPower("player");
+  if Oldhand_PlayerBU("末日突降") or power > 80 then
+		if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
+	end
+  
 	if (power >= 70 or (power >= 30 and player_health * 3 < target_health)) then
 		if Oldhand_CastSpell("黑暗仲裁者", deathknight_action_table["黑暗仲裁者"]) then return true; end;
 		if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
@@ -815,12 +819,9 @@ function DeathKnight_DpsOut3()
 	
 	if Oldhand_CastSpell("脓疮打击", deathknight_action_table["脓疮打击"]) then return true; end;
 	
-  if Oldhand_PlayerBU("末日突降") or power > 80 then
-		if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
-	end
 	
-	if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
 	if Oldhand_CastSpell("凋零缠绕", deathknight_action_table["凋零缠绕"]) then return true; end;
+	if Oldhand_CastSpell("暗影之爪", deathknight_action_table["暗影之爪"]) then return true; end;
 
 	--local id1 = Oldhand_GetActionID("Spell_Shadow_AnimateDead");
 	--if id1~=0 and Oldhand_PlayerBU("活力分流") then

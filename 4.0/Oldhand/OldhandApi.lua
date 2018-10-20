@@ -144,21 +144,26 @@ function Oldhand_BU(s) local P,B,i="player",true,1  while UnitBuff(P,i)   do if 
 function Oldhand_TargetBU(s) local P,B,i="target",true,1  while UnitBuff(P,i)   do if string.find(UnitBuff(P,i),s)   then B=false end i=i+1 end return B end
 function Oldhand_TargetDeBU(s) local P,B,i="target",true,1  while UnitDebuff(P,i) do if string.find(UnitDebuff(P,i),s) then B=false end i=i+1 end return B end
 function Oldhand_PlayerDeBU(s)
-	local name1, _,_,_,_,_,expirationTime = UnitDebuff("player", s);
-	if (name1 ~= null) then 
-		Oldhand_AddMessage("你中了Debuff: "..name1..", 还有 "..expirationTime.." 毫秒");
-		return false;
-	else
-		return true;
-	end
-	--local P,B,i="player",true,1;
-	--while UnitDebuff(P,i) do 
-	--	if string.find(UnitDebuff(P,i),s) then B=false end
-	--	i=i+1;
-	--end 
-	--return B
-	
+	-- local name1, _,_,_,_,_,expirationTime = UnitDebuff("player", s);
+	-- if (name1 ~= null) then 
+  --		Oldhand_AddMessage("你中了Debuff: "..name1..", 还有 "..expirationTime.." 毫秒");
+  --		return false;
+	--else
+	--	return true;
+	--end
+	local P,B,i="player",true,1;
+	D = UnitDebuff(P,i)
+	while D do 
+		if string.find(D,s) then 
+		  B=false
+		  break
+	  end
+		i=i+1;
+		if i > 40 then break end
+	end 
+	return B
 end
+
 --function Oldhand_UnitBU(unit,s) local P,B,i=unit,true,1  while UnitBuff(P,i)   do if string.find(UnitBuff(P,i),s)   then B=false end i=i+1 end return B end
 function Oldhand_UnitDeBU(unit,s) local P,B,i=unit,true,1  while UnitDebuff(P,i) do if string.find(UnitDebuff(P,i),s) then B=false end i=i+1 end return B end
 
@@ -172,6 +177,7 @@ function Oldhand_UnitBU(unit, s)
 			return name, temp, count
 		end;
 		i = i+1;
+		if i > 40 then break end
 		name, _, _, count, _, _, expirationTime = UnitBuff(unit, i);
 	end
 
@@ -180,18 +186,18 @@ end;
 
 function Oldhand_PlayerBU(s)
 	local i = 1;
-	local name, _, _, count, _, _, expirationTime = UnitBuff("player", i);
 
+	local name, _, count, _,_, expirationTime = UnitBuff("player", i);
 	while name ~= null do
 		if name==s then
 			local temp = expirationTime - GetTime();
 			return name, temp, count
 		end;
 		i = i+1;
-		name, _, _, count, _, _, expirationTime = UnitBuff("player", i);
+		name, _, count, _,_, expirationTime = UnitBuff("player", i);
 	end
 
-	return null,null,0;
+	return null, null, 0;
 
 	--local P,B,i="player",true,1;
 	--local temp = UnitBuff(P,i);
@@ -263,7 +269,6 @@ function Oldhand_TestPlayerIsHorse()
 	end	
 	return false;
 end
-
 
 function Oldhand_TestHasBoss()	
 	if (not UnitIsDeadOrGhost("player"))  and UnitExists("playertarget") then		    
@@ -397,11 +402,6 @@ function Oldhand_GetUnitAssistantHandType(unit)
 	return "";
 end
 function Oldhand_AddMessage(str)
-  local rune_count = 0;
-	for i=1, 5 do
-		local _, _, runeReady = GetRuneCooldown(i);
-		if runeReady then rune_count = rune_count + 1; end;
-	end
 	if Messagestr ~= str then
 		Messagestr = str;
 		DEFAULT_CHAT_FRAME:AddMessage("|cffffff00战斗信息:|r |cff00ff00" .. str .. "|r");	
@@ -507,17 +507,18 @@ end
 
 function Oldhand_CastSpell(text, texture)
 	for i = 2, 12 do
-	  -- Oldhand_AddMessage("for do text: "..text..", i: "..i..", texture: "..texture); 
 		if ( HasAction(i) ) then
-		  -- Oldhand_AddMessage("HasAction text: "..text..", i: "..i..", texture: "..texture); 
 			local temptexture = GetActionTexture(i);
-			-- Oldhand_AddMessage("text: "..text..", i: "..i..", texture: "..texture);
+
+			--if i == 2 then Oldhand_AddMessage("text: "..text..", i: "..i..", texture: "..texture); end
 			if temptexture == texture then
-			  -- Oldhand_AddMessage("text: "..text..", temptexture: "..temptexture..", texture: "..texture);
+			  --if i == 2 then Oldhand_AddMessage("text: "..text..", temptexture: "..temptexture..", texture: "..texture); end
 				if Oldhand_CanUseAction(i) and (true==IsActionInRange(i)) then
+				  --if i == 2 then Oldhand_AddMessage("湮灭"); end
 					Oldhand_SetText(text, i);															
 					return true;
-				end
+				end;
+				break;
 			end
 		end
 	end
@@ -526,10 +527,12 @@ function Oldhand_CastSpell(text, texture)
 			local temptexture = GetActionTexture(i);
 			if temptexture == texture then
 				if Oldhand_CanUseAction(i) and (true==IsActionInRange(i)) then
-					Oldhand_SetText(text,i - 48);															
+					Oldhand_SetText(text, i - 48);															
 					return true;
 				end
+				break;
 			end
+			
 		end
 	end
 	return false;

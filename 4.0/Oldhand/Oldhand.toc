@@ -3,5 +3,5 @@
 ## Title: 智能施法插件(全职业整合版)
 ## Notes: 智能施法插件(全职业整合版)
 ## SavedVariables: Oldhand_SaveData
-## Version: 7.0.3
+## Version: 8.0.3
 Oldhand.xml

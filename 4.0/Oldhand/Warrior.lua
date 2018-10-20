@@ -23,23 +23,28 @@ warrior_action_table["自动攻击"] = 132400;
 warrior_action_table["冲锋"] = 132337;
 warrior_action_table["嘲讽"] = 136080;
 warrior_action_table["旋风斩"] = 132369;
-warrior_action_table["战吼"] = 458972;
+--  warrior_action_table["战吼"] = 458972;
 warrior_action_table["命令怒吼"] = 132351;
+warrior_action_table["战斗怒吼"] = 132333;
 warrior_action_table["拳击"] = 132938;
+warrior_action_table["压制"] = 132223;
 warrior_action_table["狂暴之怒"] = 136009;
+
 -- 武器
 warrior_action_table["致死打击"] = 132355;
+warrior_action_table["横扫攻击"] = 132306;
 warrior_action_table["巨人打击"] = 464973;
 warrior_action_table["猛击"] = 132340;
 warrior_action_table["顺劈斩"] = 132338;
 warrior_action_table["剑在人在"] = 132336;
 warrior_action_table["风暴之锤"] = 613635;
-warrior_action_table["战吼"] = 458972;
+--  warrior_action_table["战吼"] = 458972;
 warrior_action_table["剑刃风暴"] = 236303;
 warrior_action_table["乘胜追击"] = 132342;
-warrior_action_table["剑刃风暴"] = 458972;
 warrior_action_table["破胆怒吼"] = 132154;
-warrior_action_table["灭战者"] = 1257950;
+--  warrior_action_table["灭战者"] = 1257950;
+warrior_action_table["天神下凡"] = 613534;
+--  warrior_action_table["怒火聚焦"] = 132345;
 -- 狂怒
 warrior_action_table["嗜血"] = 136012;
 warrior_action_table["狂暴挥砍"] = 132367;
@@ -59,6 +64,9 @@ warrior_action_table["盾牌格挡"] = 132110;
 -- 饰品
 warrior_action_table["临近风暴之怒"] = 236164;
 warrior_action_table["伊萨诺斯甲虫"] = 236164;
+warrior_action_table["霸权印记"] = 134086;
+warrior_action_table["残次的反制机关"] = 237468;
+warrior_action_table["活性血瓶"] = 1387657;
 
 function Warrior_CreateMacro()	
 --	if GetMacroIndexByName("打断施法") == 0 then
@@ -188,8 +196,21 @@ function Warrior_AutoDrink()
 	return false;
 end
 
-function Warrior_RunCommand()
+function Warrior_RunCommand(isInRange)
+  isInRange = isInRange or false;
+  local buff = Oldhand_PlayerBU("战斗怒吼");
+  if not buff then
+    Oldhand_AddMessage("战斗怒吼");
+  	if Oldhand_CastSpellByIdIgnoreRange("战斗怒吼", Oldhand_GetActionID(warrior_action_table["战斗怒吼"])) then return true; end;
+  end;
 	if UnitAffectingCombat("player") then
+	  if Oldhand_CastSpellByIdIgnoreRange("天神下凡", Oldhand_GetActionID(warrior_action_table["天神下凡"])) then return true; end;
+	  buff = Oldhand_PlayerBU("狂怒");
+  	if not buff then
+  		if Oldhand_CastSpellByIdIgnoreRange("霸权印记", Oldhand_GetActionID(warrior_action_table["霸权印记"])) then return true; end;
+  	end;
+    -- if Oldhand_CastSpellByIdIgnoreRange("残次的反制机关", Oldhand_GetActionID(warrior_action_table["残次的反制机关"])) then return true; end;
+    
 		local id1 = Oldhand_GetActionID("Racial_Troll_Berserk");
 		if id1~=0 and null==Oldhand_PlayerBU("战争践踏") then
 			if 0~=IsActionInRange(Oldhand_GetActionID("Ability_Warrior_Lavalash")) then -- 灵界打击有效
@@ -204,6 +225,14 @@ function Warrior_RunCommand()
 end;
 
 function Warrior_Auto_Trinket()
+  -- 是否近战范围
+  local isNearAction = IsActionInRange(Oldhand_GetActionID(warrior_action_table["斩杀"])) == true;
+  
+  -- if (isNearAction) then
+    if not Oldhand_PlayerBU("狂怒") then         
+		  if Oldhand_CastSpellByIdIgnoreRange("霸权印记", warrior_action_table["霸权印记"]) then return true; end;
+    end;
+	-- end
   if not Oldhand_PlayerBU("水手的迅捷") then
 		if Oldhand_TestTrinket("大副的怀表") and (IsActionInRange(Oldhand_GetActionID("Ability_Warrior_Lavalash")) ~= 0)  then
 			if Oldhand_CastSpell("大副的怀表", "INV_Misc_PocketWatch_02") then return true; end		
@@ -315,75 +344,90 @@ function Warrior_DpsOut1()
 		return ;
 	end;
 	if Warrior_playerSafe() then return true;end;
-	
+
 	local power = UnitPower("player");
 	
   local partyNum = GetNumGroupMembers();
-
-	
-	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
-  
-	local spellname = UnitCastingInfo("target") 
-	if null~=spellname then
-		if Oldhand_CastSpell("拳击", warrior_action_table["拳击"]) then return true; end;
-	end;
-	
-	-- 狂怒	Buff
-	if Warrior_RunCommand() then return true; end;
-
-	-- 狂怒饰品
-	if Warrior_Auto_Trinket() then return true; end;
+  local target_count = Oldhand_TargetCount()
 	
 	-- 近战范围		
 	local isNearAction = IsActionInRange(Oldhand_GetActionID(warrior_action_table["猛击"]));
 	
+	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
+	local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("player");
+  
+	if Oldhand_BreakCasting("拳击")==1 then
+	  if Oldhand_CastSpell("拳击", warrior_action_table["拳击"]) then return true; end;
+	end;
+	
+	-- 狂怒	Buff
+	if Warrior_RunCommand(isNearAction) then return true; end;
+
+	-- 狂怒饰品
+	if Warrior_Auto_Trinket() then return true; end;
+	
+	-- local buff2, remain_time2, count2 = Oldhand_PlayerBU("怒火聚焦");
+  -- if power >= 28 and (not buff2 or count2 < 3) then
+  --   if Oldhand_CastSpell_IgnoreRange("怒火聚焦", warrior_action_table["怒火聚焦"]) then return true; end;
+  -- end;
+  
 	-- if not isNearAction and partyNum <= 1 then
 	if not isNearAction then
-	  if partyNum <= 1 then
+	  if partyNum <= 1 or target_health_percent < 100 and player_health_percent > 50 then
       if Oldhand_CastSpell("冲锋", warrior_action_table["冲锋"]) then return true; end;
 	    if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
 	  end
 	else
-	  if UnitIsPlayer("target") and UnitCanAttack("player","target") then
-		  if Oldhand_TargetDeBU("风暴之锤") then
-			   if Oldhand_CastSpell("风暴之锤", deathknight_action_table["风暴之锤"]) then return true; end;
-			end;	  
-		end;
-
-    if target_health_percent <= 20 and power >= 20 then
-  	  if Oldhand_CastSpell("斩杀", warrior_action_table["斩杀"]) then return true; end;
-    end;
-    
-  	if not Oldhand_PlayerBU("战吼") then
-  		if Oldhand_CastSpell_IgnoreRange("战吼", warrior_action_table["战吼"]) then return true; end;
-  	end
-
-    if Oldhand_TargetCount() >= 2 then
+	  
+	  if Oldhand_TestTrinket("活性血瓶") then
+    	local buff = Oldhand_PlayerBU("我敌之血");
+    	if not buff then
+    		if Oldhand_CastSpellIgnoreRange("活性血瓶", warrior_action_table["活性血瓶"]) then return true; end;
+    	end;
+    end
+	  if target_count >= 5 then
       if Oldhand_CastSpell_IgnoreRange("剑刃风暴", warrior_action_table["剑刃风暴"]) then return true; end;
     end;
-
-    if Oldhand_TargetCount() >= 3 then
-  	  if not Oldhand_PlayerBU("顺劈斩") then
-  	     if Oldhand_CastSpell_IgnoreRange("顺劈斩", warrior_action_table["顺劈斩"]) then return true; end;
-  	  end;
-  	  if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;  	     
-  	end;	  
-  
-    local debuff1, remainTime1 = Oldhand_CheckDebuffByPlayer("巨人打击");
-    if isNearAction and not debuff1 then
-      if Oldhand_CastSpell_IgnoreRange("灭战者", warrior_action_table["灭战者"]) then return true; end;
+	  if target_count >= 2 then
+  	  if not Oldhand_PlayerBU("横扫攻击") then
+  	    if Oldhand_CastSpell_IgnoreRange("横扫攻击", warrior_action_table["横扫攻击"]) then return true; end;
+  	  end; 	     
+    end;
+    
+	  local debuff1, remainTime1 = Oldhand_CheckDebuffByPlayer("巨人打击");
+    if not debuff1 then
       if Oldhand_CastSpell("巨人打击", warrior_action_table["巨人打击"]) then return true; end;
     end;
 
-    if power >= 16 then
-      if Oldhand_CastSpell("致死打击", warrior_action_table["致死打击"]) then return true; end;
-    end
+    if Oldhand_PlayerBU("猝死") or (target_health_percent < 35 and power >= 28) then
+  	  if Oldhand_CastSpell_IgnoreRange("斩杀", warrior_action_table["斩杀"]) then return true; end;
+    end;
     
-    if Oldhand_CastSpell_IgnoreRange("灭战者", warrior_action_table["灭战者"]) then return true; end;
+    if target_count >= 4 then
+      if Oldhand_CastSpell_IgnoreRange("剑刃风暴", warrior_action_table["剑刃风暴"]) then return true; end;
+    end;
+    
+    if Oldhand_PlayerBU("碾压突袭") then
+  	 if Oldhand_CastSpell_IgnoreRange("猛击", warrior_action_table["猛击"]) then return true; end;
+  	end;
 
+    if Oldhand_CastSpell("巨人打击", warrior_action_table["巨人打击"]) then return true; end;
+    
+    if target_count >= 5 then
+      if Oldhand_CastSpell_IgnoreRange("旋风斩", warrior_action_table["旋风斩"]) then return true; end;
+    end;
+
+    -- if not debuff1 then
+    --   if Oldhand_CastSpell("巨人打击", warrior_action_table["巨人打击"]) then return true; end;
+    -- end;
+    
+
+    if Oldhand_CastSpell("致死打击", warrior_action_table["致死打击"]) then return true; end;
+
+    if Oldhand_CastSpell("压制", warrior_action_table["压制"]) then return true; end;
+    
     if Oldhand_CastSpell("猛击", warrior_action_table["猛击"]) then return true; end;
 
-    if Oldhand_CastSpell("狂暴挥砍", warrior_action_table["狂暴挥砍"]) then return true; end;
 	end;
  
 	Oldhand_SetText("无动作",0);
@@ -485,13 +529,13 @@ end;
 
 -- 防护模式
 function Warrior_DpsOut3()
-    if Warrior_Test_Target_Debuff() then 
+    if Oldhand_Test_Target_Debuff() then 
 		Oldhand_AddMessage(UnitName("target").."目标已经被控制...");			
 		Oldhand_SetText("目标已经被控制",0);
 		return;
 	end
 	
-	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Warrior_Test_Target_Debuff()) then
+	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Oldhand_Test_Target_Debuff()) then
 		mianyi1 = 0; mianyi2 = 0; isPlague = 0;
 		--Oldhand_SetText("开始攻击",26);	
 		Oldhand_SetText("自动攻击", 1);

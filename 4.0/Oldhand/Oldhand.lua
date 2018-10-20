@@ -17,6 +17,7 @@ local fishing_time = 0;       -- 最近钓上鱼的时间
 local fishing_id = 136245
 
 local oldhand_dps_module = {};
+local oldhand_notarget_module = {};
 
 local   Oldhand_DISEASE = '疾病';
 local 	Oldhand_MAGIC   = '魔法';
@@ -109,18 +110,22 @@ function Oldhand_AutoSelectMode()
 	if playerClass=="死亡骑士" and (DeathKnight_DpsOut1 ~= nil and DeathKnight_DpsOut2 ~= nil and DeathKnight_DpsOut3 ~= nil) then
 	  is_valid_class = true;
 	  oldhand_dps_module[englishClass] =  DeathKnight_DpsOut;
+	  oldhand_notarget_module[englishClass] = DeathKnight_NoTarget_RunCommand;
 	end;
 	if playerClass=="恶魔猎手" and (DemonHunter_DpsOut1 ~= nil and DemonHunter_DpsOut2 ~= nil and DemonHunter_DpsOut3 ~= nil) then
 	  is_valid_class = true;
 	  oldhand_dps_module[englishClass] =  DemonHunter_DpsOut;
+	  oldhand_notarget_module[englishClass] =  DemonHunter_NoTarget_RunCommand;
 	end;
   if playerClass=="战士" and (Warrior_DpsOut1 ~= nil and Warrior_DpsOut2 ~= nil and Warrior_DpsOut3 ~= nil) then
     is_valid_class = true;
     oldhand_dps_module[englishClass] = Warrior_DpsOut;
+    oldhand_notarget_module[englishClass] =  Warrior_NoTarget_RunCommand;
   end;
   if playerClass=="萨满祭司" and (Shaman_DpsOut1 ~= nil and Shaman_DpsOut2 ~= nil and Shaman_DpsOut3 ~= nil) then 
     is_valid_class = true;
     oldhand_dps_module[englishClass] = Shaman_DpsOut;
+    oldhand_notarget_module[englishClass] =  Shaman_NoTarget_RunCommand;
   end;
   
 	if not is_valid_class then return; end;
@@ -134,10 +139,10 @@ end
 -- 判断是否需要打断目标施法
 function Oldhand_BreakCasting(myspell)
 	local target_name = UnitName("target");
-	local spell,  _, displayName,  _, startTime,  endTime,  _, _, notInterruptible = UnitCastingInfo("target");
+	local spell, _, displayName, startTime, endTime, _,_, notInterruptible = UnitCastingInfo("target");
 	local is_channel = false;
 	if (spell == null) then
-	  spell,  _, displayName,  _, startTime,  endTime,  _, notInterruptible = UnitChannelInfo("target");
+	  spell, _, displayName, startTime, endTime, _, notInterruptible = UnitChannelInfo("target");
 	  is_channel = true;
 	end;
 	if (spell == null) then currTargetCasting = null; return 0; end;
@@ -151,6 +156,7 @@ function Oldhand_BreakCasting(myspell)
 	end;
 	
 	local remainTime = 1000;
+	local target_spellname;
 	
 	if endTime and startTime then
 		target_spellname = spell;
@@ -242,22 +248,27 @@ function Oldhand_RegisterEvents(self)
 	if playerClass=="死亡骑士" and (DeathKnight_DpsOut1 ~= nil and DeathKnight_DpsOut2 ~= nil and DeathKnight_DpsOut3 ~= nil) then
 	  is_valid_class = true;
 	  oldhand_dps_module[englishClass] =  DeathKnight_DpsOut;
+	  oldhand_notarget_module[englishClass] =  DeathKnight_NoTarget_RunCommand;
 	end;
 	if playerClass=="恶魔猎手" and (DemonHunter_DpsOut1 ~= nil and DemonHunter_DpsOut2 ~= nil and DemonHunter_DpsOut3 ~= nil) then
 	  is_valid_class = true;
 	  oldhand_dps_module[englishClass] =  DemonHunter_DpsOut;
+	  oldhand_notarget_module[englishClass] =  DemonHunter_NoTarget_RunCommand;
 	end;
   if playerClass=="战士" and (Warrior_DpsOut1 ~= nil and Warrior_DpsOut2 ~= nil and Warrior_DpsOut3 ~= nil) then
     is_valid_class = true;
     oldhand_dps_module[englishClass] = Warrior_DpsOut;
+    oldhand_notarget_module[englishClass] =  Warrior_NoTarget_RunCommand;
   end;
   if playerClass=="萨满祭司" and (Shaman_DpsOut1 ~= nil and Shaman_DpsOut2 ~= nil and Shaman_DpsOut3 ~= nil) then 
     is_valid_class = true;
     oldhand_dps_module[englishClass] = Shaman_DpsOut;
+    oldhand_notarget_module[englishClass] =  Shaman_NoTarget_RunCommand;
   end;
   if playerClass=="术士" and (Warlock_DpsOut1 ~= nil and Warlock_DpsOut2 ~= nil and Warlock_DpsOut3 ~= nil) then 
     is_valid_class = true;
     oldhand_dps_module[englishClass] = Warlock_DpsOut;
+    oldhand_notarget_module[englishClass] =  Warlock_NoTarget_RunCommand;
   end;
   
 	if not is_valid_class then return; end;
@@ -541,7 +552,7 @@ function Oldhand_Test_IsFriend(unitname, unitguid)
 		return true;
 	end
 	if (UnitInRaid("player")) then
-	  Oldhand_AddMessage("GetNumRaidMembers: "..GetNumRaidMembers());
+	  -- Oldhand_AddMessage("GetNumRaidMembers: "..GetNumRaidMembers());
 		for id=1, GetNumRaidMembers()  do
 			if UnitName("raid"..id) == unitname then
 				if UnitCanAttack("player", "raid"..id) then return false; end;
@@ -549,7 +560,7 @@ function Oldhand_Test_IsFriend(unitname, unitguid)
 			end;
 		end
 	else
-	  Oldhand_AddMessage("GetNumGroupMembers: "..GetNumGroupMembers());
+	  -- Oldhand_AddMessage("GetNumGroupMembers: "..GetNumGroupMembers());
 		for id=1, GetNumGroupMembers()  do
 			if UnitName("party"..id) == unitname then
 				if UnitCanAttack("player", "party"..id) then return false; end;
@@ -749,13 +760,27 @@ function Oldhand_Frame_OnUpdate()
 
 	if not UnitExists("playertarget") and not UnitExists("target") then
 		Oldhand_SetText("没有目标", 0);
+		
+		if playerClass == "萨满祭司" then
+	    Shaman_NoTarget_RunCommand();
+	  elseif playerClass == "死亡骑士" then
+	    DeathKnight_NoTarget_RunCommand();
+	  elseif playerClass == "恶魔猎手" then
+	    DemonHunter_NoTarget_RunCommand();
+	  elseif playerClass == "战士" then
+	    oldhand_notarget_module[englishClass]()
+	    Warrior_NoTarget_RunCommand();
+	  elseif playerClass == "术士" then
+	    Warlock_NoTarget_RunCommand();
+	  end;
+	  
 		return;
 	end;
-	if UnitIsDead("playertarget") then
+	if UnitIsDead("playertarget") and playerClass ~= "萨满祭司" then
 		Oldhand_SetText("目标死亡", 0);
 		return;
 	end;
-	if not UnitCanAttack("player", "target")  then
+	if not UnitCanAttack("player", "target") and playerClass ~= "萨满祭司" then
 		Oldhand_SetText("友善目标", 0);
 		return;
 	end;
@@ -790,7 +815,7 @@ end;
 
 function Oldhand_SelectPartyTarget(unitid)
 	if UnitIsUnit("target", "party"..unitid) then return false; end;
-	Oldhand_SetText("选取"..unitid.."个队友",unitid+29);
+	Oldhand_SetText("选取"..unitid.."个队友", unitid + 29);
 	return true;	
 end
 
@@ -931,7 +956,8 @@ end
 
 function Oldhand_CheckDebuffByPlayer(debuffName)
 	local i = 1;
-	local name, _, _, count, _, _, expirationTime, unitCaster = UnitDebuff("target", i);
+	-- name, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable
+	local name, _, count, _, _, expirationTime, unitCaster = UnitDebuff("target", i);
 	while name do
 		--Oldhand_AddMessage(string.format("name: %s, debuffName: %s, unitCaster: %s", name, debuffName, unitCaster));
 		if (name==debuffName) and (unitCaster=="player" or unitCaster==UnitName("player")) then
@@ -940,7 +966,8 @@ function Oldhand_CheckDebuffByPlayer(debuffName)
 			return true, temp, count;
 		end;
 		i = i+1;
-		name, _, _, count, _, _, expirationTime, unitCaster = UnitDebuff("target", i);
+		if i > 40 then break; end
+		name, _, count, _, _, expirationTime, unitCaster = UnitDebuff("target", i);
 	end
 	return false, 0, 0;
 end
@@ -989,7 +1016,7 @@ end
 
 function Oldhand_GetPlayerManaPercent(unit)
 	if UnitIsDeadOrGhost("player") then return 100; end
-	local mana, manamax = UnitMana("player"), UnitManaMax("player");
+	local mana, manamax = UnitPower("player", 0), UnitPowerMax("player", 0);
 	local ManaPercent = floor(mana*100/manamax+0.5);
 	return ManaPercent;
 end
@@ -1096,19 +1123,14 @@ function Oldhand_CombatLogEvent(event, ...)
 	local player_health, player_max_health = Oldhand_GetPlayerHealthPercent();
 	local valve_health = player_max_health / 10;
 	
-	--local timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags = ...
-	local timestamp, eventType, hideCaster, sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags = ...
+	local timestamp, eventType, hideCaster,                                                                                         -- arg1  to arg3
+       sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,                        -- arg4  to arg11
+       spellId, spellName, spellSchool = CombatLogGetCurrentEventInfo()
+       
 	local amount, school, resisted, blocked, absorbed, critical, glancing, crushing, missType, enviromentalType, interruptedSpellId, interruptedSpellName, interruptedSpellSchool;
-  local spellId, spellName, spellSchool;
-  
-  -- 1st Parameter (12th)	2nd Parameter (13th)	3rd Parameter (14th)
-  -- spellId	spellName	spellSchool
-  
-  -- 1st Param (15th)	2nd Param (16th)	3rd Param (17th)	4th Param (18th)	5th Param (19th)	6th Param (20th)	7th Param (21st)	8th Param (22nd)	9th Param (23rd)	10th Param (24th)
-  -- amount	overkill	school	resisted	blocked	absorbed	critical	glancing	crushing	isOffHand
-  
+
 	if eventType == "SPELL_CAST_SUCCESS" then
-		spellId, spellName, spellSchool = select(12, ...);
+		-- spellId, spellName, spellSchool = select(12, ...);
 		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_HOSTILE_PLAYERS) then
 				if spellName == "消失" and sourceName then
 					Oldhand_Warning_AddMessage("**敌对玩家>>"..sourceName.."<<使用了消失,反隐反隐!**");
@@ -1149,7 +1171,10 @@ function Oldhand_CombatLogEvent(event, ...)
 	end;
 
 	if eventType == "SPELL_MISSED" then
-		spellId, spellName, spellSchool, missType = select(12, ...);
+		missType = select(15, CombatLogGetCurrentEventInfo());
+		if sourceName == nil then
+		  sourceName = "未知";
+		end;
 		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) and spellName then
 			if missType == "RESIST" then
 				Oldhand_AddMessage("**>>"..destName.."<<抵抗了"..sourceName.."的"..spellName.."!**");
@@ -1196,7 +1221,8 @@ function Oldhand_CombatLogEvent(event, ...)
 	end;
 	if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) then
 		if (eventType == "SPELL_DAMAGE") then
-			spellId, spellName, spellSchool, amount, school, resisted, blocked, absorbed, critical, glancing, crushing = select(12, ...)
+			-- spellId, spellName, spellSchool, amount, school, resisted, blocked, absorbed, critical, glancing, crushing = select(12, ...)
+			amount, _, _, _, _, _, critical = select(15, CombatLogGetCurrentEventInfo())
 			if spellName and amount > valve_health then
 				if critical then
 					Oldhand_AddMessage("你的|cffffff00"..spellName.."|r|cff00ff00对|r|cffffff00"..destName.."|r|cff00ff00造成|r|cffffff00"..amount.."|r|cff00ff00伤害(|r|cffffff00爆击|r|cff00ff00)...|r");
@@ -1207,7 +1233,10 @@ function Oldhand_CombatLogEvent(event, ...)
 		end
 	end
 	if eventType == "SPELL_HEAL" then
-		spellId, spellName, spellSchool, amount, critical = select(12, ...);
+		-- spellId, spellName, spellSchool, amount, school, resisted, blocked, absorbed, critical
+		-- critical = school
+		-- spellId, spellName, spellSchool, amount, critical = select(12, ...);
+		amount, _, _, critical = select(15, CombatLogGetCurrentEventInfo())
 		if CombatLog_Object_IsA(sourceFlags, COMBATLOG_FILTER_MINE) and amount > valve_health and destName and sourceName then
 			if critical then
 				Oldhand_AddMessage("|cff00ff00你的|cffffff00"..spellName.."|r|cff00ff00给|r|cffffff00"..destName.."|r|cff00ff00恢复|r|cffffff00"..amount.."|r|cff00ff00点生命(|r|cffffff00爆击|r|cff00ff00)...|r");
@@ -1238,11 +1267,11 @@ end
 
 function Oldhand_DecreaseTarget(sourceGUID, sourceName, destGUID, destName)
 	if target_count > 0 then
-		if not Oldhand_Test_IsFriend(srcName) then
-			if target_table[srcGuid]~=null then
+		if not Oldhand_Test_IsFriend(destName, destGUID) then
+			if target_table[destGUID]~=null then
 				target_count = target_count-1;
-				target_table[srcGuid] = null;
-				Oldhand_AddMessage("战斗中目标数："..target_count.." "..destName.." 已被杀死或摧毁");
+				target_table[destGUID] = null;
+				Oldhand_AddMessage(destName.." 已被杀死或摧毁，当前战斗目标数："..target_count);
 			end;
 		end
 	end

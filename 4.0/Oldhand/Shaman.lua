@@ -72,8 +72,6 @@ shaman_action_table["元素冲击"] = 651244;
 
 shaman_action_table["图腾掌握"] = 511726;
 
-
-
 shaman_action_table["震地图腾"] = 451165;
 shaman_action_table["土元素"] = 136024;
 shaman_action_table["火元素"] = 135790;
@@ -83,6 +81,7 @@ shaman_action_table["升腾"] = 135791;
 -- 增强
 shaman_action_table["火舌"] = 135814;
 shaman_action_table["石拳"] = 1016351;
+shaman_action_table["石化"] = 136086;
 shaman_action_table["冰封"] = 462327;
 shaman_action_table["熔岩猛击"] = 236289;
 shaman_action_table["风暴打击"] = 132314;
@@ -94,9 +93,23 @@ shaman_action_table["野性狼魂"] = 237577;
 shaman_action_table["降雨"] = 136037;
 shaman_action_table["幽魂步"] = 132328;
 
+-- 治疗
+shaman_action_table["激流"] = 252995;
+shaman_action_table["治疗之雨"] = 237582;
+shaman_action_table["灵魂行者的恩赐"] = 451170;
+shaman_action_table["治疗之涌"] = 136044;
+shaman_action_table["治疗波"] = 136043;
+shaman_action_table["治疗链"] = 136042;
+shaman_action_table["先祖视界"] = 237576;
+shaman_action_table["闪电奔涌图腾"] = 136013;
+shaman_action_table["灵魂链接图腾"] = 237586;
+shaman_action_table["治疗之潮图腾"] = 538569;
+
 -- 饰品
 shaman_action_table["临近风暴之怒"] = 236164;
 shaman_action_table["伊萨诺斯甲虫"] = 236164;
+
+shaman_action_table["治疗石"] = 538745;
 
 -- 51 Racial_Troll_Berserk			狂暴
 -- 100 spell_shaman_unleashweapon_wind 风怒武器
@@ -137,47 +150,48 @@ function Shaman_CreateMacro()
 	--ClearCursor();
 
 
-  Oldhand_PutAction("治疗之涌", 7);
-  Oldhand_PutAction("先祖之魂", 11);
-  
-  Oldhand_PutAction("嗜血", 62);
-  Oldhand_PutAction("星界转移", 63);
-  Oldhand_PutAction("风剪", 64);
-  Oldhand_PutAction("陷地图腾", 65);
-  Oldhand_PutAction("净化术", 69);
-  Oldhand_PutAction("净化灵魂", 70);
-  
-  if Shaman_DPS == 1 then
-    Oldhand_PutAction("闪电箭", 2);
-    Oldhand_PutAction("烈焰震击", 3);
-    Oldhand_PutAction("熔岩爆裂", 4);
-    Oldhand_PutAction("大地震击", 5);
-    Oldhand_PutAction("冰霜震击", 6);
-    Oldhand_PutAction("闪电链", 8);
-    Oldhand_PutAction("雷霆风暴", 9);
-    Oldhand_PutAction("元素冲击", 10);
-    
-    Oldhand_PutAction("图腾掌握", 12);
-    
-    Oldhand_PutAction("升腾", 65);
-    Oldhand_PutAction("震地图腾", 66);
-    Oldhand_PutAction("土元素", 67);
-    Oldhand_PutAction("火元素", 68);
-  elseif Shaman_DPS == 2 then
-    Oldhand_PutAction("火舌", 2);
-    Oldhand_PutAction("石拳", 3);
-    Oldhand_PutAction("冰封", 4);
-    Oldhand_PutAction("熔岩猛击", 5);
-    Oldhand_PutAction("风暴打击", 6);
-    Oldhand_PutAction("闪电箭", 8);
-    Oldhand_PutAction("毁灭闪电", 9);
-    
-    Oldhand_PutAction("野性狼魂", 66);
-    Oldhand_PutAction("降雨", 67);
-    Oldhand_PutAction("幽魂步", 68);  
-  elseif Shaman_DPS == 3 then
-  
-  end;
+  -- Oldhand_PutAction("治疗之涌", 7);
+  -- Oldhand_PutAction("先祖之魂", 11);
+  -- 
+  -- Oldhand_PutAction("嗜血", 62);
+  -- Oldhand_PutAction("星界转移", 63);
+  -- Oldhand_PutAction("风剪", 64);
+  -- Oldhand_PutAction("陷地图腾", 65);
+  -- Oldhand_PutAction("净化术", 69);
+  -- Oldhand_PutAction("净化灵魂", 70);
+  -- 
+  -- if Shaman_DPS == 1 then
+  --   Oldhand_PutAction("闪电箭", 2);
+  --   Oldhand_PutAction("烈焰震击", 3);
+  --   Oldhand_PutAction("熔岩爆裂", 4);
+  --   Oldhand_PutAction("大地震击", 5);
+  --   Oldhand_PutAction("冰霜震击", 6);
+  --   Oldhand_PutAction("闪电链", 8);
+  --   Oldhand_PutAction("雷霆风暴", 9);
+  --   Oldhand_PutAction("元素冲击", 10);
+  --   
+  --   Oldhand_PutAction("图腾掌握", 12);
+  --   
+  --   Oldhand_PutAction("升腾", 65);
+  --   Oldhand_PutAction("震地图腾", 66);
+  --   Oldhand_PutAction("土元素", 67);
+  --   Oldhand_PutAction("火元素", 68);
+  --   
+  -- elseif Shaman_DPS == 2 then
+  --   Oldhand_PutAction("火舌", 2);
+  --   Oldhand_PutAction("石拳", 3);
+  --   Oldhand_PutAction("冰封", 4);
+  --   Oldhand_PutAction("熔岩猛击", 5);
+  --   Oldhand_PutAction("风暴打击", 6);
+  --   Oldhand_PutAction("闪电箭", 8);
+  --   Oldhand_PutAction("毁灭闪电", 9);
+  --   
+  --   Oldhand_PutAction("野性狼魂", 66);
+  --   Oldhand_PutAction("降雨", 67);
+  --   Oldhand_PutAction("幽魂步", 68);  
+  -- elseif Shaman_DPS == 3 then
+  -- 
+  -- end;
 
 	if Oldhand_TestTrinket("部落勋章") then
 		Oldhand_PutAction("部落勋章", 71);
@@ -436,7 +450,7 @@ end;
 
 -- 增强模式
 function Shaman_DpsOut2()
-    if Oldhand_Test_Target_Debuff() then 
+  if Oldhand_Test_Target_Debuff() then 
 		Oldhand_AddMessage(UnitName("target").."目标已经被控制...");			
 		Oldhand_SetText("目标已经被控制",0);
 		return;
@@ -469,16 +483,26 @@ function Shaman_DpsOut2()
   local partyNum = GetNumGroupMembers();
 	local power = UnitPower("player");
 	
-	if Oldhand_TargetCount() >= 3 and power >= 20 then
+  local isNearAction = IsActionInRange(Oldhand_GetActionID(shaman_action_table["熔岩猛击"])) == true;
+  
+  local buff1, remainTime1, count1 = Oldhand_PlayerBU("风暴使者");
+  local buff4, remainTime4, count4 = Oldhand_PlayerBU("山崩");
+  if (buff1 or buff4) and power >= 30 then
+    if Oldhand_CastSpell("风暴打击", shaman_action_table["风暴打击"]) then return true; end;
+  end;
+  
+  if power >= 80 then
+    if Oldhand_CastSpell("风暴打击", shaman_action_table["风暴打击"]) then return true; end;
+  end;
+  
+	if isNearAction and Oldhand_TargetCount() >= 3 and power >= 20 then
 	  if Oldhand_CastSpell_IgnoreRange("毁灭闪电", shaman_action_table["毁灭闪电"]) then return true; end;
 	end;
 
-  local isNearAction = IsActionInRange(shaman_action_table["熔岩猛击"]) == true;
-  
   local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
 	local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("player");
 
-  if isNearAction and target_health_percent * target_health > player_health / 4 then
+  if isNearAction and (target_health_percent * target_health / 100 > player_health / 3 or Oldhand_TargetCount() >= 2) then
     if Oldhand_CastSpell_IgnoreRange("毁灭之风", shaman_action_table["毁灭之风"]) then return true; end;
   end;
   
@@ -491,19 +515,21 @@ function Shaman_DpsOut2()
   if not buff3 then
     if Oldhand_CastSpell("火舌", shaman_action_table["火舌"]) then return true; end;
   end;
-    
-  local buff1, remainTime1, count1 = Oldhand_PlayerBU("风暴使者");
-  if buff1 or power >= 40 then
-    if Oldhand_CastSpell("风暴打击", shaman_action_table["风暴打击"]) then return true; end;
-  end;
-  
-  if power >= 70 then
-    if Oldhand_CastSpell("熔岩猛击", shaman_action_table["熔岩猛击"]) then return true; end;
-  elseif power >= 20 then
+
+  if power >= 30 then
     if Oldhand_CastSpell("风暴打击", shaman_action_table["风暴打击"]) then return true; end;
   end
+  if power >= 40 then
+    if Oldhand_CastSpell("熔岩猛击", shaman_action_table["熔岩猛击"]) then return true; end;
+  end
   
-  if Oldhand_CastSpell("石拳", shaman_action_table["石拳"]) then return true; end;
+  local buff5, remainTime5, count5 = Oldhand_PlayerBU("冰封");
+  if buff5 and power >= 20 then
+    if Oldhand_CastSpell("冰封", shaman_action_table["冰封"]) then return true; end;
+  end
+  
+  if Oldhand_CastSpell("石化", shaman_action_table["石化"]) then return true; end;
+  if Oldhand_CastSpell("火舌", shaman_action_table["火舌"]) then return true; end;
   if Oldhand_CastSpell("闪电箭", shaman_action_table["闪电箭"]) then return true; end;
 
 	Oldhand_SetText("无动作",0);
@@ -513,22 +539,6 @@ end;
 
 -- 治疗模式
 function Shaman_DpsOut3()
-    if Oldhand_Test_Target_Debuff() then 
-		Oldhand_AddMessage(UnitName("target").."目标已经被控制...");			
-		Oldhand_SetText("目标已经被控制",0);
-		return;
-	end
-	
-	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Oldhand_Test_Target_Debuff()) then
-		mianyi1 = 0; mianyi2 = 0; isPlague = 0;
-		--Oldhand_SetText("开始攻击",26);	
-		Oldhand_SetText("自动攻击", 1);
-		return true;
-	end;
-	if not Oldhand_TargetDeBU("飓风术") or not Oldhand_TargetBU("圣盾术") or not  Oldhand_TargetBU("保护之手") or  not Oldhand_TargetBU("寒冰屏障") or not  Oldhand_TargetBU("法术反射") or not  Oldhand_TargetDeBU("放逐术") then
-		Oldhand_SetText("目标无法攻击",0);
-		return ;
-	end;
 	if Shaman_playerSafe() then return true; end;
 	
 	if Oldhand_BreakCasting("风剪")==1 and Oldhand_CastSpell("风剪", shaman_action_table["风剪"]) then return true; end;
@@ -538,41 +548,34 @@ function Shaman_DpsOut3()
 
 	-- 增强饰品
 	if Shaman_Auto_Trinket() then return true; end;
-
-	local spell_name,_,_,count = UnitBuff("player", "漩涡武器");
-	if spell_name~=null then
-		if count>4 then
-			if Oldhand_CastSpell("闪电箭","Spell_Nature_Lightning") then return true; end;
-			if Oldhand_CastSpell("闪电链","Spell_Nature_ChainLightning") then return true; end;
-		end
-	end
-	if null~=Oldhand_PlayerBU("节能施法") then 
-		if Oldhand_CastSpell("大地震击","Spell_Nature_EarthShock") then return true; end;
-	end
-	if Oldhand_TargetDeBU("烈焰震击") then
-		if Oldhand_CastSpell("烈焰震击","Spell_Fire_FlameShock") then return true; end;
-		--if Oldhand_CastSpell("冰霜震击","Spell_Frost_FrostShock") then return true; end;
+	
+	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
+	if target_health_percent < 60 then
+	  if Oldhand_CastSpell("激流", shaman_action_table["激流"]) then return true; end;
 	end;
-	if 0~=IsActionInRange(Oldhand_GetActionID("Ability_Shaman_Lavalash")) then
-		if Oldhand_CastSpell("熔岩猛击","Ability_Shaman_Lavalash") then return true; end;
-		if Oldhand_CastSpell("风暴打击","Ability_Shaman_Stormstrike") then return true; end;
-	end
-	if 0~=IsActionInRange(Oldhand_GetActionID("Spell_Nature_EarthShock")) then
-		if Oldhand_CastSpell("大地震击","Spell_Nature_EarthShock") then return true; end;
-		--if Oldhand_CastSpell("冰霜震击","Spell_Frost_FrostShock") then return true; end;
-	else
-		if not Oldhand_TargetDeBU("烈焰震击") then
-			if Oldhand_CastSpell("熔岩爆裂","Spell_Shaman_LavaBurst") then return true; end;
-		end
-		if Oldhand_CastSpell("闪电箭","Spell_Nature_Lightning") then return true; end;
-	end
-	if UnitCanAttack("player", "target") and UnitName("player")~=tt_name and tt_name~=null then
-		
-		if Oldhand_CastSpell("闪电箭", "Spell_Nature_Lightning") then return true; end;
+	if target_health_percent < 70 then
+	  if Oldhand_CastSpell("治疗波", shaman_action_table["治疗波"]) then return true; end; 
+	elseif target_health_percent < 90 then
+	  if Oldhand_CastSpell("治疗之涌", shaman_action_table["治疗之涌"]) then return true; end;
 	end
 	
-	local tt_name = UnitName("targettarget");
+	if UnitCanAttack("player", "target") then
+	  local manapercent = Oldhand_GetPlayerManaPercent("player")
+	  if manapercent > 50 then
+  	  if Oldhand_TargetCount() >= 5 and target_health_percent > 60 then
+  	    if Oldhand_CastSpell("闪电链", shaman_action_table["闪电链"]) then return true; end;
+  	  end;
+  	  
+  	  if not Oldhand_TargetDeBU("烈焰震击") then
+        if Oldhand_CastSpell("熔岩爆裂", shaman_action_table["熔岩爆裂"]) then return true; end;
+      end;
+      if Oldhand_CastSpell("烈焰震击", shaman_action_table["烈焰震击"]) then return true; end;
+	    if Oldhand_CastSpell("闪电箭", shaman_action_table["闪电箭"]) then return true; end;
+	  end;
+	end
 	
+  -- local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("player");
+
 	Oldhand_SetText("无动作",0);
 	return;		
 
@@ -586,11 +589,16 @@ function Shaman_playerSafe()
 --	if debufftype==3 or debufftype==2 then
 --		if Oldhand_CastSpell("净化术", shaman_action_table["净化术"]) then return true; end;
 --	end
+  
 	if debufftype==1 or debufftype==4 then
 		if Oldhand_CastSpell("净化灵魂", shaman_action_table["净化灵魂"]) then return true; end;
 	end
 	
 	local HealthPercent, maxHealth = Oldhand_GetPlayerHealthPercent("player");
+	if HealthPercent < 70 then
+    if Oldhand_CastSpell_IgnoreRange("治疗石", shaman_action_table["治疗石"]) then return true; end;
+  end;
+  
 	--Oldhand_AddMessage("player health percent: "..HealthPercent);
 	if HealthPercent < 60 then
 		if Oldhand_CastSpell_IgnoreRange("星界转移", shaman_action_table["星界转移"]) then return true; end;
@@ -601,30 +609,20 @@ function Shaman_playerSafe()
   		if Oldhand_CastSpell_IgnoreRange("治疗之涌", shaman_action_table["治疗之涌"]) then return true; end;
   	end;
   else
-    local spell_name,_,_,count = UnitBuff("player", "漩涡武器");
+    local name, temp, count = Oldhand_PlayerBU("漩涡武器");
   	if UnitIsPlayer("playertarget") or HealthPercent < 55 then
   		if (spell_name~=null and count>4) or UnitAffectingCombat("player")==0 then
   			if Oldhand_CastSpell("治疗波", shaman_action_table["治疗波"]) then return true; end;
   		end
   	end;
   	if HealthPercent < 60 then
-  		if (spell_name~=null and count>3) or UnitAffectingCombat("player")==0 then
-  			if Oldhand_CastSpell("次级治疗波", shaman_action_table["次级治疗波"]) then return true; end;
-  		end		
-  	end
-  	if HealthPercent < 70 then
   		if UnitAffectingCombat("player")==0 then
   			if Oldhand_CastSpell("治疗波", shaman_action_table["治疗波"]) then return true; end;
   		end	
   	end
-  	if HealthPercent < 80 then
+  	if HealthPercent < 70 then
   		
   	end
-  	if HealthPercent < 90 then
-  		if (Oldhand_TestTrinket("英雄勋章")) then
-  			if Oldhand_CastSpell("英雄勋章","INV_Jewelry_Talisman_07") then return true; end;
-  		end
-  	end;
 	end;
 	return false;
 end;

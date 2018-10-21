@@ -35,14 +35,28 @@ DemonHunter_action_table["恶魔变形"] = 1247262;
 DemonHunter_action_table["疾影"] = 1305150;
 DemonHunter_action_table["幻影打击"] = 1305154;
 DemonHunter_action_table["混乱新星"] = 1305159;
-DemonHunter_action_table["伊利达雷之怒"] = 1117778;
+DemonHunter_action_table["献祭光环"] = 1344649;
+--DemonHunter_action_table["伊利达雷之怒"] = 1117778;
 
 -- 复仇
+DemonHunter_action_table["裂魂"] = 1344648;
+DemonHunter_action_table["灵魂裂劈"] = 1344653;
+DemonHunter_action_table["折磨"] = 1344654;
+DemonHunter_action_table["恶魔尖刺"] = 1344645;
+DemonHunter_action_table["恶魔变形"] = 1247263;
+DemonHunter_action_table["邪能之刃"] = 1344646;
+DemonHunter_action_table["献祭光环"] = 1344649;
+DemonHunter_action_table["烈火烙印"] = 1344647;
+DemonHunter_action_table["瓦解"] = 1305153;
+DemonHunter_action_table["投掷利刃"] = 1305159;
+DemonHunter_action_table["毁灭打击"] = 135291;
 DemonHunter_action_table["毁灭打击"] = 135291;
 
 -- 饰品
 DemonHunter_action_table["临近风暴之怒"] = 236164;
 DemonHunter_action_table["伊萨诺斯甲虫"] = 236164;
+
+DemonHunter_action_table["治疗石"] = 538745;
 
 function DemonHunter_CreateMacro()	
 --	if GetMacroIndexByName("打断施法") == 0 then
@@ -79,11 +93,6 @@ function DemonHunter_CreateMacro()
 			CreateMacro("复仇模式", 62, "/script DemonHunter_Input(1);", 0, 0);
 		end;
 		PickupMacro("复仇模式");
-	elseif DemonHunter_DPS == 3 then
-		if GetMacroIndexByName("防护模式") == 0 then
-			CreateMacro("防护模式", 62, "/script DemonHunter_Input(1);", 0, 0);
-		end;
-		PickupMacro("防护模式");
 	end
 	PlaceAction(50);
 	ClearCursor();
@@ -91,23 +100,10 @@ function DemonHunter_CreateMacro()
   Oldhand_PutAction("自动攻击", 1);
  
   if DemonHunter_DPS == 1 then
-    Oldhand_PutAction("恶魔之咬", 2);
-    Oldhand_PutAction("混乱打击", 3);
-    Oldhand_PutAction("刃舞", 4);
-    Oldhand_PutAction("眼棱", 5);    
-    Oldhand_PutAction("伊利达雷之怒", 6);
-    Oldhand_PutAction("疾影", 7);
-    Oldhand_PutAction("幻影打击", 8);
-    Oldhand_PutAction("恶魔变形", 12);
-    Oldhand_PutAction("邪能冲撞", 62);
-    Oldhand_PutAction("吞噬魔法", 64);
-    Oldhand_PutAction("投掷利刃", 65);
-    Oldhand_PutAction("混乱新星", 66);
-    Oldhand_PutAction("幽灵视觉", 72);
-    
+
   elseif DemonHunter_DPS == 2 then
 
-  elseif DemonHunter_DPS == 3 then
+  --elseif DemonHunter_DPS == 3 then
 
   end;
 
@@ -160,7 +156,7 @@ function DemonHunter_CreateMacro()
 	
 	SetBindingMacro(",","战争践踏");	-- 29
 	--SetBindingMacro("\'","活力分流");	-- 28
-	SetBindingMacro(";","打断施法");	-- 27
+	--SetBindingMacro(";","打断施法");	-- 27
 	--SetBindingMacro("\\","开始攻击");	-- 26
 	
 	SaveBindings(1);
@@ -276,8 +272,6 @@ function DemonHunter_DpsOut(dps_mode)
     DemonHunter_DpsOut1();
   elseif dps_mode == 2 then
     DemonHunter_DpsOut2();
-  elseif dps_mode == 3 then
-    DemonHunter_DpsOut3();
   else
     Oldhand_AddMessage("错误的天赋模式："..dps_mode);
   end;
@@ -306,7 +300,7 @@ function DemonHunter_DpsOut1()
   
 	local spellname = UnitCastingInfo("target") 
 	if null~=spellname then
-		if Oldhand_CastSpell("吞噬魔法", DemonHunter_action_table["吞噬魔法"]) then return true; end;
+		if Oldhand_CastSpell("瓦解", DemonHunter_action_table["瓦解"]) then return true; end;
 	end;
 	
 	-- 浩劫	Buff
@@ -322,25 +316,26 @@ function DemonHunter_DpsOut1()
 	  if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
 	else
   	-- local partyNum = GetNumGroupMembers();
-    if Oldhand_CastSpell_IgnoreRange("伊利达雷之怒", DemonHunter_action_table["伊利达雷之怒"]) then return true; end;
+    if Oldhand_CastSpell_IgnoreRange("献祭光环", DemonHunter_action_table["献祭光环"]) then return true; end;
     
-    if (isNearAction and Oldhand_TargetCount() >= 3 and power >= 50) then
+    if (isNearAction and power >= 30) then
   	   if Oldhand_CastSpell_IgnoreRange("眼棱", DemonHunter_action_table["眼棱"]) then return true; end;
   	   if Oldhand_CastSpell_IgnoreRange("刃舞", DemonHunter_action_table["刃舞"]) then return true; end;
-  	   if Oldhand_CastSpell_IgnoreRange("死亡横扫", DemonHunter_action_table["死亡横扫"]) then return true; end;
+  	   --if Oldhand_CastSpell_IgnoreRange("死亡横扫", DemonHunter_action_table["死亡横扫"]) then return true; end;
     end;	
   	
     if power >= 40 then
        if Oldhand_CastSpell("混乱打击", DemonHunter_action_table["混乱打击"]) then return true; end;
-       if Oldhand_CastSpell("毁灭", DemonHunter_action_table["毁灭"]) then return true; end;
+       --if Oldhand_CastSpell("毁灭", DemonHunter_action_table["毁灭"]) then return true; end;
     end
     
 ----if not Oldhand_PlayerBU("战吼") then
 ----	if Oldhand_CastSpell_IgnoreRange("战吼", DemonHunter_action_table["战吼"]) then return true; end;
 ----end  
-    if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
     
     if Oldhand_CastSpell("恶魔之咬", DemonHunter_action_table["恶魔之咬"]) then return true; end;
+    
+    if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
 
 	end;
  
@@ -351,6 +346,64 @@ end;
 
 -- 复仇模式
 function DemonHunter_DpsOut2()
+  if Oldhand_Test_Target_Debuff() then 
+		Oldhand_AddMessage(UnitName("target").."目标已经被控制...");			
+		Oldhand_SetText("目标已经被控制", 0);
+		return;
+	end
+	
+	if (not IsCurrentAction(Oldhand_Auto_Attack())) and (not Oldhand_Test_Target_Debuff()) then
+		--Oldhand_SetText("开始攻击",26);	
+		Oldhand_SetText("自动攻击", 1);
+		return true;
+	end;
+	if not Oldhand_TargetDeBU("飓风术") or not Oldhand_TargetBU("圣盾术") or not  Oldhand_TargetBU("保护之手") or  not Oldhand_TargetBU("寒冰屏障") or not  Oldhand_TargetBU("法术反射") or not  Oldhand_TargetDeBU("放逐术") then
+		Oldhand_SetText("目标无法攻击", 0);
+		return ;
+	end;
+	if DemonHunter_playerSafe() then return true;end;
+	
+	local power = UnitPower("player");
+  
+	local spellname = UnitCastingInfo("target") 
+	if null~=spellname then
+		if Oldhand_CastSpell("瓦解", DemonHunter_action_table["瓦解"]) then return true; end;
+	end;
+	
+	-- 复仇	Buff
+	if DemonHunter_RunCommand() then return true; end;
+
+	-- 复仇饰品
+	if DemonHunter_Auto_Trinket() then return true; end;
+	
+	-- 近战范围		
+	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["裂魂"]));
+	
+
+	if not isNearAction then
+    if Oldhand_CastSpell("邪能之刃", DemonHunter_action_table["邪能之刃"]) then return true; end;     
+    if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
+    if Oldhand_CastSpell("烈火烙印", DemonHunter_action_table["烈火烙印"]) then return true; end;
+	else
+	
+    if Oldhand_CastSpell("烈火烙印", DemonHunter_action_table["烈火烙印"]) then return true; end;
+	
+	  if Oldhand_CastSpell_IgnoreRange("献祭光环", DemonHunter_action_table["献祭光环"]) then return true; end;
+
+	  if power >= 30 then
+       if Oldhand_CastSpell("灵魂裂劈", DemonHunter_action_table["灵魂裂劈"]) then return true; end;
+    end
+  	  
+    if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
+
+    if Oldhand_CastSpell("邪能之刃", DemonHunter_action_table["邪能之刃"]) then return true; end;
+    	    
+    if Oldhand_CastSpell("裂魂", DemonHunter_action_table["裂魂"]) then return true; end;	  
+	
+	end;
+ 
+	Oldhand_SetText("无动作",0);
+	return;
 
 end;
 
@@ -359,7 +412,12 @@ function DemonHunter_DpsOut3()
 end;
 
 function DemonHunter_playerSafe()
+
   local HealthPercent = Oldhand_GetPlayerHealthPercent("player");
+  if HealthPercent < 70 then
+    if Oldhand_CastSpell_IgnoreRange("治疗石", DemonHunter_action_table["治疗石"]) then return true; end;
+  end;
+  
   if (DemonHunter_DPS == 1 and HealthPercent < 70) then
 	  Oldhand_AddMessage('血量过低 '..HealthPercent);
 	  if Oldhand_CastSpellIgnoreRange("疾影", DemonHunter_action_table["疾影"]) then return true; end;
@@ -370,6 +428,14 @@ function DemonHunter_playerSafe()
 	  Oldhand_AddMessage('血量过低 '..HealthPercent);
 	  if Oldhand_CastSpellIgnoreRange("混乱新星", DemonHunter_action_table["混乱新星"]) then return true; end;
 	end;
+	
+	  if (DemonHunter_DPS == 2 and HealthPercent < 90) then
+	    Oldhand_AddMessage('血量过低 '..HealthPercent);
+	    if Oldhand_CastSpellIgnoreRange("恶魔尖刺", DemonHunter_action_table["恶魔尖刺"]) then return true; end;
+	  elseif (DemonHunter_DPS == 2 and HealthPercent < 40) then
+	    Oldhand_AddMessage('血量过低 '..HealthPercent);
+	    if Oldhand_CastSpellIgnoreRange("恶魔变形", DemonHunter_action_table["恶魔变形"]) then return true; end;
+	  end;
 	return false;
 end;
 

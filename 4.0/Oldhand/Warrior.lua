@@ -54,12 +54,20 @@ warrior_action_table["暴怒"] = 132352;
 warrior_action_table["狂怒回复"] = 132345;
 warrior_action_table["英勇投掷"] = 132453;
 warrior_action_table["浴血奋战"] = 236304;
+
 -- 防护
 warrior_action_table["毁灭打击"] = 135291;
 warrior_action_table["盾牌猛击"] = 134951;
 warrior_action_table["雷霆一击"] = 136105;
 warrior_action_table["乘胜追击"] = 132342;
 warrior_action_table["盾牌格挡"] = 132110;
+
+warrior_action_table["无视苦痛"] = 1377132;
+warrior_action_table["震荡波"] = 236312;
+warrior_action_table["盾墙"] = 132362;
+warrior_action_table["拦截"] = 132365;
+warrior_action_table["复仇"] = 132353;
+warrior_action_table["集结呐喊"] = 132351;
 
 -- 饰品
 warrior_action_table["临近风暴之怒"] = 236164;
@@ -125,12 +133,12 @@ function Warrior_CreateMacro()
     Oldhand_PutAction("怒击", 63);
     
   elseif Warrior_DPS == 3 then
-    Oldhand_PutAction("毁灭打击", 2);
-    Oldhand_PutAction("盾牌猛击", 3);
-    Oldhand_PutAction("雷霆一击", 4);
-    Oldhand_PutAction("盾牌格挡", 7);    
-    Oldhand_PutAction("嘲讽", 62);
-    Oldhand_PutAction("乘胜追击", 63);  
+    --Oldhand_PutAction("毁灭打击", 2);
+    --Oldhand_PutAction("盾牌猛击", 3);
+    --Oldhand_PutAction("雷霆一击", 4);
+    --Oldhand_PutAction("盾牌格挡", 7);    
+    --Oldhand_PutAction("嘲讽", 62);
+    --Oldhand_PutAction("乘胜追击", 63);  
   end;
 
 	if Oldhand_TestTrinket("部落勋章") then
@@ -547,55 +555,80 @@ function Warrior_DpsOut3()
 	end;
 	if Warrior_playerSafe() then return true; end;
 	
-	if 0~=IsActionInRange(Oldhand_GetActionID("Spell_Nature_EarthShock")) then
-		local spellname = UnitCastingInfo("target") 
-		if null~=spellname then
-			if Oldhand_CastSpell("风剪", "Spell_Nature_Cyclone") then return true; end;
-		end;
+	local power = UnitPower("player");
+	
+  local partyNum = GetNumGroupMembers();
+  local target_count = Oldhand_TargetCount()
+  
+  Oldhand_AddMessage(power.." "..target_count);
+  
+  -- 近战范围
+	local isNearAction = IsActionInRange(Oldhand_GetActionID(warrior_action_table["盾牌猛击"])) or IsActionInRange(Oldhand_GetActionID(warrior_action_table["复仇"]));
+	
+	local target_health_percent, target_health = Oldhand_GetPlayerHealthPercent("target");
+	local player_health_percent, player_health = Oldhand_GetPlayerHealthPercent("player");
+  
+	if Oldhand_BreakCasting("拳击")==1 then
+	  if Oldhand_CastSpell("拳击", warrior_action_table["拳击"]) then return true; end;
 	end;
 	
-	-- 增强	Buff
-	if Warrior_RunCommand() then return true; end;
+	-- 狂怒	Buff
+	if Warrior_RunCommand(isNearAction) then return true; end;
 
-	-- 增强饰品
+	-- 狂怒饰品
 	if Warrior_Auto_Trinket() then return true; end;
-
-	local spell_name,_,_,count = UnitBuff("player", "漩涡武器");
-	if spell_name~=null then
-		if count>4 then
-			if Oldhand_CastSpell("闪电箭","Spell_Nature_Lightning") then return true; end;
-			if Oldhand_CastSpell("闪电链","Spell_Nature_ChainLightning") then return true; end;
-		end
-	end
-	if null~=Oldhand_PlayerBU("节能施法") then 
-		if Oldhand_CastSpell("大地震击","Spell_Nature_EarthShock") then return true; end;
-	end
-	if Oldhand_TargetDeBU("烈焰震击") then
-		if Oldhand_CastSpell("烈焰震击","Spell_Fire_FlameShock") then return true; end;
-		--if Oldhand_CastSpell("冰霜震击","Spell_Frost_FrostShock") then return true; end;
-	else
-		
+	
+	if player_health_percent < 50 then
+	  if Oldhand_CastSpell("破斧沉舟", warrior_action_table["破斧沉舟"]) then return true; end;
 	end;
-	if 0~=IsActionInRange(Oldhand_GetActionID("Ability_Warrior_Lavalash")) then
-		if Oldhand_CastSpell("熔岩猛击","Ability_Warrior_Lavalash") then return true; end;
-		if Oldhand_CastSpell("风暴打击","Ability_Warrior_Stormstrike") then return true; end;
-	end
-	if 0~=IsActionInRange(Oldhand_GetActionID("Spell_Nature_EarthShock")) then
-		if Oldhand_CastSpell("大地震击","Spell_Nature_EarthShock") then return true; end;
-		--if Oldhand_CastSpell("冰霜震击","Spell_Frost_FrostShock") then return true; end;
-	else
-		if not Oldhand_TargetDeBU("烈焰震击") then
-			if Oldhand_CastSpell("熔岩爆裂","Spell_Warrior_LavaBurst") then return true; end;
-		end
-		if Oldhand_CastSpell("闪电箭","Spell_Nature_Lightning") then return true; end;
-	end
-	if UnitCanAttack("player", "target") and UnitName("player")~=tt_name and tt_name~=null then
-		
-		if Oldhand_CastSpell("闪电箭","Spell_Nature_Lightning") then return true; end;
-	end
+	if player_health_percent < 60 then
+	  if Oldhand_CastSpell("盾墙", warrior_action_table["盾墙"]) then return true; end;
+	end;
+	if player_health_percent < 70 then
+	  if Oldhand_CastSpell("法术反射", warrior_action_table["法术反射"]) then return true; end;
+	end;
+	if player_health_percent < 80 then
+	  if Oldhand_CastSpell("集结呐喊", warrior_action_table["集结呐喊"]) then return true; end;
+	  if Oldhand_CastSpell("乘胜追击", warrior_action_table["乘胜追击"]) then return true; end;
+	end;
 	
-	local tt_name = UnitName("targettarget");
+	if isNearAction and (Oldhand_PlayerBU("复仇！") or power > 90) then
+	  if Oldhand_CastSpell("复仇", warrior_action_table["复仇"]) then return true; end;
+	end;
 	
+	if player_health_percent < 90 then
+	  if Oldhand_CastSpell("无视苦痛", warrior_action_table["无视苦痛"]) then return true; end;
+	end;
+
+  if target_count >= 4 then
+    if Oldhand_CastSpell("震荡波", warrior_action_table["震荡波"]) then return true; end;
+  end;
+  if target_count >= 3 then
+    if Oldhand_CastSpell("雷霆一击", warrior_action_table["雷霆一击"]) then return true; end;
+  end;
+  
+  if power >= 30 and isNearAction then
+    if Oldhand_CastSpellIgnoreRange("盾牌格挡", warrior_action_table["盾牌格挡"]) then return true; end;
+    if target_count >= 3 then
+      if Oldhand_CastSpell("复仇", warrior_action_table["复仇"]) then return true; end;
+    end
+  end;
+  
+  if Oldhand_CastSpellIgnoreRange("天神下凡", warrior_action_table["天神下凡"]) then return true; end;
+  
+  if isNearAction then
+	  if Oldhand_CastSpell("盾牌猛击", warrior_action_table["盾牌猛击"]) then return true; end;
+	  if Oldhand_CastSpell("复仇", warrior_action_table["复仇"]) then return true; end;
+	end;
+	
+	if Oldhand_CastSpellIgnoreRange("雷霆一击", warrior_action_table["雷霆一击"]) then return true; end;
+	
+	if isNearAction and power > 40 then
+    if Oldhand_CastSpell("复仇", warrior_action_table["复仇"]) then return true; end;
+  end
+  
+  if Oldhand_CastSpellIgnoreRange("震荡波", warrior_action_table["震荡波"]) then return true; end;
+    
 	Oldhand_SetText("无动作",0);
 	return;		
 

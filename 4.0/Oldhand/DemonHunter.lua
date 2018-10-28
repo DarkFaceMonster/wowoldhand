@@ -49,8 +49,10 @@ DemonHunter_action_table["献祭光环"] = 1344649;
 DemonHunter_action_table["烈火烙印"] = 1344647;
 DemonHunter_action_table["瓦解"] = 1305153;
 DemonHunter_action_table["投掷利刃"] = 1305159;
-DemonHunter_action_table["毁灭打击"] = 135291;
-DemonHunter_action_table["毁灭打击"] = 135291;
+DemonHunter_action_table["沉默咒符"] = 1418288;
+DemonHunter_action_table["烈焰咒符"] = 1344652;
+DemonHunter_action_table["悲苦咒符"] = 1418287;
+
 
 -- 饰品
 DemonHunter_action_table["临近风暴之怒"] = 236164;
@@ -320,13 +322,13 @@ function DemonHunter_DpsOut1()
     
     if (isNearAction and power >= 30) then
   	   if Oldhand_CastSpell_IgnoreRange("眼棱", DemonHunter_action_table["眼棱"]) then return true; end;
-  	   if Oldhand_CastSpell_IgnoreRange("刃舞", DemonHunter_action_table["刃舞"]) then return true; end;
-  	   --if Oldhand_CastSpell_IgnoreRange("死亡横扫", DemonHunter_action_table["死亡横扫"]) then return true; end;
+  	   if Oldhand_CastSpell_IgnoreRange("死亡横扫", DemonHunter_action_table["死亡横扫"]) then return true; end;
+  	   if Oldhand_CastSpell_IgnoreRange("刃舞", DemonHunter_action_table["刃舞"]) then return true; end;  	   
     end;	
   	
     if power >= 40 then
-       if Oldhand_CastSpell("混乱打击", DemonHunter_action_table["混乱打击"]) then return true; end;
-       --if Oldhand_CastSpell("毁灭", DemonHunter_action_table["毁灭"]) then return true; end;
+       if Oldhand_CastSpell("毁灭", DemonHunter_action_table["毁灭"]) then return true; end;
+       if Oldhand_CastSpell("混乱打击", DemonHunter_action_table["混乱打击"]) then return true; end;      
     end
     
 ----if not Oldhand_PlayerBU("战吼") then
@@ -389,12 +391,16 @@ function DemonHunter_DpsOut2()
     if Oldhand_CastSpell("烈火烙印", DemonHunter_action_table["烈火烙印"]) then return true; end;
 	
 	  if Oldhand_CastSpell_IgnoreRange("献祭光环", DemonHunter_action_table["献祭光环"]) then return true; end;
+	  
+	  if Oldhand_CastSpell_IgnoreRange("沉默咒符", DemonHunter_action_table["沉默咒符"]) then return true; end;
 
 	  if power >= 30 then
        if Oldhand_CastSpell("灵魂裂劈", DemonHunter_action_table["灵魂裂劈"]) then return true; end;
     end
   	  
     if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
+    
+    if Oldhand_CastSpell_IgnoreRange("烈焰咒符", DemonHunter_action_table["烈焰咒符"]) then return true; end;
 
     if Oldhand_CastSpell("邪能之刃", DemonHunter_action_table["邪能之刃"]) then return true; end;
     	    
@@ -435,6 +441,9 @@ function DemonHunter_playerSafe()
 	  elseif (DemonHunter_DPS == 2 and HealthPercent < 40) then
 	    Oldhand_AddMessage('血量过低 '..HealthPercent);
 	    if Oldhand_CastSpellIgnoreRange("恶魔变形", DemonHunter_action_table["恶魔变形"]) then return true; end;
+	  elseif (DemonHunter_DPS == 2 and HealthPercent < 20) then
+	    Oldhand_AddMessage('血量过低 '..HealthPercent);
+	    if Oldhand_CastSpellIgnoreRange("悲苦咒符", DemonHunter_action_table["悲苦咒符"]) then return true; end;
 	  end;
 	return false;
 end;

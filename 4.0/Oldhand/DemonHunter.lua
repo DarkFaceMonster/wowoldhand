@@ -52,6 +52,7 @@ DemonHunter_action_table["投掷利刃"] = 1305159;
 DemonHunter_action_table["沉默咒符"] = 1418288;
 DemonHunter_action_table["烈焰咒符"] = 1344652;
 DemonHunter_action_table["悲苦咒符"] = 1418287;
+DemonHunter_action_table["灵魂壁障"] = 2065625;
 
 
 -- 饰品
@@ -438,6 +439,9 @@ function DemonHunter_playerSafe()
 	  if (DemonHunter_DPS == 2 and HealthPercent < 90) then
 	    Oldhand_AddMessage('血量过低 '..HealthPercent);
 	    if Oldhand_CastSpellIgnoreRange("恶魔尖刺", DemonHunter_action_table["恶魔尖刺"]) then return true; end;
+	  elseif (DemonHunter_DPS == 2 and HealthPercent < 80) then
+	    Oldhand_AddMessage('血量过低 '..HealthPercent);
+	    if Oldhand_CastSpellIgnoreRange("灵魂壁障", DemonHunter_action_table["灵魂壁障"]) then return true; end;
 	  elseif (DemonHunter_DPS == 2 and HealthPercent < 40) then
 	    Oldhand_AddMessage('血量过低 '..HealthPercent);
 	    if Oldhand_CastSpellIgnoreRange("恶魔变形", DemonHunter_action_table["恶魔变形"]) then return true; end;

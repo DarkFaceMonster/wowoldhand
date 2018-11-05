@@ -300,11 +300,6 @@ function DemonHunter_DpsOut1()
 	if DemonHunter_playerSafe() then return true;end;
 	
 	local power = UnitPower("player");
-  
-	local spellname = UnitCastingInfo("target") 
-	if null~=spellname then
-		if Oldhand_CastSpell("瓦解", DemonHunter_action_table["瓦解"]) then return true; end;
-	end;
 	
 	-- 浩劫	Buff
 	if DemonHunter_RunCommand() then return true; end;
@@ -314,6 +309,10 @@ function DemonHunter_DpsOut1()
 	
 	-- 近战范围		
 	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["恶魔之咬"]));
+	
+	if Oldhand_BreakCasting("瓦解")==1 then
+	  if Oldhand_CastSpell("瓦解", DemonHunter_action_table["瓦解"]) then return true; end;
+	end;
 	
 	if not isNearAction then
 	  if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;
@@ -369,9 +368,6 @@ function DemonHunter_DpsOut2()
 	local power = UnitPower("player");
   
 	local spellname = UnitCastingInfo("target") 
-	if null~=spellname then
-		if Oldhand_CastSpell("瓦解", DemonHunter_action_table["瓦解"]) then return true; end;
-	end;
 	
 	-- 复仇	Buff
 	if DemonHunter_RunCommand() then return true; end;
@@ -382,7 +378,10 @@ function DemonHunter_DpsOut2()
 	-- 近战范围		
 	local isNearAction = IsActionInRange(Oldhand_GetActionID(DemonHunter_action_table["裂魂"]));
 	
-
+	if Oldhand_BreakCasting("瓦解")==1 then
+	  if Oldhand_CastSpell("瓦解", DemonHunter_action_table["瓦解"]) then return true; end;
+	end;
+	
 	if not isNearAction then
     if Oldhand_CastSpell("邪能之刃", DemonHunter_action_table["邪能之刃"]) then return true; end;     
     if Oldhand_CastSpell("投掷利刃", DemonHunter_action_table["投掷利刃"]) then return true; end;

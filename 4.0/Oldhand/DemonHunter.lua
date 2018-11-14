@@ -418,36 +418,36 @@ function DemonHunter_DpsOut3()
 end;
 
 function DemonHunter_playerSafe()
-
   local HealthPercent = Oldhand_GetPlayerHealthPercent("player");
   if HealthPercent < 70 then
     if Oldhand_CastSpell_IgnoreRange("治疗石", DemonHunter_action_table["治疗石"]) then return true; end;
   end;
-  
-  if (DemonHunter_DPS == 1 and HealthPercent < 70) then
-	  Oldhand_AddMessage('血量过低 '..HealthPercent);
-	  if Oldhand_CastSpellIgnoreRange("疾影", DemonHunter_action_table["疾影"]) then return true; end;
-  elseif (DemonHunter_DPS == 1 and HealthPercent < 60) then
-	  Oldhand_AddMessage('血量过低 '..HealthPercent);
-	  if Oldhand_CastSpellIgnoreRange("幻影打击", DemonHunter_action_table["幻影打击"]) then return true; end;
-  elseif (DemonHunter_DPS == 1 and HealthPercent < 40) then
-	  Oldhand_AddMessage('血量过低 '..HealthPercent);
-	  if Oldhand_CastSpellIgnoreRange("混乱新星", DemonHunter_action_table["混乱新星"]) then return true; end;
+  if (DemonHunter_DPS == 1) then
+    if (HealthPercent < 70) then  
+  	  if Oldhand_CastSpellIgnoreRange("疾影", DemonHunter_action_table["疾影"]) then return true; end;
+  	end;
+    if (HealthPercent < 60) then
+  	  if Oldhand_CastSpellIgnoreRange("幻影打击", DemonHunter_action_table["幻影打击"]) then return true; end;
+  	end;
+    if (HealthPercent < 50) then
+  	  if Oldhand_CastSpellIgnoreRange("混乱新星", DemonHunter_action_table["混乱新星"]) then return true; end;
+  	end;
 	end;
 	
-	  if (DemonHunter_DPS == 2 and HealthPercent < 90) then
-	    Oldhand_AddMessage('血量过低 '..HealthPercent);
-	    if Oldhand_CastSpellIgnoreRange("恶魔尖刺", DemonHunter_action_table["恶魔尖刺"]) then return true; end;
-	  elseif (DemonHunter_DPS == 2 and HealthPercent < 80) then
-	    Oldhand_AddMessage('血量过低 '..HealthPercent);
-	    if Oldhand_CastSpellIgnoreRange("灵魂壁障", DemonHunter_action_table["灵魂壁障"]) then return true; end;
-	  elseif (DemonHunter_DPS == 2 and HealthPercent < 40) then
-	    Oldhand_AddMessage('血量过低 '..HealthPercent);
-	    if Oldhand_CastSpellIgnoreRange("恶魔变形", DemonHunter_action_table["恶魔变形"]) then return true; end;
-	  elseif (DemonHunter_DPS == 2 and HealthPercent < 20) then
-	    Oldhand_AddMessage('血量过低 '..HealthPercent);
-	    if Oldhand_CastSpellIgnoreRange("悲苦咒符", DemonHunter_action_table["悲苦咒符"]) then return true; end;
-	  end;
+	if (DemonHunter_DPS == 2) then
+  	if (HealthPercent < 50) then
+  	  if Oldhand_CastSpellIgnoreRange("悲苦咒符", DemonHunter_action_table["悲苦咒符"]) then return true; end;
+  	end;
+  	if (HealthPercent < 60) then	    
+  	  if Oldhand_CastSpellIgnoreRange("恶魔变形", DemonHunter_action_table["恶魔变形"]) then return true; end;
+  	end;
+  	if (HealthPercent < 80) then
+  	  if Oldhand_CastSpellIgnoreRange("灵魂壁障", DemonHunter_action_table["灵魂壁障"]) then return true; end;
+  	end;
+  	if (HealthPercent < 90) then
+  	  if Oldhand_CastSpellIgnoreRange("恶魔尖刺", DemonHunter_action_table["恶魔尖刺"]) then return true; end;
+  	end;
+	end;
 	return false;
 end;
 

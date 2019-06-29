@@ -362,7 +362,8 @@ function Oldhand_Test_Target_Debuff()
 end	
 
 function Oldhand_GetItemInfo(slotId)
-	local mainHandLink = GetInventoryItemLink("player",slotId);
+	local mainHandLink = GetInventoryItemLink("player", slotId);
+	Oldhand_AddMessage(mainHandLink)
 	local _, _, itemCode = strfind(mainHandLink, "(%d+):");
 	local itemName, _, _, _, _, itemType = GetItemInfo(itemCode);
 	return itemName;

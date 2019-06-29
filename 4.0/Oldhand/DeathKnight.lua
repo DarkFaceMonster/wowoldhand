@@ -235,6 +235,7 @@ function DeathKnight_CreateMacro()
 	--	PlaceAction(1);
 	--	ClearCursor();	
 	--end;
+	Oldhand_PutAction("血性狂怒", 6);
 	Oldhand_PutAction("灵界打击", 7);
 	
 	Oldhand_PutAction("反魔法护罩", 11);
@@ -247,23 +248,21 @@ function DeathKnight_CreateMacro()
 		
 	if DeathKnight_DPS==1 then
 		Oldhand_PutAction("冰冷触摸", 3);
-		Oldhand_PutAction("血性狂怒", 6);
+		
 		Oldhand_PutAction("符文刃舞", 71);
 	elseif DeathKnight_DPS==2 then
 	  Oldhand_PutAction("湮没", 2);
 		Oldhand_PutAction("凛风冲击", 3);
 		Oldhand_PutAction("冰霜打击", 5);
-		Oldhand_PutAction("辛达苟萨之怒", 6);
+		Oldhand_PutAction("辛达苟萨之怒", 9);
 		Oldhand_PutAction("冰霜之柱", 8);
-		Oldhand_PutAction("血性狂怒", 9);
 		Oldhand_PutAction("冷酷严冬", 10);
 		
 	elseif DeathKnight_DPS==3 then
 		Oldhand_PutAction("暗影之爪", 2);   -- 615099
 		Oldhand_PutAction("脓疮打击", 3);   -- 879926
 		Oldhand_PutAction("凋零缠绕", 4);   -- 136145
-	  Oldhand_PutAction("灵魂收割", 6);
-	  Oldhand_PutAction("血性狂怒", 9);
+	  Oldhand_PutAction("灵魂收割", 9);
 		--Oldhand_PutAction("白骨之盾", 8);
 		Oldhand_PutAction("黑暗突变", 10);
 		Oldhand_PutAction("传染", 62);

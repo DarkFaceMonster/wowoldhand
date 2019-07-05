@@ -106,6 +106,7 @@ deathknight_action_table["符文武器增效"] = 135372;
 deathknight_action_table["冰霜突进"] = 537514;
 deathknight_action_table["冷酷严冬"] = 538770;
 deathknight_action_table["辛达苟萨之怒"] = 341980;
+deathknight_action_table["火红烈焰"] = 3015740;
 
 -- 邪恶
 deathknight_action_table["暗影之爪"] = 615099;
@@ -633,7 +634,7 @@ function DeathKnight_DpsOut2()
   	  if Oldhand_CastSpell("凛风冲击", deathknight_action_table["凛风冲击"]) then return true; end;
   	  if Oldhand_CastSpellIgnoreRange("冰川突进", deathknight_action_table["冰川突进"]) then return true; end;
   	end
-    
+    if Oldhand_CastSpell("火红烈焰", deathknight_action_table["火红烈焰"]) then return true; end;
     if Oldhand_PlayerBU("杀戮机器") then
       if Oldhand_CastSpell("杀戮机器.湮灭", deathknight_action_table["湮灭"]) then return true; end;
   	  if Oldhand_CastSpell("杀戮机器.冰霜之镰", deathknight_action_table["冰霜之镰"]) then return true; end;

@@ -140,6 +140,7 @@ deathknight_action_table["奥拉留斯的低语水晶"] = 340336;
 deathknight_action_table["普兰比尔德的合剂"] = 132788;
 deathknight_action_table["大副的望远镜"] = 134441;
 deathknight_action_table["杰斯的咆哮"] = 538568;
+deathknight_action_table["实用发条晶塔"] = 133003;
 
 deathknight_action_table["治疗石"] = 538745;
 
@@ -425,7 +426,8 @@ end;
 
 function DeathKnight_Auto_Trinket()
   -- 是否近战范围
-  local isNearAction = IsActionInRange(Oldhand_GetActionID(237517)) == true;
+  local isNearAction = IsActionInRange(Oldhand_GetActionID(deathknight_action_table["灵界打击"])) or IsActionInRange(Oldhand_GetActionID(deathknight_action_table["骨髓分裂"])) or 
+	                     IsActionInRange(Oldhand_GetActionID(deathknight_action_table["符文打击"])) or IsActionInRange(Oldhand_GetActionID(deathknight_action_table["心脏打击"]));
   
 	if null==Oldhand_PlayerBU("极化") then
 		if Oldhand_TestTrinket("磁力之镜") and (isNearAction)  then
@@ -451,7 +453,7 @@ function DeathKnight_Auto_Trinket()
 	if null==Oldhand_PlayerBU("怒火") and null==Oldhand_PlayerBU("狂怒") then
 	  local range1 = IsActionInRange(Oldhand_GetActionID("Spell_DeathKnight_EmpowerRuneBlade2")); -- 冰霜打击
 	  
-	  --if range1 == 1 then
+	  --if range1 == 1 then 
 	  --  Oldhand_AddMessage("冰霜打击 距离 ....... 1");
 	  --elseif range1 == 0 then
 	  --  Oldhand_AddMessage("冰霜打击 距离 ....... 0");
@@ -514,6 +516,12 @@ function DeathKnight_Auto_Trinket()
 			if Oldhand_CastSpellbyID("外交徽记", spell_table["外交徽记"]) then return true; end		
 		end
 	end
+	if null==Oldhand_PlayerBU("实用发条晶塔") then
+		if Oldhand_TestTrinket("实用发条晶塔") and isNearAction then
+			if Oldhand_CastSpellIgnoreRange("实用发条晶塔", deathknight_action_table["实用发条晶塔"]) then return true; end;
+		end
+	end
+	
 	
 	--if Oldhand_GetActionID("INV_Misc_MonsterScales_15") ~= 0 then
 	--	if Oldhand_TestTrinket("嗜血胸针") and (IsActionInRange(Oldhand_GetActionID("Spell_Deathknight_DeathStrike")) == 1)  then

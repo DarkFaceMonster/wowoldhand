@@ -75,6 +75,7 @@ warrior_action_table["伊萨诺斯甲虫"] = 236164;
 warrior_action_table["霸权印记"] = 134086;
 warrior_action_table["残次的反制机关"] = 237468;
 warrior_action_table["活性血瓶"] = 1387657;
+warrior_action_table["狂战士的魂能战符"] = 136088;
 
 function Warrior_CreateMacro()	
 --	if GetMacroIndexByName("打断施法") == 0 then
@@ -125,12 +126,12 @@ function Warrior_CreateMacro()
  
   if Warrior_DPS == 1 then
   elseif Warrior_DPS == 2 then
-    Oldhand_PutAction("嗜血", 2);
-    Oldhand_PutAction("狂暴挥砍", 3);
-    Oldhand_PutAction("暴怒", 4);
-    Oldhand_PutAction("狂怒回复", 7);    
-    Oldhand_PutAction("斩杀", 62);
-    Oldhand_PutAction("怒击", 63);
+    --Oldhand_PutAction("嗜血", 2);
+    --Oldhand_PutAction("狂暴挥砍", 3);
+    --Oldhand_PutAction("暴怒", 4);
+    --Oldhand_PutAction("狂怒回复", 7);    
+    --Oldhand_PutAction("斩杀", 62);
+    --Oldhand_PutAction("怒击", 63);
     
   elseif Warrior_DPS == 3 then
     --Oldhand_PutAction("毁灭打击", 2);
@@ -190,7 +191,7 @@ function Warrior_CreateMacro()
 	
 	SetBindingMacro(",","战争践踏");	-- 29
 	--SetBindingMacro("\'","活力分流");	-- 28
-	SetBindingMacro(";","打断施法");	-- 27
+	--SetBindingMacro(";","打断施法");	-- 27
 	--SetBindingMacro("\\","开始攻击");	-- 26
 	
 	SaveBindings(1);
@@ -374,6 +375,8 @@ function Warrior_DpsOut1()
 	-- 狂怒饰品
 	if Warrior_Auto_Trinket() then return true; end;
 	
+	
+	
 	-- local buff2, remain_time2, count2 = Oldhand_PlayerBU("怒火聚焦");
   -- if power >= 28 and (not buff2 or count2 < 3) then
   --   if Oldhand_CastSpell_IgnoreRange("怒火聚焦", warrior_action_table["怒火聚焦"]) then return true; end;
@@ -386,7 +389,12 @@ function Warrior_DpsOut1()
 	    if Oldhand_CastSpell("英勇投掷", warrior_action_table["英勇投掷"]) then return true; end;
 	  end
 	else
-	  
+	  if Oldhand_TestTrinket("狂战士的魂能战符") then
+    	local buff = Oldhand_PlayerBU("狂战士之怒");
+    	if not buff then
+    		if Oldhand_CastSpellIgnoreRange("狂战士的魂能战符", warrior_action_table["狂战士的魂能战符"]) then return true; end;
+    	end;
+    end
 	  if Oldhand_TestTrinket("活性血瓶") then
     	local buff = Oldhand_PlayerBU("我敌之血");
     	if not buff then

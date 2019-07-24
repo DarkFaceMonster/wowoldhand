@@ -453,7 +453,7 @@ function DeathKnight_Auto_Trinket()
 	if null==Oldhand_PlayerBU("怒火") and null==Oldhand_PlayerBU("狂怒") then
 	  local range1 = IsActionInRange(Oldhand_GetActionID("Spell_DeathKnight_EmpowerRuneBlade2")); -- 冰霜打击
 	  
-	  --if range1 == 1 then 
+	  --if range1 == 1 then
 	  --  Oldhand_AddMessage("冰霜打击 距离 ....... 1");
 	  --elseif range1 == 0 then
 	  --  Oldhand_AddMessage("冰霜打击 距离 ....... 0");
